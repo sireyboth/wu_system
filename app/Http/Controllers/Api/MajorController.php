@@ -5,108 +5,71 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\MajorRequest;
 use App\Http\Resources\MajorResource;
 use App\Models\Major;
-use function App\Helpers\handle;
 use Illuminate\Http\Request;
 
 class MajorController extends Controller
 {
     public function __construct()
     {
-        $this->name = 'Major';
+        $this->name          = 'Major';
+        $this->model         = Major::class;
+        $this->resource      = MajorResource::class;
+        $this->relationships = ['faculty:id,shortcut,name,name_en,name_kh'];
     }
 
     /**
-     * Display a listing of majors.
+     * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $per_page = $request->integer('per_page', 10);
-        $result   = Major::query()
-            ->when($request->filled('search'), fn($q) => $q->search($request->search))
-            ->when($request->filled('with'), fn($q) => $q->with(explode(',', $request->with)))
-            ->paginate($per_page);
-
-        return MajorResource::collection($result);
+        return $this->list($request);
     }
 
     /**
-     * Store a newly created major.
+     * Store a newly created resource in storage.
      */
     public function store(MajorRequest $request)
     {
-        return handle(function () use ($request) {
-            $result = Major::create($request->validated());
-
-            return new MajorResource($result->fresh());
-        }, "{$this->name} created successfully", 201);
+        return $this->save($request);
     }
 
     /**
-     * Display the specified major.
+     * Display the specified resource.
      */
     public function show(string $id)
     {
-        $result = Major::find($id);
-        if (! $result) {
-            return $this->not_found($id);
-        }
-
-        return new MajorResource($result);
+        return $this->view($id);
     }
 
     /**
-     * Update the specified major.
+     * Update the specified resource in storage.
      */
     public function update(MajorRequest $request, string $id)
     {
-        $result = Major::find($id);
-        if (! $result) {
-            return $this->not_found($id, 'not matched');
-        }
-
-        return handle(function () use ($request, $result) {
-            $result->update($request->validated());
-
-            return new MajorResource($result);
-        }, "{$this->name} updated successfully.");
+        return $this->release($request, $id);
     }
 
     /**
-     * Soft delete the specified major.
+     * Disable the specified resource from storage.
      */
     public function destroy(string $id)
     {
-        return handle(function () use ($id) {
-            $result = Major::withTrashed()->findOrFail($id);
-            $result->delete();
-
-            return null;
-        }, "{$this->name} deleted successfully.");
+        return $this->disable($id);
     }
 
     /**
-     * Restore a soft-deleted major.
+     * Restore a soft-deleted of the resource.
      */
     public function restore(string $id)
     {
-        return handle(function () use ($id) {
-            $result = Major::withTrashed()->findOrFail($id);
-            $result->restore();
-
-            return new MajorResource($result->fresh());
-        }, "{$this->name} restored successfully.");
+        return $this->enable($id);
     }
 
     /**
-     * Force delete a major permanently.
+     * Remove the specified resource from storage.
      */
     public function force_destroy(string $id)
     {
-        return handle(function () use ($id) {
-            $result = Major::withTrashed()->findOrFail($id);
-            $result->forceDelete();
-
-            return null;
-        }, "{$this->name} permanently deleted.");
+        return $this->clear($id);
     }
 }

@@ -15,4 +15,5 @@ class Faculty extends IModel
     {
         return $this->hasMany(Major::class);
     }
+
 }

@@ -12,10 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        make_fields('majors', function (Blueprint $table) {
-            $table->foreignId('faculty_id')->constrained()->cascadeOnDelete();
-            $table->string('shortcut')->unique()->nullable();
-        }, ['name_kh', 'name_en']);
+        make_fields('campuses', function (Blueprint $table) {}, ['name_kh', 'name_en']);
     }
 
     /**
@@ -23,6 +20,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('majors');
+        Schema::dropIfExists('campuses');
     }
 };

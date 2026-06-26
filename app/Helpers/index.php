@@ -9,16 +9,16 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 
 if (! function_exists('make_fields')) {
-    function make_fields(string $name, callable $fn, array $fields = []): void
+    function make_fields(string $name, callable $fn, array $fields = [], bool $named = true): void
     {
         Schema::create($name, fn(Blueprint $table) => fields($table, function () use ($table, $fn) {
             $fn($table);
-        }, $fields));
+        }, $fields, $named));
     }
 }
 
 if (! function_exists('fields')) {
-    function fields(Blueprint $table, callable $fn, array $fields = []): void
+    function fields(Blueprint $table, callable $fn, array $fields = [], bool $named = false): void
     {
         $table->id();
         if ($fields) {
@@ -28,6 +28,10 @@ if (! function_exists('fields')) {
         }
         $fn();
 
+        if ($named) {
+            $table->string('name')->nullable();
+        }
+
         $table->text('remark')->nullable();
         $table->timestamps();
         $table->softDeletes();
@@ -35,22 +39,22 @@ if (! function_exists('fields')) {
 }
 
 if (! function_exists('to_list')) {
-    function to_list(mixed $instance, array $fields = []): array
+    function to_list(mixed $object, array $fields = []): array
     {
         return [
-            'id'         => $instance->id,
+            'id'         => $object->id,
             ...$fields,
-            'remark'     => $instance->remark,
-            'created_at' => $instance->created_at->format('Y-m-d H:i:s'),
-            'updated_at' => $instance->updated_at->format('Y-m-d H:i:s'),
+            'remark'     => $object->remark,
+            'created_at' => $object->created_at?->format('Y-m-d H:i:s'),
+            'updated_at' => $object->updated_at?->format('Y-m-d H:i:s'),
         ];
     }
 }
 
 if (! function_exists('to_name')) {
-    function to_name(mixed $instance): string
+    function to_name(mixed $object): string
     {
-        return "{$instance->name_kh} ({$instance->name_en})";
+        return "{$object->name_kh} ({$object->name_en})";
     }
 }
 
@@ -129,7 +133,7 @@ if (! function_exists('api_routes')) {
                 ->name("{$slug}.restore");
 
             // Force Delete
-            Route::delete("{$slug}/{id}/force", [$controller, 'force_destroy'])
+            Route::delete("{$slug}/{id}/clear", [$controller, 'force_destroy'])
                 ->name("{$slug}.force-destroy");
         }
     }

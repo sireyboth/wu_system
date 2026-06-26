@@ -5,7 +5,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class FacultyRequest extends FormRequest
+class SubjectRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,14 +25,17 @@ class FacultyRequest extends FormRequest
         return [
             'name_kh'  => 'required|string|min:3|max:255',
             'name_en'  => 'required|string|min:3|max:255',
-            'shortcut' => [
+            'code'     => [
                 'nullable',
                 'string',
                 'max:50',
-                Rule::unique('faculties', 'shortcut')
-                    ->ignore($this->route('faculty'))
+                Rule::unique('subjects', 'code')
+                    ->ignore($this->route('subject'))
                     ->withoutTrashed(),
             ],
+            'year'     => 'nullable|string|max:50',
+            'semester' => 'nullable|string|max:50',
+            'credit'   => 'nullable|string|max:10',
             'remark'   => 'nullable|string|max:500',
         ];
     }

@@ -2,7 +2,6 @@
 namespace App\Http\Resources;
 
 use function App\Helpers\to_list;
-use function App\Helpers\to_name;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -16,11 +15,12 @@ class MajorResource extends JsonResource
     public function toArray(Request $request): array
     {
         return to_list($this, [
-            'name'     => to_name($this),
-            'shortcut' => $this->shortcut,
-            'faculty'  => new FacultyResource($this->faculty),
+            'name'       => $this->name,
+            'name_name'  => $this->name_kh,
+            'name_en'    => $this->name_en,
+            'faculty_id' => $this->faculty_id,
+            'shortcut'   => $this->shortcut,
+            'fucalty'    => $this->faculty,
         ]);
-
-        // return parent::toArray($request);
     }
 }

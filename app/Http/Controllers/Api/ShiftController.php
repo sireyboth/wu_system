@@ -2,19 +2,18 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\FacultyRequest;
-use App\Http\Resources\FacultyResource;
-use App\Models\Faculty;
+use App\Http\Requests\ShiftRequest;
+use App\Http\Resources\ShiftResource;
+use App\Models\Shift;
 use Illuminate\Http\Request;
 
-class FacultyController extends Controller
+class ShiftController extends Controller
 {
     public function __construct()
     {
-        $this->name          = 'Faculty';
-        $this->model         = Faculty::class;
-        $this->resource      = FacultyResource::class;
-        $this->relationships = ['majors:id,shortcut,faculty_id,name,name_en,name_kh'];
+        $this->name     = 'Shift';
+        $this->model    = Shift::class;
+        $this->resource = ShiftResource::class;
     }
 
     /**
@@ -28,7 +27,7 @@ class FacultyController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(FacultyRequest $request)
+    public function store(ShiftRequest $request)
     {
         return $this->save($request);
     }
@@ -44,7 +43,7 @@ class FacultyController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(FacultyRequest $request, string $id)
+    public function update(ShiftRequest $request, string $id)
     {
         return $this->release($request, $id);
     }

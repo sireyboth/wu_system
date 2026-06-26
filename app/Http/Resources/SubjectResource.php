@@ -5,7 +5,7 @@ use function App\Helpers\to_list;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class FacultyResource extends JsonResource
+class SubjectResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,8 +18,10 @@ class FacultyResource extends JsonResource
             'name'     => $this->name,
             'name_kh'  => $this->name_kh,
             'name_en'  => $this->name_en,
-            'shortcut' => $this->shortcut,
-            'majors'   => $this->majors,
+            'code'     => $this->code,
+            'year'     => $this->year,
+            'semester' => $this->semester,
+            'credit'   => $this->credit,
         ]);
     }
 }
