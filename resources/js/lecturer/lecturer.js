@@ -1,331 +1,341 @@
-// 1. GLOBAL UTILITIES & CONFIG
-const Toast = Swal.mixin({
-    toast: true,
-    position: 'top-end',
-    showConfirmButton: false,
-    timer: 3000,
-    timerProgressBar: true
-});
+/**
+ * Lecturer Management System Module
+ * Encapsulated to prevent global scope pollution, using event delegation and decoupled UI templates.
+ */
+(() => {
+    'use strict';
 
-const form = document.getElementById('addlecturerForm');
+    // 1. CONFIGURATION & CONSTANTS
+    const CONFIG = {
+        API_BASE: '/api/v1/lecturers',
+        DEBOUNCE_DELAY: 300,
+        LOCALE: 'en-GB'
+    };
 
-// State managers for managing editing lifecycles
-let isEditMode = false;
-let editingLecturerId = null;
+    // 2. CENTRALIZED DOM SELECTORS
+    const DOM = {
+        form: document.getElementById('addlecturerForm'),
+        tableBody: document.getElementById('lecturer-table-body'),
+        searchInput: document.getElementById('lecturerSearchInput'),
+        loader: document.getElementById('loading-overlay'),
+        modal: document.getElementById('lecturerModal'),
+        modalCard: document.getElementById('modalCard'),
+        modalTitle: document.getElementById('modalTitle'),
+        submitBtn: document.getElementById('addlecturerForm')?.querySelector('button[type="submit"]')
+    };
 
-// 2. CORE INITIALIZATION
-document.addEventListener('DOMContentLoaded', function () {
-    const searchInput = document.getElementById('lecturerSearchInput');
-    let debounceTimer;
+    // Third-party instance verification
+    const Toast = typeof Swal !== 'undefined' ? Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true
+    }) : { fire: console.log };
 
-    // Initial load when page opens
-    fetchLecturers();
+    // 3. PRIVATE MODULE STATE
+    const state = {
+        isEditMode: false,
+        editingLecturerId: null,
+        debounceTimer: null
+    };
 
-    // Event Listeners
-    if (searchInput) {
-        //console.log("🔍 Search input detected successfully!");
+    // 4. CORE API SERVICES (Isolated HTTP layer)
+    const ApiService = {
+        async request(url, options = {}) {
+            this.toggleLoader(true);
+            try {
+                const response = await fetch(url, {
+                    credentials: 'omit',
+                    headers: { 'Accept': 'application/json', ...options.headers },
+                    ...options
+                });
 
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value;
-            //console.log(`⌨️ User typing search query: "${query}"`);
+                const contentType = response.headers.get("content-type");
+                const isJson = contentType && contentType.includes("application/json");
+                const result = isJson ? await response.json() : null;
 
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => {
-                fetchLecturers(query);
-            }, 300); // Wait 300ms after user stops typing before hitting API
-        });
-    } else {
-        //console.error("❌ Error: Could not find HTML input with ID 'lecturerSearchInput'!");
-    }
-});
+                if (!response.ok) {
+                    return { error: true, status: response.status, data: result };
+                }
+                return { error: false, status: response.status, data: result };
+            } catch (err) {
+                console.error(`[API Error] Action failed on ${url}:`, err);
+                return { error: true, status: 500, data: null };
+            } finally {
+                this.toggleLoader(false);
+            }
+        },
 
-// 3. API & DATA FETCHING
-async function fetchLecturers(search = '') {
-    const loader = document.getElementById('loading-overlay');
-    if (loader) loader.classList.remove('hidden');
-
-    try {
-        // Encode the search string safely to avoid breaking URLs with spaces or special chars
-        const response = await fetch(`/api/v1/lecturers?search=${encodeURIComponent(search)}`);
-        const result = await response.json();
-
-        //console.log("🔍 Search/Fetch API Result:", result);
-
-        // Smart fallback: Check if the data lives inside a pagination wrapper (.data)
-        // OR if the raw response itself is an array of records
-        if (result && Array.isArray(result.data)) {
-            renderTable(result.data);
-        } else if (Array.isArray(result)) {
-            renderTable(result);
-        } else {
-            //console.warn("Unexpected structural layout format returned:", result);
-            renderTable([]);
+        toggleLoader(show) {
+            if (DOM.loader) {
+                DOM.loader.classList.toggle('hidden', !show);
+            }
         }
-    } catch (error) {
-        //console.error("Fetch Error:", error);
-        if (typeof Toast !== 'undefined') {
+    };
+
+    // 5. CORE WORKFLOW CONTROLLERS
+    async function loadLecturers(searchQuery = '') {
+        const url = `${CONFIG.API_BASE}?search=${encodeURIComponent(searchQuery)}`;
+        const { error, data } = await ApiService.request(url);
+
+        if (error) {
             Toast.fire({ icon: 'error', title: 'Failed to load lecturers' });
-        }
-    } finally {
-        if (loader) loader.classList.add('hidden');
-    }
-}
-
-// 4. UI RENDERING LOGIC
-function renderTable(lecturers) {
-    const tableBody = document.getElementById('lecturer-table-body');
-    if (!tableBody) return;
-
-    if (!lecturers || lecturers.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-neutral-500">No records found.</td></tr>';
-        return;
-    }
-
-    tableBody.innerHTML = lecturers.map((lecturer, index) => generateTableRowHtml(lecturer, index)).join('');
-}
-
-// 5. COMPONENT TEMPLATES
-function generateTableRowHtml(lecturer, index) {
-    const formattedDate = new Date(lecturer.created_at).toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
-    });
-
-    return `
-        <tr class="group hover:bg-indigo-50/50 dark:hover:bg-indigo-500/5 transition-all duration-200 border-b border-neutral-100 dark:border-white/5">
-            <td class="px-6 py-4 text-neutral-500 font-mono text-sm">${index + 1}</td>
-            <td class="px-6 py-4 font-mono font-bold text-indigo-600 dark:text-indigo-400">
-                ${lecturer.code ?? '<span class="text-neutral-400 italic">N/A</span>'}
-            </td>
-            <td class="px-6 py-4">
-                <div class="flex items-center">
-                    <div class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mr-3">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                    </div>
-                    <div>
-                        <div class="font-semibold text-neutral-900 dark:text-white">${lecturer.name_kh}</div>
-                        <div class="text-xs text-neutral-400 font-mono">${lecturer.name_en}</div>
-                    </div>
-                </div>
-            </td>
-            <td class="px-6 py-4">
-                <p class="text-sm text-neutral-600 dark:text-neutral-400 max-w-[250px] truncate" title="${lecturer.remark ?? ''}">
-                    ${lecturer.remark ?? '<span class="italic opacity-40 text-xs">No remarks</span>'}
-                </p>
-            </td>
-            <td class="px-6 py-4 text-xs text-neutral-500 font-mono">${formattedDate}</td>
-            <td class="px-6 py-4 text-right">
-                <div class="flex justify-end gap-2">
-                    <button onclick="editLecturer(${lecturer.id})" class="p-2 text-amber-600 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 rounded-lg transition-colors" title="Edit Lecturer">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                        </svg>
-                    </button>
-                    <button onclick="deleteLecturer(${lecturer.id})" class="p-2 text-rose-600 hover:bg-rose-100 dark:hover:bg-rose-500/20 rounded-lg transition-colors" title="Delete Lecturer">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                        </svg>
-                    </button>
-                </div>
-            </td>
-        </tr>
-    `;
-}
-
-// ====================== Add / Edit / Delete Data Operations ======================
-
-// Open & Close Modal Controller
-window.toggleModal = function() {
-    const modal = document.getElementById('lecturerModal');
-    if (modal) {
-        modal.classList.toggle('hidden');
-        modal.classList.toggle('flex');
-    }
-
-    // Reset back to creation mode if modal is closed down manually
-    if (modal && modal.classList.contains('hidden')) {
-        resetFormState();
-    }
-};
-
-// Reset State clean helper
-function resetFormState() {
-    if (form) form.reset();
-    isEditMode = false;
-    editingLecturerId = null;
-
-    // Switch modal title text back to normal default language structures
-    const modalTitle = document.getElementById('modalTitle');
-    if (modalTitle) modalTitle.textContent = 'បន្ថែមសាស្ត្រាចារ្យថ្មី'; // "Add New Lecturer"
-
-    const submitBtn = form?.querySelector('button[type="submit"]');
-    if (submitBtn) submitBtn.textContent = 'រក្សាទុក'; // "Save"
-}
-
-// 6. EDIT OPERATION (GET TARGET DATA & POPULATE)
-window.editLecturer = async function(id) {
-    const loader = document.getElementById('loading-overlay');
-    if (loader) loader.classList.remove('hidden');
-
-    try {
-        // Fetch specific singular record from API resource endpoint
-        const response = await fetch(`/api/v1/lecturers/${id}`);
-        if (!response.ok) throw new Error('Failed to retrieve record parameters');
-
-        const result = await response.json();
-        const data = result.data || result; // Cover wrapper scenarios safely
-
-        // Set tracking variables up to shift update logic pathways
-        isEditMode = true;
-        editingLecturerId = id;
-
-        // Change Title & Buttons visually to match Update Actions
-        const modalTitle = document.getElementById('modalTitle');
-        if (modalTitle) modalTitle.textContent = 'កែប្រែព័ត៌មានសាស្ត្រាចារ្យ'; // "Edit Lecturer Info"
-
-        const submitBtn = form.querySelector('button[type="submit"]');
-        if (submitBtn) submitBtn.textContent = 'ធ្វើបច្ចុប្បន្នភាព'; // "Update"
-
-        // Autofill form inputs by matching input elements name attributes
-        if (form) {
-            form.querySelector('[name="name_kh"]').value = data.name_kh ?? '';
-            form.querySelector('[name="name_en"]').value = data.name_en ?? '';
-            form.querySelector('[name="code"]').value = data.code ?? '';
-            form.querySelector('[name="remark"]').value = data.remark ?? '';
+            return;
         }
 
-        // Open Modal interface
-        window.toggleModal();
-
-    } catch (error) {
-        //console.error("Edit Selection Failure:", error);
-        Toast.fire({ icon: 'error', title: 'មិនអាចទាញយកទិន្នន័យបានទេ' });
-    } finally {
-        if (loader) loader.classList.add('hidden');
+        // Handle both object-paginated dynamic data lists or straight array responses safely
+        const records = data && Array.isArray(data.data) ? data.data : (Array.isArray(data) ? data : []);
+        renderTable(records);
     }
-};
 
-// 7. DELETE OPERATION (PROMPT & PURGE)
-window.deleteLecturer = async function(id) {
-    // Elegant system validation check using SweetAlert confirmation layout structures
-    const confirmation = await Swal.fire({
-        title: 'តើអ្នកប្រាកដជាចង់លុបមែនទេ?',
-        text: "ទិន្នន័យនេះមិនអាចយកមកវិញបានឡើយ!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#4f46e5', // Indigo-600 styling highlight
-        cancelButtonColor: '#ef4444',  // Rose-500
-        confirmButtonText: 'បាទ/ចាស លុបវា!',
-        cancelButtonText: 'បោះបង់'
-    });
+    async function handleEditAction(id) {
+        const { error, data } = await ApiService.request(`${CONFIG.API_BASE}/${id}`);
+        if (error) {
+            Toast.fire({ icon: 'error', title: 'មិនអាចទាញយកទិន្នន័យបានទេ' });
+            return;
+        }
 
-    if (!confirmation.isConfirmed) return;
+        const payload = data.data || data;
+        state.isEditMode = true;
+        state.editingLecturerId = id;
 
-    const loader = document.getElementById('loading-overlay');
-    if (loader) loader.classList.remove('hidden');
+        if (DOM.modalTitle) DOM.modalTitle.textContent = 'កែប្រែព័ត៌មានសាស្ត្រាចារ្យ';
+        if (DOM.submitBtn) DOM.submitBtn.textContent = 'ធ្វើបច្ចុប្បន្នភាព';
 
-    try {
-        const response = await fetch(`/api/v1/lecturers/${id}`, {
-            method: 'DELETE',
-            credentials: 'omit',
-            headers: { 'Accept': 'application/json' }
+        if (DOM.form) {
+            ['name_kh', 'name_en', 'code', 'remark'].forEach(field => {
+                const element = DOM.form.querySelector(`[name="${field}"]`);
+                if (element) element.value = payload[field] ?? '';
+            });
+        }
+        toggleModal(true);
+    }
+
+    async function handleDeleteAction(id) {
+        const confirmation = await Swal.fire({
+            title: 'តើអ្នកប្រាកដជាចង់លុបមែនទេ?',
+            text: "ទិន្នន័យនេះមិនអាចយកមកវិញបានឡើយ!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#4f46e5',
+            cancelButtonColor: '#ef4444',
+            confirmButtonText: 'បាទ/ចាស លុបវា!',
+            cancelButtonText: 'បោះបង់'
         });
 
-        if (response.ok) {
+        if (!confirmation.isConfirmed) return;
+
+        const { error } = await ApiService.request(`${CONFIG.API_BASE}/${id}`, { method: 'DELETE' });
+        if (!error) {
+            Toast.fire({ icon: 'success', title: 'លុបទិន្នន័យបានជោគជ័យ!' });
+            loadLecturers(DOM.searchInput?.value || '');
+        } else {
+            Toast.fire({ icon: 'error', title: 'មានបញ្ហាមិនអាចលុបទិន្នន័យនេះបាន' });
+        }
+    }
+
+    async function handleFormSubmit(e) {
+        e.preventDefault();
+        if (!DOM.form || !DOM.submitBtn) return;
+
+        DOM.submitBtn.disabled = true;
+        const formData = new FormData(DOM.form);
+        const payload = {};
+
+        for (const [key, value] of formData.entries()) {
+            if (key === 'search') continue;
+            const cleanVal = value.toString().trim();
+            payload[key] = cleanVal === '' ? null : cleanVal;
+        }
+
+        const url = state.isEditMode ? `${CONFIG.API_BASE}/${state.editingLecturerId}` : CONFIG.API_BASE;
+        const method = state.isEditMode ? 'PUT' : 'POST';
+
+        const { error, status, data } = await ApiService.request(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!error) {
             Toast.fire({
                 icon: 'success',
-                title: 'លុបទិន្នន័យបានជោគជ័យ!'
+                title: state.isEditMode ? 'ធ្វើបច្ចុប្បន្នភាពជោគជ័យ!' : 'បង្កើតសាស្ត្រាចារ្យជោគជ័យ!',
+                text: state.isEditMode ? 'ព័ត៌មានត្រូវបានកែប្រែរួចរាល់។' : `${payload.name_kh} has been added.`
             });
-            fetchLecturers(); // Live re-render list updates
+            resetFormState();
+            toggleModal(false);
+            loadLecturers();
+        } else if (status === 422 && data) {
+            const errorMessages = data.errors ? Object.values(data.errors).flat() : ['Validation failed'];
+            Toast.fire({
+                icon: 'warning',
+                title: 'ពិនិត្យទិន្នន័យឡើងវិញ',
+                html: `<div class="text-left text-xs text-rose-500 mt-1 list-disc pl-4">${errorMessages.map(msg => `<li>${msg}</li>`).join('')}</div>`
+            });
         } else {
-            throw new Error('Failed to delete records resource element');
-        }
-    } catch (error) {
-        //console.error("Delete Action Failure:", error);
-        Toast.fire({ icon: 'error', title: 'មានបញ្ហាមិនអាចលុបទិន្នន័យនេះបាន' });
-    } finally {
-        if (loader) loader.classList.add('hidden');
-    }
-};
-
-// 8. INTERCEPT & DISPATCH FORM ENTRIES (POST / PUT)
-if (form) {
-    form.addEventListener('submit', async function (e) {
-        e.preventDefault();
-
-        const submitBtn = form.querySelector('button[type="submit"]');
-        if (submitBtn) submitBtn.disabled = true;
-
-        const formData = new FormData(form);
-        const rawPayload = Object.fromEntries(formData.entries());
-
-        const cleanPayload = {};
-        for (const [key, value] of Object.entries(rawPayload)) {
-            // 🚫 FIX: If the key is 'search', skip it entirely! Do not send it to the store/update API
-            if (key === 'search') continue;
-
-            cleanPayload[key] = value.trim() === '' ? null : value.trim();
-        }
-
-        try {
-            const url = isEditMode ? `/api/v1/lecturers/${editingLecturerId}` : '/api/v1/lecturers';
-            const method = isEditMode ? 'PUT' : 'POST';
-
-            //console.log(`👉 DISPATCHING REQUEST [${method}] Target: ${url}`, cleanPayload);
-
-            const response = await fetch(url, {
-                method: method,
-                credentials: 'omit',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(cleanPayload)
-            });
-
-            const contentType = response.headers.get("content-type");
-            let result = {};
-            if (contentType && contentType.includes("application/json")) {
-                result = await response.json();
-            } else {
-                const rawText = await response.text();
-                //console.error("Server returned non-JSON response:", rawText);
-                throw new Error("Server returned a 500 internal error page.");
-            }
-
-            if (response.ok) {
-                Toast.fire({
-                    icon: 'success',
-                    title: isEditMode ? 'ធ្វើបច្ចុប្បន្នភាពជោគជ័យ!' : 'បង្កើតសាស្ត្រាចារ្យជោគជ័យ!',
-                    text: isEditMode ? 'ព័ត៌មានត្រូវបានកែប្រែរួចរាល់។' : `${cleanPayload.name_kh} has been added.`
-                });
-
-                resetFormState();
-                window.toggleModal();
-                fetchLecturers();
-            } else if (response.status === 422) {
-                let errorMessages = result.errors ? Object.values(result.errors).flat() : ['Validation failed'];
-                Toast.fire({
-                    icon: 'warning',
-                    title: 'ពិនិត្យទិន្នន័យឡើងវិញ',
-                    html: `<div class="text-left text-xs text-rose-500 mt-1 list-disc pl-4">${errorMessages.map(msg => `<li>${msg}</li>`).join('')}</div>`
-                });
-            } else {
-                throw new Error(result.message || 'Server error');
-            }
-
-        } catch (error) {
-            //console.error("Submission Failure:", error);
             Toast.fire({
                 icon: 'error',
                 title: 'មានបញ្ហាភ្ជាប់ទៅកាន់ប្រព័ន្ធ',
-                text: 'Internal Server Error (500). Please trace system execution logs.'
+                text: data?.message || 'Internal Server Error (500).'
             });
-        } finally {
-            if (submitBtn) submitBtn.disabled = false;
         }
+        DOM.submitBtn.disabled = false;
+    }
+
+    // 6. UI RENDERING & COMPONENT TEMPLATES
+    function renderTable(lecturers) {
+        if (!DOM.tableBody) return;
+
+        if (!lecturers || lecturers.length === 0) {
+            DOM.tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-neutral-500">No records found.</td></tr>';
+            return;
+        }
+
+        DOM.tableBody.innerHTML = lecturers.map((lecturer, index) => {
+            const formattedDate = new Date(lecturer.created_at).toLocaleDateString(CONFIG.LOCALE, {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+
+            return `
+                <tr class="group hover:bg-indigo-50/50 dark:hover:bg-indigo-500/5 transition-all duration-200 border-b border-neutral-100 dark:border-white/5">
+                    <td class="px-6 py-4 text-neutral-500 font-mono text-sm">${index + 1}</td>
+                    <td class="px-6 py-4 font-mono font-bold text-indigo-600 dark:text-indigo-400">${lecturer.code ?? '<span class="text-neutral-400 italic">N/A</span>'}</td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mr-3">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-neutral-900 dark:text-white">${lecturer.name_kh}</div>
+                                <div class="text-xs text-neutral-400 font-mono">${lecturer.name_en}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <p class="text-sm text-neutral-600 dark:text-neutral-400 max-w-[250px] truncate" title="${lecturer.remark ?? ''}">
+                            ${lecturer.remark ?? '<span class="italic opacity-40 text-xs">No remarks</span>'}
+                        </p>
+                    </td>
+                    <td class="px-6 py-4 text-xs text-neutral-500 font-mono">${formattedDate}</td>
+                    <td class="px-6 py-4 text-right">
+                        <div class="flex justify-end gap-2">
+                            <button data-action="edit" data-id="${lecturer.id}" class="p-2 text-amber-600 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 rounded-lg transition-colors" title="Edit Lecturer">
+                                <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                            </button>
+                            <button data-action="delete" data-id="${lecturer.id}" class="p-2 text-rose-600 hover:bg-rose-100 dark:hover:bg-rose-500/20 rounded-lg transition-colors" title="Delete Lecturer">
+                                <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
+        }).join('');
+    }
+
+    // 7. INTERACTIVE & MODAL TRANSLATION ENGINE
+    function toggleModal(forceOpen = null) {
+        if (!DOM.modal || !DOM.modalCard) return;
+
+        const isOpen = DOM.modal.classList.contains('flex');
+        const makeOpen = forceOpen !== null ? forceOpen : !isOpen;
+
+        if (makeOpen) {
+            DOM.modal.classList.remove('invisible');
+            DOM.modal.classList.add('flex');
+
+            requestAnimationFrame(() => {
+                DOM.modal.classList.remove('opacity-0');
+                DOM.modalCard.classList.remove('scale-90', 'opacity-0');
+                DOM.modalCard.classList.add('scale-100', 'opacity-100');
+            });
+
+            setTimeout(() => {
+                DOM.form?.querySelector('[name="name_kh"]')?.focus();
+            }, 250);
+        } else {
+            DOM.modal.classList.add('opacity-0');
+            DOM.modalCard.classList.remove('scale-100', 'opacity-100');
+            DOM.modalCard.classList.add('scale-90', 'opacity-0');
+
+            setTimeout(() => {
+                DOM.modal.classList.add('invisible');
+                DOM.modal.classList.remove('flex');
+                resetFormState();
+            }, 300);
+        }
+    }
+
+    function resetFormState() {
+        if (DOM.form) DOM.form.reset();
+        state.isEditMode = false;
+        state.editingLecturerId = null;
+
+        if (DOM.modalTitle) DOM.modalTitle.textContent = 'បន្ថែមសាស្ត្រាចារ្យថ្មី';
+        if (DOM.submitBtn) DOM.submitBtn.textContent = 'រក្សាទុក';
+
+        document.querySelectorAll('.smart-hint').forEach(hint => {
+            hint.classList.add('opacity-0', 'scale-95', 'translate-y-1');
+        });
+    }
+
+    // 8. EVENT ATTACHMENTS PIPELINE
+    function initEvents() {
+        // Expose toggleModal securely only for explicit HTML elements like header close/open triggers
+        window.AppModal = { toggle: (open) => toggleModal(open) };
+
+        // Search Input Engine with Clean Debouncing
+        DOM.searchInput?.addEventListener('input', (e) => {
+            clearTimeout(state.debounceTimer);
+            state.debounceTimer = setTimeout(() => {
+                loadLecturers(e.target.value);
+            }, CONFIG.DEBOUNCE_DELAY);
+        });
+
+        // Form Submit
+        DOM.form?.addEventListener('submit', handleFormSubmit);
+
+        // Modern Event Delegation: Intercept Action Buttons without explicit tag onClick attributes
+        DOM.tableBody?.addEventListener('click', (e) => {
+            const targetBtn = e.target.closest('button[data-action]');
+            if (!targetBtn) return;
+
+            const action = targetBtn.getAttribute('data-action');
+            const targetId = targetBtn.getAttribute('data-id');
+
+            if (action === 'edit') handleEditAction(targetId);
+            if (action === 'delete') handleDeleteAction(targetId);
+        });
+
+        // Interactive Tooltips Hint Dynamic Engine
+        const inputsWithHints = document.querySelectorAll('#addlecturerForm input, #addlecturerForm textarea');
+        inputsWithHints.forEach(input => {
+            const hintBox = input.parentElement.querySelector('.smart-hint');
+            const textMessage = input.getAttribute('data-hint');
+            if (!hintBox || !textMessage) return;
+
+            hintBox.textContent = textMessage;
+
+            input.addEventListener('input', function() {
+                const hasValue = this.value.trim().length > 0;
+                hintBox.classList.toggle('opacity-0', !hasValue);
+                hintBox.classList.toggle('scale-95', !hasValue);
+                hintBox.classList.toggle('translate-y-1', !hasValue);
+                hintBox.classList.toggle('opacity-100', hasValue);
+                hintBox.classList.toggle('scale-100', hasValue);
+                hintBox.classList.toggle('-translate-y-2', hasValue);
+            });
+
+            input.addEventListener('blur', () => {
+                hintBox.classList.remove('opacity-100', 'scale-100', '-translate-y-2');
+                hintBox.classList.add('opacity-0', 'scale-95', 'translate-y-1');
+            });
+        });
+    }
+
+    // 9. INITIALIZE ENGINE RUNNING
+    document.addEventListener('DOMContentLoaded', () => {
+        initEvents();
+        loadLecturers();
     });
-}
+})();
