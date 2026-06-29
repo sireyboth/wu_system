@@ -16,7 +16,7 @@ Route::get('/export/sales', [DashboardController::class, 'exportSales'])->name('
 Route::middleware(['auth'])->group(function () {
     // This is the missing piece that connects to your Controller
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
+
     // Additional routes based on your Controller methods
     Route::resource('roomsmgt', RoomMGTController::class);
     Route::resource('salemgt', SaleMGTController::class);

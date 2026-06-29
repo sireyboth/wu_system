@@ -129,11 +129,11 @@ if (! function_exists('api_routes')) {
 
         foreach ($resources as $slug => $controller) {
             // Restore
-            Route::post("{$slug}/{id}/restore", [$controller, 'restore'])
+            Route::post("{$slug}/{$slug}/restore", [$controller, 'restore'])
                 ->name("{$slug}.restore");
 
             // Force Delete
-            Route::delete("{$slug}/{id}/clear", [$controller, 'force_destroy'])
+            Route::delete("{$slug}/{$slug}/clear", [$controller, 'force_destroy'])
                 ->name("{$slug}.force-destroy");
         }
     }
