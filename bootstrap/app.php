@@ -18,9 +18,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'some_special_field',
         ]);
     })
-    ->withMiddleware(function (Middleware $middleware): void {
-        //
-    })
     ->withExceptions(function ($exceptions) {
-        $exceptions->render(fn() => no_data('Record not found', 404));
-    })->create();
+    $exceptions->render(function (\Illuminate\Database\Eloquent\ModelNotFoundException $e, $request) {
+        return no_data('Record not found', 404);
+    });
+})->create();
