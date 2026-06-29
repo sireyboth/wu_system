@@ -133,3 +133,104 @@ function generateTableRowHtml(lecturer, index) {
         </tr>
     `;
 }
+
+// ====================== Add New Data ======================
+
+//Open Modal
+window.toggleModal = function() {
+    const modal = document.getElementById('lecturerModal');
+    if (modal) {
+        modal.classList.toggle('hidden');
+        modal.classList.toggle('flex');
+    }
+};
+
+// 1. Toggle Modal Visibility
+function toggleModal() {
+    const modal = document.getElementById('lecturerModal'); // Ensure your modal wrapper has this ID
+    if (modal) {
+        modal.classList.toggle('hidden');
+        modal.classList.toggle('flex'); // Optional: fits centering flex alignments
+    }
+}
+
+// 2. Intercept Form Submission
+// Inside your form submit event listener...
+if (form) {
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) submitBtn.disabled = true;
+
+        // 1. Get raw form entries
+        const formData = new FormData(form);
+        const rawPayload = Object.fromEntries(formData.entries());
+
+        // 2. CLEAN THE PAYLOAD: Convert empty strings to null (Just like Postman treats omitted fields)
+        const cleanPayload = {};
+        for (const [key, value] of Object.entries(rawPayload)) {
+            // If field is empty text, set it to null so Laravel treats it as nullable
+            cleanPayload[key] = value.trim() === '' ? null : value.trim();
+        }
+
+        try {
+            // 3. Send the request
+            // 🔍 SPY: Print the payload to compare with Postman
+            console.log("👉 PAYLOAD BEING SENT TO LARAVEL:", cleanPayload);
+            const response = await fetch('/api/v1/lecturers', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    // Pass the CSRF token via header
+                    // 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                },
+                body: JSON.stringify(cleanPayload) // Send clean data
+            });
+
+            // 4. FIX THE SYNTAX ERROR: Check content type before parsing as JSON
+            const contentType = response.headers.get("content-type");
+            let result = {};
+            if (contentType && contentType.includes("application/json")) {
+                result = await response.json();
+            } else {
+                // If it's HTML/text, grab raw text to inspect the server crash
+                const rawText = await response.text();
+                console.error("Server returned non-JSON response:", rawText);
+                throw new Error("Server returned a 500 internal error page.");
+            }
+
+            if (response.ok) {
+                Toast.fire({
+                    icon: 'success',
+                    title: 'បង្កើតសាស្ត្រាចារ្យជោគជ័យ!',
+                    text: `${cleanPayload.name_kh} has been added.`
+                });
+
+                form.reset();
+                window.toggleModal(); // Access the global window-scoped toggle
+                fetchLecturers();
+            } else if (response.status === 422) {
+                let errorMessages = result.errors ? Object.values(result.errors).flat() : ['Validation failed'];
+                Toast.fire({
+                    icon: 'warning',
+                    title: 'ពិនិត្យទិន្នន័យឡើងវិញ',
+                    html: `<div class="text-left text-xs text-rose-500 mt-1 list-disc pl-4">${errorMessages.map(msg => `<li>${msg}</li>`).join('')}</div>`
+                });
+            } else {
+                throw new Error(result.message || 'Server error');
+            }
+
+        } catch (error) {
+            console.error("Submission Failure:", error);
+            Toast.fire({
+                icon: 'error',
+                title: 'មានបញ្ហាភ្ជាប់ទៅកាន់ប្រព័ន្ធ',
+                text: 'Internal Server Error (500). Check Laravel log files.'
+            });
+        } finally {
+            if (submitBtn) submitBtn.disabled = false;
+        }
+    });
+}

@@ -78,8 +78,8 @@
                             </th>
                             <th scope="col" class="px-6 py-4">Invoice Code</th>
                             <th scope="col" class="px-6 py-4">Customer Name</th>
-                            <th scope="col" class="px-6 py-4">Sub-Total</th>
-                            <th scope="col" class="px-6 py-4">Vat Price</th>
+                            <th scope="col" class="px-6 py-4">Remark</th>
+                            <th scope="col" class="px-6 py-4">Create At</th>
                             <th scope="col" class="px-6 py-4 text-right">Actions</th>
                         </tr>
                     </thead>
@@ -98,7 +98,9 @@
         </div>
     </div>
     </div>
-@endsection
+
+    @include('lecturer.partials.lecModal')
+    @endsection
 
 @push('scripts')
   @vite(['resources/js/lecturer/lecturer.js'])
