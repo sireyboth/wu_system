@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\RoomMGTController;
 use App\Http\Controllers\SaleMGTController;
-use App\Http\Controllers\TaxMgtController;
+use App\Http\Controllers\LecturerController;
 
 
 Route::get('/', function () {
@@ -16,11 +16,12 @@ Route::get('/export/sales', [DashboardController::class, 'exportSales'])->name('
 Route::middleware(['auth'])->group(function () {
     // This is the missing piece that connects to your Controller
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
+
     // Additional routes based on your Controller methods
     Route::resource('roomsmgt', RoomMGTController::class);
     Route::resource('salemgt', SaleMGTController::class);
     Route::resource('taxmgt', TaxMgtController::class);
+    Route::resource('lecturer', LecturerController::class);
 });
 
 Route::middleware('auth')->group(function () {

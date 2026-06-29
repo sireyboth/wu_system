@@ -1,4 +1,4 @@
-<button data-drawer-target="sidebar-multi-level-sidebar" data-drawer-toggle="sidebar-multi-level-sidebar" aria-controls="sidebar-multi-level-sidebar" type="button" 
+<button data-drawer-target="sidebar-multi-level-sidebar" data-drawer-toggle="sidebar-multi-level-sidebar" aria-controls="sidebar-multi-level-sidebar" type="button"
   class="inline-flex items-center p-2 mt-3 ms-3 text-sm text-neutral-500 rounded-lg sm:hidden hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800 transition-all">
    <span class="sr-only">Open sidebar</span>
    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -8,7 +8,7 @@
 
 <aside id="sidebar-multi-level-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
    <div class="h-full px-4 py-6 flex flex-col justify-between bg-white dark:bg-neutral-900 border-e border-neutral-200 dark:border-white/10 shadow-2xl transition-colors duration-300">
-      
+
       <div>
          <div class="flex items-center mb-8 px-2">
             <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
@@ -18,7 +18,7 @@
          </div>
 
          <ul class="space-y-2 font-medium">
-            
+
             <x-sidebar-link route="dashboard">
                <x-slot name="icon">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -27,14 +27,14 @@
                </x-slot>
                ទំព័រដើម
             </x-sidebar-link>
-            
-             <x-sidebar-link route="salemgt.index">
+
+             <x-sidebar-link route="lecturer.index">
                <x-slot name="icon">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                      <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                </x-slot>
-               វិក្កយបត្រទូទៅ
+               សាស្ដ្រាចារ្យ
             </x-sidebar-link>
 
             <x-sidebar-link route="taxmgt.index">
@@ -43,7 +43,7 @@
                      <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                </x-slot>
-               វិក្កយបត្រពន្ធដារ
+               មហាវិទ្យាល័យ
             </x-sidebar-link>
 
              <x-sidebar-link route="roomsmgt.index">
@@ -52,11 +52,27 @@
                      <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                </x-slot>
-               គ្រប់គ្រងបន្ទប់
+               វេន
             </x-sidebar-link>
-            
+             <x-sidebar-link route="roomsmgt.index">
+               <x-slot name="icon">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                     <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+               </x-slot>
+               សាខា
+            </x-sidebar-link>
+            <x-sidebar-link route="roomsmgt.index">
+               <x-slot name="icon">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                     <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+               </x-slot>
+               ជំនាន់
+            </x-sidebar-link>
 
-<!-- 
+
+<!--
             <x-sidebar-link route="tax_sale">
                <x-slot name="icon">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -78,7 +94,7 @@
       </div>
 
       <div class="pt-4 border-t border-neutral-200 dark:border-white/10 space-y-4">
-   
+
    <button onclick="toggleDarkMode()" class="flex items-center justify-between w-full px-4 py-2.5 bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 rounded-xl transition-all duration-300 group">
       <div class="flex items-center">
          <svg id="theme-icon-moon" class="w-5 h-5 text-indigo-600 dark:hidden transition-transform group-hover:-rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
@@ -119,10 +135,10 @@
    }
 
    // On page load, apply saved theme
-   if (localStorage.getItem('theme') === 'dark' || 
+   if (localStorage.getItem('theme') === 'dark' ||
       (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
    } else {
-      document.documentElement.classList.remove('dark'); 
+      document.documentElement.classList.remove('dark');
    }
 </script>

@@ -15,7 +15,7 @@ const Toast = Swal.mixin({
 window.toggleModal = function() {
     const modal = document.getElementById('addRoomModal');
     const form = document.getElementById('addRoomForm');
-    
+
     if (!modal) return;
 
     // If we are CLOSING the modal, reset the form and the titles
@@ -28,7 +28,7 @@ window.toggleModal = function() {
 
     modal.classList.toggle("hidden");
     modal.classList.toggle("flex");
-};  
+};
 
 // 2. CORE INITIALIZATION
 document.addEventListener('DOMContentLoaded', function () {
@@ -61,7 +61,7 @@ async function fetchRooms(search = '', page = 1) {
     try {
         const response = await fetch(`/api/roomsmgt?search=${search}&page=${page}`);
         const result = await response.json();
-        
+
         renderTable(result.data);
         renderPagination(result); // Add this
     } catch (error) {
@@ -80,9 +80,9 @@ function renderPagination(paginationData) {
     for (let i = 1; i <= paginationData.last_page; i++) {
         const isActive = i === paginationData.current_page;
         pageNumbers += `
-            <button onclick="changePage(${i})" 
-                class="w-8 h-8 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${isActive 
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/30' 
+            <button onclick="changePage(${i})"
+                class="w-8 h-8 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${isActive
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/30'
                     : 'text-neutral-600 hover:bg-indigo-50 hover:text-indigo-600'}">
                 ${i}
             </button>`;
@@ -91,21 +91,21 @@ function renderPagination(paginationData) {
     container.innerHTML = `
         <div class="flex items-center justify-between px-6 py-4 border-t border-neutral-200 dark:border-neutral-700">
             <span class="text-xs text-neutral-500">
-                Showing <span class="font-bold text-neutral-900 dark:text-white">${paginationData.from || 0}</span> to 
-                <span class="font-bold text-neutral-900 dark:text-white">${paginationData.to || 0}</span> of 
+                Showing <span class="font-bold text-neutral-900 dark:text-white">${paginationData.from || 0}</span> to
+                <span class="font-bold text-neutral-900 dark:text-white">${paginationData.to || 0}</span> of
                 <span class="font-bold text-neutral-900 dark:text-white">${paginationData.total}</span> entries
             </span>
-            
+
             <div class="flex items-center gap-1">
-                <button onclick="changePage(${paginationData.current_page - 1})" 
+                <button onclick="changePage(${paginationData.current_page - 1})"
                         ${!paginationData.prev_page_url ? 'disabled' : ''}
                         class="px-3 py-1 text-sm font-bold text-neutral-600 rounded-lg hover:bg-neutral-100 disabled:opacity-30">
                     Prev
                 </button>
-                
+
                 <div class="flex gap-1">${pageNumbers}</div>
-                
-                <button onclick="changePage(${paginationData.current_page + 1})" 
+
+                <button onclick="changePage(${paginationData.current_page + 1})"
                         ${!paginationData.next_page_url ? 'disabled' : ''}
                         class="px-3 py-1 text-sm font-bold text-neutral-600 rounded-lg hover:bg-neutral-100 disabled:opacity-30">
                     Next
@@ -124,7 +124,7 @@ window.changePage = function(page) {
 function renderTable(rooms) {
     const tableBody = document.getElementById('rooms-table-body');
     if (!tableBody) return;
-    
+
     if (!rooms || rooms.length === 0) {
         tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-10">No records found.</td></tr>';
         return;
@@ -135,7 +135,7 @@ function renderTable(rooms) {
 
 // 5. COMPONENT TEMPLATES (Keeps renderTable clean)
 function generateTableRowHtml(room) {
-    
+
     const statusClasses = {
         'available': 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400',
         'occupied': 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400',
@@ -216,10 +216,10 @@ async function handleFormSubmit(e) {
         } else if (response.status === 422) {
             // --- THIS IS THE FIX ---
             // If it's a validation error, show the specific message from Laravel
-            const firstError = Object.values(result.errors)[0][0]; 
-            Toast.fire({ 
-                icon: 'warning', 
-                title: firstError || 'Room number already exists!' 
+            const firstError = Object.values(result.errors)[0][0];
+            Toast.fire({
+                icon: 'warning',
+                title: firstError || 'Room number already exists!'
             });
         } else {
             Toast.fire({ icon: 'error', title: 'Something went wrong' });
@@ -231,10 +231,10 @@ async function handleFormSubmit(e) {
 }
   // 7. EDIT LOGIC
 window.editRoom = async function(id) {
-    
+
     Toast.fire({ icon: 'info', title: 'Editing your data' });
     try {
-        
+
         const response = await fetch(`/api/roomsmgt/${id}`);
         const room = await response.json();
 
@@ -280,7 +280,7 @@ window.deleteRoom = async function(id) {
             });
             if (response.ok) {
                 Toast.fire({ icon: 'success', title: 'Deleted!' });
-                fetchRooms(); 
+                fetchRooms();
             }
         } catch (error) {
             Toast.fire({ icon: 'error', title: 'Delete failed' });
@@ -293,10 +293,10 @@ function resetModal() {
     const form = document.getElementById('addRoomForm');
     const modal = document.getElementById('addRoomModal');
     form.reset();
-    form.querySelector('#room_id').value = ''; 
+    form.querySelector('#room_id').value = '';
     modal.querySelector('h2').innerText = 'Add New Room';
     modal.querySelector('button[type="submit"]').innerText = 'Create Room';
-    
+
     modal.classList.add("hidden");
     modal.classList.remove("flex");
-} 
+}

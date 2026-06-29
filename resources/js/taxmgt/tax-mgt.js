@@ -36,15 +36,15 @@ async function fetchTaxs(search = '') {
         // 1. Ensure the URL matches your api.php (Route::apiResource('tax', ...))
         const response = await fetch(`/api/taxmgt?search=${search}`);
         const result = await response.json();
-        
-        // 2. LOGIC FIX: 
+
+        // 2. LOGIC FIX:
         // Since your API uses ->get(), 'result.data' IS the array.
         // We do NOT need '.data.data' here.
         if (result.success && Array.isArray(result.data)) {
-            renderTable(result.data); 
+            renderTable(result.data);
         } else {
             console.warn("Data is not an array or success is false", result);
-            renderTable([]); 
+            renderTable([]);
         }
     } catch (error) {
         console.error("Fetch Error:", error);
@@ -59,7 +59,7 @@ async function fetchTaxs(search = '') {
 function renderTable(taxs) {
     const tableBody = document.getElementById('tax-table-body');
     if (!tableBody) return;
-    
+
     if (!taxs || taxs.length === 0) {
         tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-10">No records found.</td></tr>';
         return;
@@ -80,10 +80,10 @@ function generateTableRowHtml(tax, index) {
     // Define the missing variables
     const formattedTotal = parseFloat(tax.tax_balance_final || 0).toFixed(2);
     const currentStatusClass = statusClasses[tax.sale.status] || 'bg-neutral-100 text-neutral-600';
-    
+
     // Accessing nested sale data carefully
-    const customerName = tax.sale 
-        ? `${tax.sale.cus_first_name} ${tax.sale.cus_last_name}` 
+    const customerName = tax.sale
+        ? `${tax.sale.cus_first_name} ${tax.sale.cus_last_name}`
         : 'N/A';
 
     return `
@@ -125,13 +125,13 @@ let salesList = [];
 // 1. Fetch Sales for Dropdown
 async function fetchSalesDropdown() {
   try {
-        const response = await fetch('/api/sales'); 
+        const response = await fetch('/api/sales');
         const result = await response.json();
-        
+
         if (result.success) {
             salesList = result.data.data ? result.data.data : result.data;
             const select = document.getElementById('sale_select');
-            select.innerHTML = '<option value="">Please select a sale</option>' + 
+            select.innerHTML = '<option value="">Please select a sale</option>' +
                 salesList.map(sale => `
                     <option value="${sale.id}">${sale.invoice_no} - ${sale.cus_first_name}</option>
                 `).join('');
@@ -148,11 +148,11 @@ function calculateTaxTotals() {
     const base = parseFloat(document.getElementById('base_subtotal').value || 0);
     const hidden = parseFloat(document.getElementById('hidden_price').value || 0);
     const at = parseFloat(document.getElementById('at_price').value || 0);
-    
+
     const newSubTotal = base + hidden + at;
     const vat = newSubTotal * 0.10;
     const grandTotal = newSubTotal + vat;
-    
+
     document.getElementById('vat_display').value = vat.toFixed(2);
     document.getElementById('final_total_display').innerText = `$${grandTotal.toFixed(2)}`;
 }
@@ -171,7 +171,7 @@ window.calculateTaxTotals = calculateTaxTotals;
 window.toggleModal = function() {
     const modal = document.getElementById('addTaxModal');
     const form = document.getElementById('addTaxForm');
-    
+
     if (modal.classList.contains('hidden')) {
         // Opening
         modal.classList.replace('hidden', 'flex');
@@ -188,14 +188,14 @@ window.toggleModal = function() {
 // 4. Form Submission Logic
 form.addEventListener('submit', async function(e) {
     e.preventDefault();
-    
+
     const mode = this.dataset.mode || 'add';
     const id = this.dataset.id;
     const url = mode === 'edit' ? `/api/taxmgt/${id}` : '/api/taxmgt';
     const method = mode === 'edit' ? 'PUT' : 'POST';
 
     const formData = new FormData(this);
-    
+
     // Convert FormData to JSON for PUT requests (Standard for Laravel APIs)
     let bodyData = formData;
     let headers = {
@@ -240,12 +240,12 @@ window.editTax = async function(id) {
             modal.classList.replace('hidden', 'flex');
 
             // 3. IMPORTANT: Wait for the dropdown to finish loading options
-            await fetchSalesDropdown(); 
+            await fetchSalesDropdown();
 
             // 4. Now that options exist, we can select the right one
             document.getElementById('sale_select').value = tax.sale_mgt_id;
-            
-            
+
+
             // Fill rest of fields
             document.querySelector('input[name="tax_invoice_number"]').value = tax.tax_invoice_number;
             document.querySelector('input[name="tax_cus_vattin"]').value = tax.tax_cus_vattin || '';
@@ -259,7 +259,7 @@ window.editTax = async function(id) {
             document.getElementById('hidden_price').value = Number(tax.tax_hidden_price).toFixed(2);
             document.getElementById('at_price').value = Number(tax.tax_at_price).toFixed(2);
             calculateTaxTotals();
-            
+
             // Set mode
             const form = document.getElementById('addTaxForm');
             form.dataset.mode = 'edit';
@@ -312,8 +312,8 @@ window.viewInvoiceTax = async function(id) {
         });
 
         // Trigger Print
-        setTimeout(() => { 
-            window.print(); 
+        setTimeout(() => {
+            window.print();
             document.title = originalTitle;
         }, 500);
 
