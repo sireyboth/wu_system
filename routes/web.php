@@ -6,6 +6,7 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\RoomMGTController;
 use App\Http\Controllers\SaleMGTController;
 use App\Http\Controllers\LecturerController;
+use App\Http\Controllers\ShiftController;
 
 
 Route::get('/', function () {
@@ -22,6 +23,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('salemgt', SaleMGTController::class);
     Route::resource('taxmgt', TaxMgtController::class);
     Route::resource('lecturer', LecturerController::class);
+    Route::resource('shift', ShiftController::class);
 });
 
 Route::middleware('auth')->group(function () {
