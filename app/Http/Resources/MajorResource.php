@@ -16,7 +16,7 @@ class MajorResource extends JsonResource
     {
         return to_list($this, [
             'name'       => $this->name,
-            'name_name'  => $this->name_kh,
+            'name_kh'  => $this->name_kh,
             'name_en'    => $this->name_en,
             'faculty_id' => $this->faculty_id,
             'shortcut'   => $this->shortcut,

@@ -7,6 +7,8 @@ use App\Http\Controllers\RoomMGTController;
 use App\Http\Controllers\SaleMGTController;
 use App\Http\Controllers\LecturerController;
 use App\Http\Controllers\ShiftController;
+use App\Http\Controllers\FacultyController;
+use App\Http\Controllers\MajorController;
 
 
 Route::get('/', function () {
@@ -24,6 +26,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('taxmgt', TaxMgtController::class);
     Route::resource('lecturer', LecturerController::class);
     Route::resource('shift', ShiftController::class);
+    Route::resource('faculty', FacultyController::class);
+    Route::resource('major', MajorController::class);
 });
 
 Route::middleware('auth')->group(function () {

@@ -5,7 +5,12 @@ use App\Helpers\IModel;
 
 class Major extends IModel
 {
-    protected $fillable = ['name_kh', 'name_en', 'faculty_id', 'shortcut', 'remark'];
+    protected $fillable = [
+        'name_kh',
+        'name_en',
+        'faculty_id',
+        'shortcut',
+        'remark'];
 
     /**
      * Get the faculty that owns this major
