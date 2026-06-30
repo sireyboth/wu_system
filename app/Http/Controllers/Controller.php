@@ -1,8 +1,6 @@
 <?php
 namespace App\Http\Controllers;
 
-use function App\Helpers\handle;
-use function App\Helpers\no_data;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -34,8 +32,7 @@ abstract class Controller
     protected function save(FormRequest $request)
     {
         return handle(function () use ($request) {
-            $data     = $request->validated();
-            $response = $this->model::create($data);
+            $response = $this->model::create($request->validated());
             $this->related($response);
 
             return new $this->resource($response->fresh());

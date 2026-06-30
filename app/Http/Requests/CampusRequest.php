@@ -21,10 +21,6 @@ class CampusRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'name_kh' => 'required|string|min:3|max:255',
-            'name_en' => 'required|string|min:3|max:255',
-            'remark'  => 'nullable|string|max:500',
-        ];
+        return DEFAULT_VALIDATE;
     }
 }

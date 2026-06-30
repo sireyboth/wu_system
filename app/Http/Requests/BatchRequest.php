@@ -5,7 +5,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class FacultyRequest extends FormRequest
+class BatchRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,14 +24,15 @@ class FacultyRequest extends FormRequest
     {
         return [
              ...DEFAULT_VALIDATE,
-            'shortcut' => [
+            'shortcut'      => [
                 'nullable',
                 'string',
                 'max:50',
-                Rule::unique('faculties', 'shortcut')
-                    ->ignore($this->route('faculty'))
+                Rule::unique('batches', 'shortcut')
+                    ->ignore($this->route('batch'))
                     ->withoutTrashed(),
             ],
+            'academic_year' => 'nullable|string',
         ];
     }
 }

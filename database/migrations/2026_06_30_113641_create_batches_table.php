@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        make_fields('majors', function (Blueprint $table) {
-            $table->foreignId('faculty_id')->constrained()->cascadeOnDelete();
+        make_fields('batches', function (Blueprint $table) {
             $table->string('shortcut')->unique()->nullable();
+            $table->string('academic_year')->nullable();
         });
     }
 
@@ -22,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('majors');
+        Schema::dropIfExists('batches');
     }
 };

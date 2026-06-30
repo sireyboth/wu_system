@@ -10,11 +10,11 @@ abstract class IModel extends Model
 {
     use HasFactory, SoftDeletes;
 
-     protected array $searchable = [];
+    protected array $searchable = [];
 
     public function scopeSearch(Builder $query, ?string $keyword): Builder
     {
-        if (!$keyword || empty($this->searchable)) {
+        if (! $keyword || empty($this->searchable)) {
             return $query;
         }
 
@@ -40,7 +40,7 @@ abstract class IModel extends Model
         $this->attributes['name']    = $this->combineName($this->name_kh ?? request('name_kh'), $value);
     }
 
-    protected function combineName(string $name_kh, string $name_en): string
+    private function combineName(string $name_kh, string $name_en): string
     {
         return "{$name_kh} ({$name_en})";
     }

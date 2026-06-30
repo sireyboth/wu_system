@@ -23,9 +23,8 @@ class LecturerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name_kh' => 'required|string|min:3|max:255',
-            'name_en' => 'required|string|min:3|max:255',
-            'code'    => [
+            DEFAULT_VALIDATE,
+            'code' => [
                 'nullable',
                 'string',
                 'max:50',
@@ -33,7 +32,6 @@ class LecturerRequest extends FormRequest
                     ->ignore($this->route('lecturer'))
                     ->withoutTrashed(),
             ],
-            'remark'  => 'nullable|string|max:500',
         ];
     }
 }

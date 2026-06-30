@@ -1,7 +1,6 @@
 <?php
 namespace App\Http\Resources;
 
-use function App\Helpers\to_list;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,10 +13,6 @@ class CampusResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return to_list($this, [
-            'name'    => $this->name,
-            'name_kh' => $this->name_kh,
-            'name_en' => $this->name_en,
-        ]);
+        return to_list($this);
     }
 }

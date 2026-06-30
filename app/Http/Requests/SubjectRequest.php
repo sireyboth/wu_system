@@ -23,8 +23,7 @@ class SubjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name_kh'  => 'required|string|min:3|max:255',
-            'name_en'  => 'required|string|min:3|max:255',
+            DEFAULT_VALIDATE,
             'code'     => [
                 'nullable',
                 'string',
@@ -35,8 +34,7 @@ class SubjectRequest extends FormRequest
             ],
             'year'     => 'nullable|string|max:50',
             'semester' => 'nullable|string|max:50',
-            'credit'   => 'nullable|string|max:10',
-            'remark'   => 'nullable|string|max:500',
+            'credit'   => 'nullable|integer',
         ];
     }
 }

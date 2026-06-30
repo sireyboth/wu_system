@@ -23,8 +23,7 @@ class ShiftRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name_kh'  => 'required|string|min:3|max:255',
-            'name_en'  => 'required|string|min:3|max:255',
+            DEFAULT_VALIDATE,
             'shortcut' => [
                 'nullable',
                 'string',
@@ -33,7 +32,6 @@ class ShiftRequest extends FormRequest
                     ->ignore($this->route('shift'))
                     ->withoutTrashed(),
             ],
-            'remark'   => 'nullable|string|max:500',
         ];
     }
 }

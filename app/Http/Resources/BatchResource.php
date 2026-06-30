@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class LecturerResource extends JsonResource
+class BatchResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,7 +14,8 @@ class LecturerResource extends JsonResource
     public function toArray(Request $request): array
     {
         return to_list($this, [
-            'code' => $this->code,
+            'shortcut'      => $this->shortcut,
+            'academic_year' => $this->academic_year,
         ]);
     }
 }

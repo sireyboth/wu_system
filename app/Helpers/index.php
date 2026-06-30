@@ -1,5 +1,4 @@
 <?php
-namespace App\Helpers;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\JsonResponse;
@@ -9,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 
 if (! function_exists('make_fields')) {
-    function make_fields(string $name, callable $fn, array $fields = [], bool $named = true): void
+    function make_fields(string $name,  ? callable $fn = null, array $fields = [], bool $named = true) : void
     {
         Schema::create($name, fn(Blueprint $table) => fields($table, function () use ($table, $fn) {
             $fn($table);
@@ -18,7 +17,7 @@ if (! function_exists('make_fields')) {
 }
 
 if (! function_exists('fields')) {
-    function fields(Blueprint $table, callable $fn, array $fields = [], bool $named = false): void
+    function fields(Blueprint $table,  ? callable $fn = null, array $fields = [], bool $named = false) : void
     {
         $table->id();
         if ($fields) {
@@ -29,6 +28,8 @@ if (! function_exists('fields')) {
         $fn();
 
         if ($named) {
+            $table->string('name_kh');
+            $table->string('name_en');
             $table->string('name')->nullable();
         }
 
@@ -39,15 +40,24 @@ if (! function_exists('fields')) {
 }
 
 if (! function_exists('to_list')) {
-    function to_list(mixed $object, array $fields = []): array
+    function to_list(mixed $object, array $fields = [], bool $named = true): array
     {
-        return [
-            'id'         => $object->id,
+        $data = [
+            'id' => $object->id,
             ...$fields,
-            'remark'     => $object->remark,
-            'created_at' => $object->created_at?->format('Y-m-d H:i:s'),
-            'updated_at' => $object->updated_at?->format('Y-m-d H:i:s'),
         ];
+
+        if ($named) {
+            $data['name']    = $object->name;
+            $data['name_kh'] = $object->name_kh;
+            $data['name_en'] = $object->name_en;
+        }
+
+        $data['remark']     = $object->remark;
+        $data['created_at'] = $object->created_at?->format('Y-m-d H:i:s');
+        $data['updated_at'] = $object->updated_at?->format('Y-m-d H:i:s');
+
+        return $data;
     }
 }
 
@@ -135,6 +145,16 @@ if (! function_exists('api_routes')) {
             // Force Delete
             Route::delete("{$slug}/{id}/clear", [$controller, 'force_destroy'])
                 ->name("{$slug}.force-destroy");
+        }
+    }
+}
+
+if (! function_exists('web_routes')) {
+    function web_routes(array $actions,  ? callable $fn = null) : void
+    {
+        foreach ($actions as $slug => $controller) {
+            Route::get($slug, [$controller, $slug])->name($slug);
+            $fn();
         }
     }
 }

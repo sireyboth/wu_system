@@ -6,7 +6,7 @@ use App\Helpers\IModel;
 class Faculty extends IModel
 {
 
-    protected $fillable = ['name_kh', 'name_en', 'shortcut', 'remark'];
+    protected $fillable = [...DEFAULT_FIELD, 'shortcut'];
 
     /**
      * Get all majors that belong to this faculty

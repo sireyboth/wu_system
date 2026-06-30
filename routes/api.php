@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\BatchController;
 use App\Http\Controllers\Api\CampusController;
 use App\Http\Controllers\Api\DashboardApiController;
 use App\Http\Controllers\Api\FacultyController;
@@ -10,7 +11,6 @@ use App\Http\Controllers\Api\SaleMgtApiController;
 use App\Http\Controllers\Api\ShiftController;
 use App\Http\Controllers\Api\SubjectController;
 use App\Http\Controllers\Api\TaxMgtApiController;
-use function App\Helpers\api_routes;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -24,6 +24,7 @@ Route::prefix('v1')->group(function () {
         'campuses'  => CampusController::class,
         'lecturers' => LecturerController::class,
         'subjects'  => SubjectController::class,
+        'batches'   => BatchController::class,
     ]);
 });
 

@@ -23,9 +23,8 @@ class MajorRequest extends FormRequest
     public function rules(): array
     {
         return [
+            DEFAULT_VALIDATE,
             'faculty_id' => 'required|exists:faculties,id|integer',
-            'name_kh'    => 'required|string|min:3|max:255',
-            'name_en'    => 'required|string|min:3|max:255',
             'shortcut'   => [
                 'nullable',
                 'string',
@@ -34,7 +33,6 @@ class MajorRequest extends FormRequest
                     ->ignore($this->route('major'))
                     ->withoutTrashed(),
             ],
-            'remark'     => 'nullable|string|max:500',
         ];
     }
 }
