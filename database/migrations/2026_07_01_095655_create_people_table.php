@@ -12,8 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         make_fields('people', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
         });
     }
 
