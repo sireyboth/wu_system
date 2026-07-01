@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         make_fields('batches', function (Blueprint $table) {
-            $table->string('shortcut')->unique()->nullable();
-            $table->string('academic_year')->nullable();
+            $table->string('shortcut', 50)->unique()->nullable();
+            $table->string('academic_year', 20)->nullable();
         });
     }
 

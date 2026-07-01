@@ -13,7 +13,7 @@ return new class extends Migration
     {
         make_fields('majors', function (Blueprint $table) {
             $table->foreignId('faculty_id')->constrained()->cascadeOnDelete();
-            $table->string('shortcut')->unique()->nullable();
+            $table->string('shortcut', 50)->unique()->nullable();
         });
     }
 

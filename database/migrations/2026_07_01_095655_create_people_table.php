@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        make_fields('shifts', function (Blueprint $table) {
-            $table->string('shortcut', 50)->unique()->nullable();
+        make_fields('people', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
         });
     }
 
@@ -21,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('shifts');
+        Schema::dropIfExists('people');
     }
 };

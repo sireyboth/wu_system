@@ -11,9 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        make_fields('shifts', function (Blueprint $table) {
-            $table->string('shortcut', 50)->unique()->nullable();
-        });
+        make_fields('villages', function (Blueprint $table) {
+            $table->unsignedInteger('commune_id');
+            $table->foreign('commune_id')->references('id')->on('communes')->cascadeOnDelete();
+        }, key: false);
     }
 
     /**
@@ -21,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('shifts');
+        Schema::dropIfExists('villages');
     }
 };

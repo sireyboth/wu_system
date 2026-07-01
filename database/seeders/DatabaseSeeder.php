@@ -1,5 +1,4 @@
 <?php
-
 namespace Database\Seeders;
 
 use App\Models\User;
@@ -18,8 +17,10 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         User::factory()->create([
-            'name' => 'Admin System',
+            'name'  => 'Admin System',
             'email' => 'admin@system.me',
         ]);
+
+        $this->call([LocationSeeder::class]);
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -10,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        make_fields('campuses');
+        make_fields('campuses', function (Blueprint $table) {});
     }
 
     /**

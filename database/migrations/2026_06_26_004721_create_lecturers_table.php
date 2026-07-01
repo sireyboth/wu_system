@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         make_fields('lecturers', function (Blueprint $table) {
-            $table->string('code')->unique()->nullable();
+            $table->string('code', 50)->unique()->nullable();
         });
     }
 

@@ -11,9 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        make_fields('shifts', function (Blueprint $table) {
-            $table->string('shortcut', 50)->unique()->nullable();
-        });
+        make_fields('provinces', function (Blueprint $table) {}, key: false);
     }
 
     /**
@@ -21,6 +19,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('shifts');
+        Schema::dropIfExists('provinces');
     }
 };

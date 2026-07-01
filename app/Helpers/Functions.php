@@ -3,39 +3,40 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 
 if (! function_exists('make_fields')) {
-    function make_fields(string $name,  ? callable $fn = null, array $fields = [], bool $named = true) : void
+    function make_fields(string $name, callable $fn, bool $named = true, bool $increment = true): void
     {
         Schema::create($name, fn(Blueprint $table) => fields($table, function () use ($table, $fn) {
             $fn($table);
-        }, $fields, $named));
+        }, $named, $increment));
     }
 }
 
 if (! function_exists('fields')) {
-    function fields(Blueprint $table,  ? callable $fn = null, array $fields = [], bool $named = false) : void
+    function fields(Blueprint $table, callable $fn, bool $named = false, bool $increment = false): void
     {
-        $table->id();
-        if ($fields) {
-            foreach ($fields as $field) {
-                $table->string($field);
-            }
-        }
+        $increment ? $table->id() : $table->unsignedInteger('id')->primary();
         $fn();
 
         if ($named) {
-            $table->string('name_kh');
-            $table->string('name_en');
-            $table->string('name')->nullable();
+            $table->string('name_kh', 100);
+            $table->string('name_en', 100);
+            $table->string('name', 255)->nullable();
         }
 
-        $table->text('remark')->nullable();
-        $table->timestamps();
-        $table->softDeletes();
+        if ($increment) {
+            $table->text('remark')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+        } else {
+            $table->timestamps();
+        }
+
     }
 }
 
@@ -118,10 +119,8 @@ if (! function_exists('has_data')) {
 }
 
 if (! function_exists('no_data')) {
-    function no_data(
-        string $message,
-        int $code = 400,
-    ): JsonResponse {
+    function no_data(string $message, int $code = 400): JsonResponse
+    {
         return response()->json([
             'success' => false,
             'message' => $message,
@@ -135,26 +134,59 @@ if (! function_exists('no_data')) {
 if (! function_exists('api_routes')) {
     function api_routes(array $resources): void
     {
-        Route::apiResources($resources);
+        Route::apiResources("/{$resources}");
 
         foreach ($resources as $slug => $controller) {
             // Restore
-            Route::post("{$slug}/{id}/restore", [$controller, 'restore'])
+            Route::post("/{$slug}/{id}/restore", [$controller, 'restore'])
                 ->name("{$slug}.restore");
 
             // Force Delete
-            Route::delete("{$slug}/{id}/clear", [$controller, 'force_destroy'])
+            Route::delete("/{$slug}/{id}/clear", [$controller, 'force_destroy'])
                 ->name("{$slug}.force-destroy");
         }
     }
 }
 
 if (! function_exists('web_routes')) {
-    function web_routes(array $actions,  ? callable $fn = null) : void
+    function web_routes(array $actions, callable $fn): void
     {
         foreach ($actions as $slug => $controller) {
-            Route::get($slug, [$controller, $slug])->name($slug);
+            Route::get("/{$slug}", [$controller, $slug])->name($slug);
             $fn();
+        }
+    }
+}
+
+if (! function_exists('set_data')) {
+    function set_data(string $name, array $fields = []): void
+    {
+        $path = database_path("/data/{$name}.json");
+        $rows = json_decode(file_get_contents($path), true);
+
+        $now  = Carbon::now();
+        $data = array_map(function ($row) use ($now, $fields) {
+            $name_en = $row['name_en'];
+            $name_kh = $row['name_kh'];
+
+            $item = [
+                'id'      => $row['id'],
+                'name_en' => $name_en,
+                'name_kh' => $name_kh,
+                'name'    => "{$name_en} ({$name_kh})",
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
+
+            foreach ($fields as $field) {
+                $item[$field] = $row[$field] ?? null;
+            }
+
+            return $item;
+        }, $rows);
+
+        foreach (array_chunk($data, 500) as $chunk) {
+            DB::table($name)->insertOrIgnore($chunk);
         }
     }
 }
