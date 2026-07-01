@@ -14,7 +14,7 @@ return new class extends Migration
         make_fields('districts', function (Blueprint $table) {
             $table->unsignedInteger('province_id');
             $table->foreign('province_id')->references('id')->on('provinces')->cascadeOnDelete();
-        }, key: false);
+        }, increment: false);
     }
 
     /**

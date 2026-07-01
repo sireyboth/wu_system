@@ -134,7 +134,7 @@ if (! function_exists('no_data')) {
 if (! function_exists('api_routes')) {
     function api_routes(array $resources): void
     {
-        Route::apiResources("/{$resources}");
+        Route::apiResources($resources);
 
         foreach ($resources as $slug => $controller) {
             // Restore

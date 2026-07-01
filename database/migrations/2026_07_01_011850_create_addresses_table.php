@@ -34,6 +34,9 @@ return new class extends Migration
                 ->constrained()
                 ->restrictOnDelete();
 
+            $table->string('street', 255)->nullable();
+            $table->string('house_no', 50)->nullable();
+
             // Address type
             $table->enum('type', [
                 'current',
@@ -42,7 +45,7 @@ return new class extends Migration
 
             // Prevent duplicate address types for the same person
             $table->unique(['person_id', 'type']);
-        }, ['street', 'house_no'], named: false);
+        });
     }
 
     /**
