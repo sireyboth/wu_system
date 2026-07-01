@@ -9,6 +9,7 @@ use App\Http\Controllers\LecturerController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\FacultyController;
 use App\Http\Controllers\MajorController;
+use App\Http\Controllers\BatchController;
 
 
 Route::get('/', function () {
@@ -23,11 +24,12 @@ Route::middleware(['auth'])->group(function () {
     // Additional routes based on your Controller methods
     Route::resource('roomsmgt', RoomMGTController::class);
     Route::resource('salemgt', SaleMGTController::class);
-    Route::resource('taxmgt', TaxMgtController::class);
+    // Route::resource('taxmgt', TaxMgtController::class);
     Route::resource('lecturer', LecturerController::class);
     Route::resource('shift', ShiftController::class);
     Route::resource('faculty', FacultyController::class);
     Route::resource('major', MajorController::class);
+    Route::resource('batch', BatchController::class);
 });
 
 Route::middleware('auth')->group(function () {

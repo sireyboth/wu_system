@@ -1,5 +1,5 @@
 /**
- * faculty Management System Module
+ * batch Management System Module
  * Encapsulated to prevent global scope pollution, using event delegation and decoupled UI templates.
  */
 (() => {
@@ -7,21 +7,21 @@
 
     // 1. CONFIGURATION & CONSTANTS
     const CONFIG = {
-        API_BASE: '/api/v1/faculties',
+        API_BASE: '/api/v1/batches',
         DEBOUNCE_DELAY: 300,
         LOCALE: 'en-GB'
     };
 
     // 2. CENTRALIZED DOM SELECTORS
     const DOM = {
-        form: document.getElementById('addfacultyForm'),
-        tableBody: document.getElementById('faculty-table-body'),
-        searchInput: document.getElementById('facultySearchInput'),
+        form: document.getElementById('addbatchForm'),
+        tableBody: document.getElementById('batch-table-body'),
+        searchInput: document.getElementById('batchSearchInput'),
         loader: document.getElementById('loading-overlay'),
-        modal: document.getElementById('facultyModal'),
+        modal: document.getElementById('batchModal'),
         modalCard: document.getElementById('modalCard'),
         modalTitle: document.getElementById('modalTitle'),
-        submitBtn: document.getElementById('addfacultyForm')?.querySelector('button[type="submit"]')
+        submitBtn: document.getElementById('addbatchForm')?.querySelector('button[type="submit"]')
     };
 
     // Third-party instance verification
@@ -36,7 +36,7 @@
     // 3. PRIVATE MODULE STATE
     const state = {
         isEditMode: false,
-        editingfacultyId: null,
+        editingbatchId: null,
         debounceTimer: null
     };
 
@@ -83,12 +83,12 @@ const ApiService = {
 };
 
     // 5. CORE WORKFLOW CONTROLLERS
-    async function loadfacultys(searchQuery = '') {
+    async function loadbatchs(searchQuery = '') {
         const url = `${CONFIG.API_BASE}?search=${encodeURIComponent(searchQuery)}`;
         const { error, data } = await ApiService.request(url);
 
         if (error) {
-            Toast.fire({ icon: 'error', title: 'Failed to load facultys' });
+            Toast.fire({ icon: 'error', title: 'Failed to load batchs' });
             return;
         }
 
@@ -106,7 +106,7 @@ const ApiService = {
 
         const payload = data.data || data;
         state.isEditMode = true;
-        state.editingfacultyId = id;
+        state.editingbatchId = id;
 
         if (DOM.modalTitle) DOM.modalTitle.textContent = 'កែប្រែព័ត៌មានវេន';
         if (DOM.submitBtn) DOM.submitBtn.textContent = 'ធ្វើបច្ចុប្បន្នភាព';
@@ -137,7 +137,7 @@ const ApiService = {
         const { error } = await ApiService.request(`${CONFIG.API_BASE}/${id}`, { method: 'DELETE' });
         if (!error) {
             Toast.fire({ icon: 'success', title: 'លុបទិន្នន័យបានជោគជ័យ!' });
-            loadfacultys(DOM.searchInput?.value || '');
+            loadbatchs(DOM.searchInput?.value || '');
         } else {
             Toast.fire({ icon: 'error', title: 'មានបញ្ហាមិនអាចលុបទិន្នន័យនេះបាន' });
         }
@@ -157,7 +157,7 @@ const ApiService = {
             payload[key] = cleanVal === '' ? null : cleanVal;
         }
 
-        const url = state.isEditMode ? `${CONFIG.API_BASE}/${state.editingfacultyId}` : CONFIG.API_BASE;
+        const url = state.isEditMode ? `${CONFIG.API_BASE}/${state.editingbatchId}` : CONFIG.API_BASE;
         const method = state.isEditMode ? 'PUT' : 'POST';
 
         const { error, status, data } = await ApiService.request(url, {
@@ -174,7 +174,7 @@ const ApiService = {
             });
             resetFormState();
             toggleModal(false);
-            loadfacultys();
+            loadbatchs();
         } else if (status === 422 && data) {
             const errorMessages = data.errors ? Object.values(data.errors).flat() : ['Validation failed'];
             Toast.fire({
@@ -193,26 +193,25 @@ const ApiService = {
     }
 
     // UI RENDERING & COMPONENT TEMPLATES
-function renderTable(facultys) {
+function renderTable(batchs) {
     if (!DOM.tableBody) return;
 
-    if (!facultys || facultys.length === 0) {
-        DOM.tableBody.className = "block text-center py-10 text-neutral-500";
-        DOM.tableBody.innerHTML = '<div>No records found.</div>';
+    if (!batchs || batchs.length === 0) {
+       DOM.tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-10 text-neutral-500">No records found.</td></tr>';
         return;
     }
 
     // Restore responsive layout classes dynamically
     DOM.tableBody.className = "grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 md:p-0 md:table-row-group md:divide-y md:divide-neutral-200 md:dark:divide-white/5";
 
-    DOM.tableBody.innerHTML = facultys.map((faculty, index) => {
-        const formattedDate = new Date(faculty.created_at).toLocaleDateString(CONFIG.LOCALE, {
+    DOM.tableBody.innerHTML = batchs.map((batch, index) => {
+        const formattedDate = new Date(batch.created_at).toLocaleDateString(CONFIG.LOCALE, {
             day: '2-digit', month: 'short', year: 'numeric'
         });
 
-        // Fixed a subtle data bug from your snippet where faculty.name_kh was printed twice instead of English variant below it
-        const nameKhmer = faculty.name_kh ?? '<span class="text-neutral-400 italic">N/A</span>';
-        const nameEnglish = faculty.name_en ?? '<span class="text-neutral-400 italic">N/A</span>';
+        // Fixed a subtle data bug from your snippet where batch.name_kh was printed twice instead of English variant below it
+        const nameKhmer = batch.name_kh ?? '<span class="text-neutral-400 italic">N/A</span>';
+        const nameEnglish = batch.name_en ?? '<span class="text-neutral-400 italic">N/A</span>';
 
         return `
             <tr class="block relative p-5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-xl shadow-sm hover:shadow-md md:shadow-none md:border-0 md:border-b md:rounded-none md:p-0 md:bg-transparent md:dark:bg-transparent group hover:bg-indigo-50/30 dark:hover:bg-indigo-500/5 transition-all duration-200 md:table-row">
@@ -237,7 +236,7 @@ function renderTable(facultys) {
                         </div>
                         <div>
                             <div class="font-semibold text-neutral-900 dark:text-white">${nameEnglish}</div>
-                            <div class="text-xs text-neutral-400 font-mono">${faculty.shortcut ?? 'No Code'}</div>
+                            <div class="text-xs text-neutral-400 font-mono">${batch.shortcut ?? 'No Code'}</div>
                         </div>
                     </div>
                 </td>
@@ -245,16 +244,16 @@ function renderTable(facultys) {
                 <!-- Shortcut Column Descriptor -->
                 <td class="block md:table-cell px-0 py-1.5 md:px-6 md:py-4">
                     <span class="text-xs text-neutral-400 font-normal md:hidden block">Shortcut</span>
-                    <p class="text-sm text-neutral-600 dark:text-neutral-400 max-w-[250px] truncate" title="${faculty.shortcut ?? ''}">
-                        ${faculty.shortcut ?? '<span class="italic opacity-40 text-xs">No Shortcut</span>'}
+                    <p class="text-sm text-neutral-600 dark:text-neutral-400 max-w-[250px] truncate" title="${batch.shortcut ?? ''}">
+                        ${batch.shortcut ?? '<span class="italic opacity-40 text-xs">No Shortcut</span>'}
                     </p>
                 </td>
 
                 <!-- Remarks Text Region -->
                 <td class="block md:table-cell px-0 py-1.5 md:px-6 md:py-4">
                     <span class="text-xs text-neutral-400 font-normal md:hidden block">Remark</span>
-                    <p class="text-sm text-neutral-600 dark:text-neutral-400 max-w-[250px] truncate" title="${faculty.remark ?? ''}">
-                        ${faculty.remark ?? '<span class="italic opacity-40 text-xs">No remarks</span>'}
+                    <p class="text-sm text-neutral-600 dark:text-neutral-400 max-w-[250px] truncate" title="${batch.remark ?? ''}">
+                        ${batch.remark ?? '<span class="italic opacity-40 text-xs">No remarks</span>'}
                     </p>
                 </td>
 
@@ -267,12 +266,12 @@ function renderTable(facultys) {
                 <!-- Action Button Controls (Anchored cleanly across both modes) -->
                 <td class="block md:table-cell px-0 pt-4 pb-1 md:p-6 text-right border-t border-neutral-100 dark:border-white/5 mt-3 md:mt-0 md:border-0">
                     <div class="flex justify-end gap-2">
-                        <button data-action="edit" data-id="${faculty.id}" class="p-2 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-lg transition-colors" title="Edit faculty">
+                        <button data-action="edit" data-id="${batch.id}" class="p-2 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-lg transition-colors" title="Edit batch">
                             <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                             </svg>
                         </button>
-                        <button data-action="delete" data-id="${faculty.id}" class="p-2 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-colors" title="Delete faculty">
+                        <button data-action="delete" data-id="${batch.id}" class="p-2 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-colors" title="Delete batch">
                             <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                             </svg>
@@ -319,7 +318,7 @@ function renderTable(facultys) {
     function resetFormState() {
         if (DOM.form) DOM.form.reset();
         state.isEditMode = false;
-        state.editingfacultyId = null;
+        state.editingbatchId = null;
 
         if (DOM.modalTitle) DOM.modalTitle.textContent = 'បន្ថែមសាស្ត្រាចារ្យថ្មី';
         if (DOM.submitBtn) DOM.submitBtn.textContent = 'រក្សាទុក';
@@ -338,7 +337,7 @@ function renderTable(facultys) {
         DOM.searchInput?.addEventListener('input', (e) => {
             clearTimeout(state.debounceTimer);
             state.debounceTimer = setTimeout(() => {
-                loadfacultys(e.target.value);
+                loadbatchs(e.target.value);
             }, CONFIG.DEBOUNCE_DELAY);
         });
 
@@ -358,7 +357,7 @@ function renderTable(facultys) {
         });
 
         // Interactive Tooltips Hint Dynamic Engine
-        const inputsWithHints = document.querySelectorAll('#addfacultyForm input, #addfacultyForm textarea');
+        const inputsWithHints = document.querySelectorAll('#addbatchForm input, #addbatchForm textarea');
         inputsWithHints.forEach(input => {
             const hintBox = input.parentElement.querySelector('.smart-hint');
             const textMessage = input.getAttribute('data-hint');
@@ -386,6 +385,6 @@ function renderTable(facultys) {
     // 9. INITIALIZE ENGINE RUNNING
     document.addEventListener('DOMContentLoaded', () => {
         initEvents();
-        loadfacultys();
+        loadbatchs();
     });
 })();
