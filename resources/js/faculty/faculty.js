@@ -192,59 +192,99 @@ const ApiService = {
         DOM.submitBtn.disabled = false;
     }
 
-    // 6. UI RENDERING & COMPONENT TEMPLATES
-    function renderTable(facultys) {
-        if (!DOM.tableBody) return;
+    // UI RENDERING & COMPONENT TEMPLATES
+function renderTable(facultys) {
+    if (!DOM.tableBody) return;
 
-        if (!facultys || facultys.length === 0) {
-            DOM.tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-neutral-500">No records found.</td></tr>';
-            return;
-        }
-
-        DOM.tableBody.innerHTML = facultys.map((faculty, index) => {
-            const formattedDate = new Date(faculty.created_at).toLocaleDateString(CONFIG.LOCALE, {
-                day: '2-digit', month: 'short', year: 'numeric'
-            });
-
-            return `
-                <tr class="group hover:bg-indigo-50/50 dark:hover:bg-indigo-500/5 transition-all duration-200 border-b border-neutral-100 dark:border-white/5">
-                    <td class="px-6 py-4 text-neutral-500 font-mono text-sm">${index + 1}</td>
-                    <td class="px-6 py-4 font-bold text-indigo-600 dark:text-indigo-400">${faculty.name_kh ?? '<span class="text-neutral-400 italic">N/A</span>'}</td>
-                    <td class="px-6 py-4">
-                        <div class="flex items-center">
-                            <div class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mr-3">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                            </div>
-                            <div>
-                                <div class="font-semibold text-neutral-900 dark:text-white">${faculty.name_kh}</div>
-                                <div class="text-xs text-neutral-400 font-mono">${faculty.name_en}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4">
-                        <p class="text-sm text-neutral-600 dark:text-neutral-400 max-w-[250px] truncate" title="${faculty.shortcut ?? ''}">
-                            ${faculty.shortcut?? '<span class="italic opacity-40 text-xs">No Shortcut</span>'}
-                        </p>
-                    </td>
-                    <td class="px-6 py-4">
-                        <p class="text-sm text-neutral-600 dark:text-neutral-400 max-w-[250px] truncate" title="${faculty.remark ?? ''}">
-                            ${faculty.remark ?? '<span class="italic opacity-40 text-xs">No remarks</span>'}
-                        </p>
-                    </td>
-                    <td class="px-6 py-4 text-xs text-neutral-500 font-mono">${formattedDate}</td>
-                    <td class="px-6 py-4 text-right">
-                        <div class="flex justify-end gap-2">
-                            <button data-action="edit" data-id="${faculty.id}" class="p-2 text-amber-600 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 rounded-lg transition-colors" title="Edit faculty">
-                                <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                            </button>
-                            <button data-action="delete" data-id="${faculty.id}" class="p-2 text-rose-600 hover:bg-rose-100 dark:hover:bg-rose-500/20 rounded-lg transition-colors" title="Delete faculty">
-                                <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                            </button>
-                        </div>
-                    </td>
-                </tr>`;
-        }).join('');
+    if (!facultys || facultys.length === 0) {
+        DOM.tableBody.className = "block text-center py-10 text-neutral-500";
+        DOM.tableBody.innerHTML = '<div>No records found.</div>';
+        return;
     }
+
+    // Restore responsive layout classes dynamically
+    DOM.tableBody.className = "grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 md:p-0 md:table-row-group md:divide-y md:divide-neutral-200 md:dark:divide-white/5";
+
+    DOM.tableBody.innerHTML = facultys.map((faculty, index) => {
+        const formattedDate = new Date(faculty.created_at).toLocaleDateString(CONFIG.LOCALE, {
+            day: '2-digit', month: 'short', year: 'numeric'
+        });
+
+        // Fixed a subtle data bug from your snippet where faculty.name_kh was printed twice instead of English variant below it
+        const nameKhmer = faculty.name_kh ?? '<span class="text-neutral-400 italic">N/A</span>';
+        const nameEnglish = faculty.name_en ?? '<span class="text-neutral-400 italic">N/A</span>';
+
+        return `
+            <tr class="block relative p-5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-xl shadow-sm hover:shadow-md md:shadow-none md:border-0 md:border-b md:rounded-none md:p-0 md:bg-transparent md:dark:bg-transparent group hover:bg-indigo-50/30 dark:hover:bg-indigo-500/5 transition-all duration-200 md:table-row">
+
+                <!-- Number Counter Indicator / Card Label Badge -->
+                <td class="block md:table-cell px-0 pb-3 md:px-6 md:py-4 text-xs font-mono font-bold tracking-wider text-neutral-400 md:text-neutral-500 md:text-sm md:font-normal">
+                    <span class="inline-block px-2 py-0.5 bg-neutral-100 dark:bg-neutral-800 rounded md:bg-transparent md:p-0"># ${index + 1}</span>
+                </td>
+
+                <!-- Khmer Name Element -->
+                <td class="block md:table-cell px-0 py-1.5 md:px-6 md:py-4 font-bold text-indigo-600 dark:text-indigo-400">
+                    <span class="text-xs text-neutral-400 font-normal md:hidden block mb-0.5">Name Khmer</span>
+                    ${nameKhmer}
+                </td>
+
+                <!-- Primary Identity Section (Combined Visual Component) -->
+                <td class="block md:table-cell px-0 py-2 md:px-6 md:py-4">
+                    <span class="text-xs text-neutral-400 font-normal md:hidden block mb-1.5">English Identity</span>
+                    <div class="flex items-center">
+                        <div class="w-9 h-9 rounded-lg bg-indigo-100 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mr-3">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-neutral-900 dark:text-white">${nameEnglish}</div>
+                            <div class="text-xs text-neutral-400 font-mono">${faculty.shortcut ?? 'No Code'}</div>
+                        </div>
+                    </div>
+                </td>
+
+                <!-- Shortcut Column Descriptor -->
+                <td class="block md:table-cell px-0 py-1.5 md:px-6 md:py-4">
+                    <span class="text-xs text-neutral-400 font-normal md:hidden block">Shortcut</span>
+                    <p class="text-sm text-neutral-600 dark:text-neutral-400 max-w-[250px] truncate" title="${faculty.shortcut ?? ''}">
+                        ${faculty.shortcut ?? '<span class="italic opacity-40 text-xs">No Shortcut</span>'}
+                    </p>
+                </td>
+
+                <!-- Remarks Text Region -->
+                <td class="block md:table-cell px-0 py-1.5 md:px-6 md:py-4">
+                    <span class="text-xs text-neutral-400 font-normal md:hidden block">Remark</span>
+                    <p class="text-sm text-neutral-600 dark:text-neutral-400 max-w-[250px] truncate" title="${faculty.remark ?? ''}">
+                        ${faculty.remark ?? '<span class="italic opacity-40 text-xs">No remarks</span>'}
+                    </p>
+                </td>
+
+                <!-- Created Timestamp Segment -->
+                <td class="block md:table-cell px-0 py-1.5 md:px-6 md:py-4 text-xs text-neutral-500 font-mono">
+                    <span class="text-xs text-neutral-400 font-normal md:hidden block font-sans mb-0.5">Created At</span>
+                    ${formattedDate}
+                </td>
+
+                <!-- Action Button Controls (Anchored cleanly across both modes) -->
+                <td class="block md:table-cell px-0 pt-4 pb-1 md:p-6 text-right border-t border-neutral-100 dark:border-white/5 mt-3 md:mt-0 md:border-0">
+                    <div class="flex justify-end gap-2">
+                        <button data-action="edit" data-id="${faculty.id}" class="p-2 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-lg transition-colors" title="Edit faculty">
+                            <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                        </button>
+                        <button data-action="delete" data-id="${faculty.id}" class="p-2 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-colors" title="Delete faculty">
+                            <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                        </button>
+                    </div>
+                </td>
+            </tr>`;
+    }).join('');
+}
 
     // 7. INTERACTIVE & MODAL TRANSLATION ENGINE
     function toggleModal(forceOpen = null) {

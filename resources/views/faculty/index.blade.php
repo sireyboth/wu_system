@@ -52,49 +52,47 @@
             </div>
         </div>
 
-        <div
-            class="relative overflow-hidden bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-2xl shadow-sm transition-colors duration-300">
-
-            <div id="loading-overlay"
-                class="hidden absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-neutral-900/50 backdrop-blur-[2px]">
-                <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
-            </div>
-
             <div
-                class="overflow-x-auto max-h-[600px] scrollbar-thin scrollbar-thumb-neutral-200 dark:scrollbar-thumb-white/10">
-                <table class="w-full text-sm text-left text-neutral-500 dark:text-neutral-400 border-collapse">
-                    <thead
-                        class="sticky top-0 z-20 text-xs text-neutral-700 uppercase bg-neutral-50 dark:bg-neutral-800/50 dark:text-neutral-300 backdrop-blur-md">
-                        <tr>
-                            <th scope="col" class="px-6 py-4 font-bold tracking-wider">
-                                <div class="flex items-center cursor-pointer group hover:text-indigo-600 transition-colors">
-                                    N.O
-                                    <svg class="w-3 h-3 ms-1.5 opacity-0 group-hover:opacity-100 transition-opacity"
-                                        fill="currentColor" viewBox="0 0 24 24">
-                                        <path
-                                            d="M8.574 11.024h6.852a2.075 2.075 0 0 0 1.847-1.086 1.9 1.9 0 0 0-.11-1.986L13.736 2.9a2.122 2.122 0 0 0-3.472 0L6.837 7.952a1.9 1.9 0 0 0-.11 1.986 2.074 2.074 0 0 0 1.847 1.086Z" />
-                                    </svg>
-                                </div>
-                            </th>
-                            <th scope="col" class="px-6 py-4">Name Khmer</th>
-                            <th scope="col" class="px-6 py-4">Name English</th>
-                            <th scope="col" class="px-6 py-4">Shortcut</th>
-                            <th scope="col" class="px-6 py-4">Remark</th>
-                            <th scope="col" class="px-6 py-4">Create At</th>
-                            <th scope="col" class="px-6 py-4 text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="faculty-table-body" class="divide-y divide-neutral-200 dark:divide-white/5">
-                       <tr>
-                            <td colspan="7" class="px-6 py-10 text-center">
-                                <span class="text-neutral-500">Loading data...</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div id="pagination-container" class="px-6 py-4 border-t border-neutral-200 dark:border-white">
-            </div>
+                class="relative overflow-hidden bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-2xl shadow-sm transition-colors duration-300">
+
+                <div id="loading-overlay"
+                    class="hidden absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-neutral-900/50 backdrop-blur-[2px]">
+                    <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
+                </div>
+
+                    <div class="w-full max-h-[600px] overflow-y-auto overflow-x-hidden md:overflow-x-auto scrollbar-thin scrollbar-thumb-neutral-200 dark:scrollbar-thumb-white/10">
+            <!-- Changed to a grid block on mobile, switches back to regular table layouts on desktop (md:) -->
+            <table class="w-full text-sm text-left text-neutral-500 dark:text-neutral-400 border-collapse block md:table">
+                <!-- Hidden on small screens, shown as proper table-header-group on desktop -->
+                <thead class="hidden md:table-header-group sticky top-0 z-20 text-xs text-neutral-700 uppercase bg-neutral-50 dark:bg-neutral-800/50 dark:text-neutral-300 backdrop-blur-md">
+                    <tr>
+                        <th scope="col" class="px-6 py-4 font-bold tracking-wider">
+                            <div class="flex items-center cursor-pointer group hover:text-indigo-600 transition-colors">
+                                N.O
+                                <svg class="w-3 h-3 ms-1.5 opacity-0 group-hover:opacity-100 transition-opacity" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M8.574 11.024h6.852a2.075 2.075 0 0 0 1.847-1.086 1.9 1.9 0 0 0-.11-1.986L13.736 2.9a2.122 2.122 0 0 0-3.472 0L6.837 7.952a1.9 1.9 0 0 0-.11 1.986 2.074 2.074 0 0 0 1.847 1.086Z" />
+                                </svg>
+                            </div>
+                        </th>
+                        <th scope="col" class="px-6 py-4">Name Khmer</th>
+                        <th scope="col" class="px-6 py-4">Name English</th>
+                        <th scope="col" class="px-6 py-4">Shortcut</th>
+                        <th scope="col" class="px-6 py-4">Remark</th>
+                        <th scope="col" class="px-6 py-4">Create At</th>
+                        <th scope="col" class="px-6 py-4 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <!-- tbody acts as a flexible grid on mobile screens -->
+                <tbody id="faculty-table-body" class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 md:p-0 md:table-row-group md:divide-y md:divide-neutral-200 md:dark:divide-white/5">
+                    <tr class="block md:table-row text-center py-10">
+                        <td class="block md:table-cell p-6 text-neutral-500">
+                            <span>Loading data...</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="pagination-container" class="px-6 py-4 border-t border-neutral-200 dark:border-white/5"></div>
 
         </div>
     </div>

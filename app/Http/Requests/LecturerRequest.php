@@ -23,7 +23,7 @@ class LecturerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            DEFAULT_VALIDATE,
+            ...DEFAULT_VALIDATE,
             'code' => [
                 'nullable',
                 'string',

@@ -23,7 +23,7 @@ class ShiftRequest extends FormRequest
     public function rules(): array
     {
         return [
-            DEFAULT_VALIDATE,
+            ...DEFAULT_VALIDATE,
             'shortcut' => [
                 'nullable',
                 'string',

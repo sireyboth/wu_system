@@ -23,7 +23,7 @@ class MajorRequest extends FormRequest
     public function rules(): array
     {
         return [
-            DEFAULT_VALIDATE,
+            ...DEFAULT_VALIDATE,
             'faculty_id' => 'required|exists:faculties,id|integer',
             'shortcut'   => [
                 'nullable',

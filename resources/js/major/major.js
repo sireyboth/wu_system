@@ -255,7 +255,7 @@
                 <td class="px-6 py-4 text-neutral-500 font-mono text-sm">${index + 1}</td>
 
                 <!-- Faculty Name Column Display -->
-                <td class="px-6 py-4 font-medium text-neutral-700 dark:text-neutral-300 text-sm">
+                <td class="px-6 py-4 font-bold text-indigo-600 dark:text-indigo-400 text-sm">
                     ${facultyName}
                 </td>
 
