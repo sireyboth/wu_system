@@ -5,5 +5,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class Group extends Model
 {
-    protected $fillable = DEFAULT_FIELD;
+    protected $fillable = DEFAULT_FIELD_AND_SHORTCUT;
 }

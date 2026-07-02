@@ -32,7 +32,7 @@ class SubjectRequest extends FormRequest
                     ->ignore($this->route('subject'))
                     ->withoutTrashed(),
             ],
-            'year'     => 'nullable|string|max:50',
+            'year_level'     => 'nullable|string|max:50',
             'semester' => 'nullable|string|max:50',
             'credit'   => 'nullable|integer',
         ];

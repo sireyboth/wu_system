@@ -15,7 +15,7 @@ class SubjectResource extends JsonResource
     {
         return to_list($this, [
             'code'     => $this->code,
-            'year'     => $this->year,
+            'year_level'     => $this->year_level,
             'semester' => $this->semester,
             'credit'   => $this->credit,
         ]);
