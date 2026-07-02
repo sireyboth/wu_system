@@ -10,6 +10,7 @@ use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\FacultyController;
 use App\Http\Controllers\MajorController;
 use App\Http\Controllers\BatchController;
+use App\Http\Controllers\GroupController;
 
 
 Route::get('/', function () {
@@ -30,6 +31,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('faculty', FacultyController::class);
     Route::resource('major', MajorController::class);
     Route::resource('batch', BatchController::class);
+    Route::resource('group', GroupController::class);
 });
 
 Route::middleware('auth')->group(function () {
