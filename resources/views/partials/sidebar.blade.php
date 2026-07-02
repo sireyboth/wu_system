@@ -61,7 +61,7 @@
                វេន (Shift)
             </x-sidebar-link>
 
-            <x-sidebar-link route="#">
+            <x-sidebar-link route="batch.index">
                <x-slot name="icon">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
