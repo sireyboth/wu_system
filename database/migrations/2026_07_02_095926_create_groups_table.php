@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        make_fields('lecturers', function (Blueprint $table) {
-            $table->foreignId('person_id')
-                ->constrained('people')
-                ->cascadeOnDelete()
-                ->unique();
-            $table->string('code', 50)->unique()->nullable();
-        }, named: false);
+        make_fields('groups', function (Blueprint $table) {
+            $table->string('shortcut', 50)->unique()->nullable();
+        });
     }
 
     /**
@@ -25,6 +21,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('lecturers');
+        Schema::dropIfExists('groups');
     }
 };

@@ -11,7 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        make_fields('campuses', function (Blueprint $table) {});
+        make_fields('campuses', function (Blueprint $table) {
+            $table->string('shortcut', 50)->unique()->nullable();
+        });
     }
 
     /**

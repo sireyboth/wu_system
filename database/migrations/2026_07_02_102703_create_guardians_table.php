@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        make_fields('lecturers', function (Blueprint $table) {
+        make_fields('guardians', function (Blueprint $table) {
             $table->foreignId('person_id')
                 ->constrained('people')
-                ->cascadeOnDelete()
-                ->unique();
-            $table->string('code', 50)->unique()->nullable();
+                ->cascadeOnDelete();
+
+            $table->string('relationship', 100)->nullable();
         }, named: false);
     }
 
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('lecturers');
+        Schema::dropIfExists('guardians');
     }
 };

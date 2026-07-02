@@ -2,9 +2,6 @@
 namespace App\Models;
 
 use App\Helpers\IModel;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class District extends IModel
 {
@@ -18,17 +15,17 @@ class District extends IModel
     public $incrementing = true;
     protected $keyType   = 'int';
 
-    public function province(): BelongsTo
+    public function province()
     {
         return $this->belongsTo(Province::class);
     }
 
-    public function communes(): HasMany
+    public function communes()
     {
         return $this->hasMany(Commune::class);
     }
 
-    public function villages(): HasManyThrough
+    public function villages()
     {
         return $this->hasManyThrough(Village::class, Commune::class);
     }

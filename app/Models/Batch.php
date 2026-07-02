@@ -10,5 +10,10 @@ class Batch extends IModel
      *
      * @var array
      */
-    protected $fillable = [ ...DEFAULT_FIELD, 'shortcut', 'academic_year'];
+    protected $fillable = [ ...DEFAULT_FIELD_AND_SHORTCUT, 'academic_year'];
+
+    public function student()
+    {
+        return $this->belongsTo(Student::class);
+    }
 }

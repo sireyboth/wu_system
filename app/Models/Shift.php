@@ -5,9 +5,8 @@ use App\Helpers\IModel;
 
 class Shift extends IModel
 {
-    protected $fillable         = [ ...DEFAULT_FIELD, 'shortcut'];
+    protected $fillable         = [ ...DEFAULT_FIELD_AND_SHORTCUT];
     protected array $searchable = [
-         ...DEFAULT_FIELD,
-        'shortcut',
+         ...DEFAULT_FIELD_AND_SHORTCUT,
     ];
 }

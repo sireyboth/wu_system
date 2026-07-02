@@ -12,9 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         make_fields('subjects', function (Blueprint $table) {
+            $table->foreignId('major_id')->constrained()->cascadeOnDelete();
             $table->string('code', 50)->unique()->nullable();
-            $table->enum('year', ['year 1', 'year 2', 'year 3', 'year 4'])->default('year 1');
-            $table->enum('semester', ['semester 1', 'semester 2'])->default('semester 1');
+            $table->enum('year_level', [1, 2, 3, 4])->default(1);
+            $table->enum('semester', [1, 2])->default(1);
             $table->integer('credit')->default(0);
         });
     }

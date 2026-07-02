@@ -2,8 +2,6 @@
 namespace App\Models;
 
 use App\Helpers\IModel;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Commune extends IModel
 {
@@ -16,12 +14,12 @@ class Commune extends IModel
     public $incrementing = true;
     protected $keyType   = 'int';
 
-    public function district(): BelongsTo
+    public function district()
     {
         return $this->belongsTo(District::class);
     }
 
-    public function villages(): HasMany
+    public function villages()
     {
         return $this->hasMany(Village::class);
     }

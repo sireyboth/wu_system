@@ -5,9 +5,14 @@ use App\Helpers\IModel;
 
 class Lecturer extends IModel
 {
-    protected $fillable         = [ ...DEFAULT_FIELD, 'code'];
+    protected $fillable         = ['remark', 'code', 'person_id'];
     protected array $searchable = [
-         ...DEFAULT_FIELD,
+        'remark',
         'code',
     ];
+
+    public function person()
+    {
+        return $this->hasOne(Person::class);
+    }
 }

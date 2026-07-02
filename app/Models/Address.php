@@ -1,9 +1,9 @@
 <?php
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Helpers\IModel;
 
-class Address extends Model
+class Address extends IModel
 {
     /**
      * The attributes that are mass assignable.
@@ -25,5 +25,25 @@ class Address extends Model
     public function person()
     {
         return $this->belongsTo(Person::class);
+    }
+
+    public function province()
+    {
+        return $this->belongsTo(Province::class);
+    }
+
+    public function district()
+    {
+        return $this->belongsTo(District::class);
+    }
+
+    public function commune()
+    {
+        return $this->belongsTo(Commune::class);
+    }
+
+    public function village()
+    {
+        return $this->belongsTo(Village::class);
     }
 }

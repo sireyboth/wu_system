@@ -11,10 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('students', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+        make_fields('students', function (Blueprint $table) {
+            $table->foreignId('person_id')
+                ->constrained('people')
+                ->cascadeOnDelete();
+
+            $table->foreignId('bactch_id')
+                ->constrained()
+                ->cascadeOnDelete();
+
+            $table->string('code', 50)->nullable()->unique();
+            $table->date('admission_at')->nullable();
+            $table->string('bacc_2_code', 50)->nullable()->unique();
+            $table->string('status', 50)->nullable();
+            $table->string('entrance_exam', 50)->nullable();
+            $table->string('exit_exam', 50)->nullable();
+        }, named: false);
     }
 
     /**

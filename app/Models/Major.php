@@ -5,11 +5,7 @@ use App\Helpers\IModel;
 
 class Major extends IModel
 {
-    protected $fillable = [
-         ...DEFAULT_FIELD,
-        'faculty_id',
-        'shortcut',
-    ];
+    protected $fillable = [ ...DEFAULT_FIELD_AND_SHORTCUT, 'faculty_id'];
 
     /**
      * Get the faculty that owns this major
@@ -17,5 +13,10 @@ class Major extends IModel
     public function faculty()
     {
         return $this->belongsTo(Faculty::class);
+    }
+
+    public function subjects()
+    {
+        return $this->hasMany(Subject::class);
     }
 }

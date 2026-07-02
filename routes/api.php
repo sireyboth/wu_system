@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\BatchController;
 use App\Http\Controllers\Api\CampusController;
 use App\Http\Controllers\Api\DashboardApiController;
 use App\Http\Controllers\Api\FacultyController;
+use App\Http\Controllers\Api\GroupController;
 use App\Http\Controllers\Api\LecturerController;
 use App\Http\Controllers\Api\MajorController;
 use App\Http\Controllers\Api\RoomMGTApiController;
@@ -25,6 +26,7 @@ Route::prefix('v1')->group(function () {
         'lecturers' => LecturerController::class,
         'subjects'  => SubjectController::class,
         'batches'   => BatchController::class,
+        'groups'   => GroupController::class,
     ]);
 });
 

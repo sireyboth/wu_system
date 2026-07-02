@@ -12,7 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         make_fields('people', function (Blueprint $table) {
-        });
+            $table->string('first_name', 100);
+            $table->string('last_name', 100);
+            $table->string('first_name_kh', 100);
+            $table->string('last_name_kh', 100);
+            $table->foreignId('country_id')->constrained()->cascadeOnDelete();
+
+            $table->date('dob')->nullable();
+            $table->enum('sex', ['female', 'male', 'other'])->default('other');
+            $table->string('email', 50)->nullable();
+            $table->json('phones')->nullable();
+        }, named: false);
     }
 
     /**
