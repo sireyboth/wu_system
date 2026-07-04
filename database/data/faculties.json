@@ -1,0 +1,37 @@
+[
+    {
+        "id": 1,
+        "name_kh": "មហាវិទ្យាល័យវិទ្យាសាស្ត្រ និងបច្ចេកវិទ្យា",
+        "name_en": "Faculty of Science and Technology",
+        "shortcut": "FST",
+        "remark": "Main campus building A"
+    },
+    {
+        "id": 2,
+        "name_kh": "មហាវិទ្យាល័យវិស្វកម្ម",
+        "name_en": "Faculty of Engineering",
+        "shortcut": "FE",
+        "remark": null
+    },
+    {
+        "id": 3,
+        "name_kh": "មហាវិទ្យាល័យធុរកិច្ច និងសេដ្ឋកិច្ច",
+        "name_en": "Faculty of Business and Economics",
+        "shortcut": "FBE",
+        "remark": "Updated curriculum 2026"
+    },
+    {
+        "id": 4,
+        "name_kh": "មហាវិទ្យាល័យវិទ្យាសាស្ត្រសង្គម",
+        "name_en": "Faculty of Social Sciences",
+        "shortcut": "FSS",
+        "remark": null
+    },
+    {
+        "id": 5,
+        "name_kh": "មហាវិទ្យាល័យបរទេស",
+        "name_en": "Faculty of Foreign Languages",
+        "shortcut": "FFL",
+        "remark": "Includes English, Chinese, and French departments"
+    }
+]

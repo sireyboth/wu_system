@@ -1,9 +1,9 @@
 <?php
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Helpers\IModel;
 
-class Person extends Model
+class Person extends IModel
 {
     /**
      * The attributes that are mass assignable.
@@ -15,12 +15,17 @@ class Person extends Model
         'last_name',
         'first_name_kh',
         'last_name_kh',
-        'country_id',
+        'nationality_id',
         'dob',
         'sex',
         'email',
         'phones',
     ];
+
+    protected function casts(): array
+    {
+        return ['phones' => 'array', 'dob' => 'date'];
+    }
 
     public function guardian()
     {
@@ -37,18 +42,13 @@ class Person extends Model
         return $this->hasOne(Lecturer::class);
     }
 
-    public function batch()
-    {
-        return $this->hasOne(Batch::class);
-    }
-
     public function addresses()
     {
         return $this->hasMany(Address::class);
     }
 
-    public function country()
+    public function nationality()
     {
-        return $this->belongsTo(Country::class);
+        return $this->belongsTo(Nationality::class);
     }
 }

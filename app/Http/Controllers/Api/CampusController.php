@@ -35,40 +35,40 @@ class CampusController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Campus $campus)
     {
-        return $this->view($id);
+        return $this->view($campus);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(CampusRequest $request, string $id)
+    public function update(CampusRequest $request, Campus $campus)
     {
-        return $this->release($request, $id);
+        return $this->release($request, $campus);
     }
 
     /**
      * Disable the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Campus $campus)
     {
-        return $this->disable($id);
+        return $this->disable($campus);
     }
 
     /**
      * Restore a soft-deleted of the resource.
      */
-    public function restore(string $id)
+    public function restore(Campus $campus)
     {
-        return $this->enable($id);
+        return $this->enable($campus);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function force_destroy(string $id)
+    public function force_destroy(Campus $campus)
     {
-        return $this->clear($id);
+        return $this->clear($campus);
     }
 }

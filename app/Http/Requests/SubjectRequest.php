@@ -24,6 +24,7 @@ class SubjectRequest extends FormRequest
     {
         return [
             ...DEFAULT_VALIDATE,
+            'major_id'  => 'required|exists:majors,id|integer',
             'code'     => [
                 'nullable',
                 'string',

@@ -1,9 +1,9 @@
 <?php
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Helpers\IModel;
 
-class Group extends Model
+class Group extends IModel
 {
     protected $fillable = DEFAULT_FIELD_AND_SHORTCUT;
 }

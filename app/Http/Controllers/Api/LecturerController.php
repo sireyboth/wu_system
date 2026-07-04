@@ -5,15 +5,18 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LecturerRequest;
 use App\Http\Resources\LecturerResource;
 use App\Models\Lecturer;
+use App\Models\Person;
 use Illuminate\Http\Request;
 
 class LecturerController extends Controller
 {
+
     public function __construct()
     {
-        $this->name     = 'Lecturer';
-        $this->model    = Lecturer::class;
-        $this->resource = LecturerResource::class;
+        $this->name          = 'Lecturer';
+        $this->model         = Lecturer::class;
+        $this->resource      = LecturerResource::class;
+        $this->relationships = ['person', 'major', 'major.faculty', 'person.addresses'];
     }
 
     /**
@@ -29,46 +32,90 @@ class LecturerController extends Controller
      */
     public function store(LecturerRequest $request)
     {
-        return $this->save($request);
+        return execute(function () use ($request) {
+            $data   = $request->validated();
+            $person = Person::create($data);
+
+            $lecturer = $person->lecturer()->create($data);
+
+            foreach ($data['addresses'] as $address) {
+                $person->addresses()->create($address);
+            }
+
+            return new LecturerResource($lecturer->load($this->relationships));
+        });
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Lecturer $lecturer)
     {
-        return $this->view($id);
+        return new LecturerResource($lecturer->load($this->relationships));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(LecturerRequest $request, string $id)
+    public function update(LecturerRequest $request, Lecturer $lecturer)
     {
-        return $this->release($request, $id);
+        return execute(function () use ($request, $lecturer) {
+            $data = $request->validated();
+            $lecturer->update($data);
+            $lecturer->person->update($data);
+
+            foreach ($data['addresses'] as $address) {
+                $lecturer->person->addresses()->updateOrCreate([], $address);
+            }
+
+            return new LecturerResource($lecturer->load($this->relationships));
+        });
     }
 
     /**
      * Disable the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Lecturer $lecturer)
     {
-        return $this->disable($id);
+        return execute(function () use ($lecturer) {
+            $person = $lecturer->person;
+
+            $person?->addresses()->forceDelete();
+            $person?->forceDelete();
+            $lecturer->forceDelete();
+
+            return has_data(null, 'Permanently deleted.');
+        });
     }
 
     /**
      * Restore a soft-deleted of the resource.
      */
-    public function restore(string $id)
+    public function restore(Lecturer $lecturer)
     {
-        return $this->enable($id);
+        return execute(function () use ($lecturer) {
+            $lecturer->restore();
+            $lecturer->person()->withTrashed()->first()?->restore();
+            $lecturer->person()->withTrashed()->first()?->addresses()
+                ->withTrashed()->first()?->restore();
+
+            return new LecturerResource($lecturer->load($this->relationships));
+        });
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function force_destroy(string $id)
+    public function trash(Lecturer $lecturer)
     {
-        return $this->clear($id);
+        return execute(function () use ($lecturer) {
+            $person    = $lecturer->person;
+            $addresses = $person?->addresses();
+            $addresses?->delete();
+            $person?->delete();
+            $lecturer->delete();
+
+            return has_data(null, 'Moved to trash.');
+        });
     }
 }

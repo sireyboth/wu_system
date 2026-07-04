@@ -14,9 +14,8 @@ class MajorResource extends JsonResource
     public function toArray(Request $request): array
     {
         return to_list($this, [
-            'faculty_id' => $this->faculty_id,
-            'shortcut'   => $this->shortcut,
-            'fucalty'    => $this->faculty,
+            'shortcut' => $this->shortcut,
+            'faculty'  => new FacultyResource($this->whenLoaded('faculty')),
         ]);
     }
 }

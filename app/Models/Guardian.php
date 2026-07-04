@@ -1,19 +1,25 @@
 <?php
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Helpers\IModel;
 
-class Guardian extends Model
+class Guardian extends IModel
 {
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['person_id', 'relationship'];
+    protected $fillable = ['person_id','occupation', 'remarks'];
 
     public function person()
     {
         return $this->belongsTo(Person::class);
+    }
+
+    public function students()
+    {
+        return $this->belongsToMany(Student::class,  StudentGuardian::class)
+            ->withPivot(['relationship', 'is_primary'])->withTimestamps();
     }
 }

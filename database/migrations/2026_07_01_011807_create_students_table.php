@@ -12,13 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         make_fields('students', function (Blueprint $table) {
-            $table->foreignId('person_id')
-                ->constrained('people')
-                ->cascadeOnDelete();
-
-            $table->foreignId('bactch_id')
-                ->constrained()
-                ->cascadeOnDelete();
+            $table->foreignId('person_id')->constrained('people')->cascadeOnDelete();
+            $table->foreignId('batch_id')->constrained('batches');
+            $table->foreignId('major_id')->constrained()->cascadeOnDelete();
 
             $table->string('code', 50)->nullable()->unique();
             $table->date('admission_at')->nullable();

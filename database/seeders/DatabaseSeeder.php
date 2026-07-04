@@ -21,6 +21,6 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@system.me',
         ]);
 
-        $this->call([LocationSeeder::class]);
+        $this->call([LocationSeeder::class, StructureSeeder::class]);
     }
 }

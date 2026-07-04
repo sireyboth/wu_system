@@ -35,40 +35,40 @@ class SubjectController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Subject $subject)
     {
-        return $this->view($id);
+        return $this->view($subject);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(SubjectRequest $request, string $id)
+    public function update(SubjectRequest $request, Subject $subject)
     {
-        return $this->release($request, $id);
+        return $this->release($request, $subject);
     }
 
     /**
      * Disable the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Subject $subject)
     {
-        return $this->disable($id);
+        return $this->disable($subject);
     }
 
     /**
      * Restore a soft-deleted of the resource.
      */
-    public function restore(string $id)
+    public function restore(Subject $subject)
     {
-        return $this->enable($id);
+        return $this->enable($subject);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function force_destroy(string $id)
+    public function force_destroy(Subject $subject)
     {
-        return $this->clear($id);
+        return $this->clear($subject);
     }
 }

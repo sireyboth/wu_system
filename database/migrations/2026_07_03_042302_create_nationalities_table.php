@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        make_fields('guardians', function (Blueprint $table) {
-            $table->foreignId('person_id')
-                ->constrained('people')
-                ->cascadeOnDelete();
-
-            $table->string('occupation', 100)->nullable();
-        }, named: false);
+        make_fields('nationalities', function (Blueprint $table) {
+           $table->string('code', 3)->unique();
+        }, increment: false);
     }
 
     /**
@@ -25,6 +21,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('guardians');
+        Schema::dropIfExists('nationalities');
     }
 };

@@ -5,14 +5,24 @@ use App\Helpers\IModel;
 
 class Lecturer extends IModel
 {
-    protected $fillable         = ['remark', 'code', 'person_id'];
+    protected $fillable         = ['major_id', 'hired_at', 'remark', 'code', 'person_id'];
     protected array $searchable = [
         'remark',
         'code',
     ];
 
+    protected function casts(): array
+    {
+        return ['hired_at' => 'date'];
+    }
+
     public function person()
     {
-        return $this->hasOne(Person::class);
+        return $this->belongsTo(Person::class);
+    }
+
+    public function major()
+    {
+        return $this->belongsTo(Major::class);
     }
 }

@@ -16,6 +16,9 @@ return new class extends Migration
                 ->constrained('people')
                 ->cascadeOnDelete()
                 ->unique();
+            $table->foreignId('major_id')->constrained()->cascadeOnDelete();
+
+            $table->date('hired_at')->nullable();
             $table->string('code', 50)->unique()->nullable();
         }, named: false);
     }

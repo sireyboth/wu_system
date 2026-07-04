@@ -1,9 +1,9 @@
 <?php
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Helpers\IModel;
 
-class Student extends Model
+class Student extends IModel
 {
     /**
      * The attributes that are mass assignable.
@@ -12,8 +12,9 @@ class Student extends Model
      */
     protected $fillable = [
         'person_id',
-        'bactch_id',
+        'batch_id',
         'code',
+        'major_id',
         'admission_at',
         'bacc_2_code',
         'status',
@@ -21,9 +22,9 @@ class Student extends Model
         'exit_exam',
     ];
 
-    public function addresses()
+    protected function casts(): array
     {
-        return $this->hasMany(Address::class);
+        return ['admission_at' => 'date'];
     }
 
     public function person()
@@ -34,5 +35,16 @@ class Student extends Model
     public function batch()
     {
         return $this->belongsTo(Batch::class);
+    }
+
+    public function major()
+    {
+        return $this->belongsTo(Major::class);
+    }
+
+    public function guardians()
+    {
+        return $this->belongsToMany(Guardian::class, StudentGuardian::class)
+            ->withPivot(['relationship', 'is_primary'])->withTimestamps();
     }
 }

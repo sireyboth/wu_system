@@ -9,12 +9,11 @@ use Illuminate\Http\Request;
 
 class MajorController extends Controller
 {
-    public function __construct()
+   public function __construct()
     {
-        $this->name          = 'Major';
-        $this->model         = Major::class;
-        $this->resource      = MajorResource::class;
-        $this->relationships = ['faculty:id,shortcut,name,name_en,name_kh'];
+        $this->name     = 'Major';
+        $this->model    = Major::class;
+        $this->resource = MajorResource::class;
     }
 
     /**
@@ -36,40 +35,40 @@ class MajorController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Major $major)
     {
-        return $this->view($id);
+        return $this->view($major);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(MajorRequest $request, string $id)
+    public function update(MajorRequest $request, Major $major)
     {
-        return $this->release($request, $id);
+        return $this->release($request, $major);
     }
 
     /**
      * Disable the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Major $major)
     {
-        return $this->disable($id);
+        return $this->disable($major);
     }
 
     /**
      * Restore a soft-deleted of the resource.
      */
-    public function restore(string $id)
+    public function restore(Major $major)
     {
-        return $this->enable($id);
+        return $this->enable($major);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function force_destroy(string $id)
+    public function force_destroy(Major $major)
     {
-        return $this->clear($id);
+        return $this->clear($major);
     }
 }

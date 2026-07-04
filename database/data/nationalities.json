@@ -1,0 +1,122 @@
+[
+    {
+        "id": 1,
+        "code": "KH",
+        "name_en": "Khmer",
+        "name_kh": "ខ្មែរ"
+    },
+    {
+        "id": 2,
+        "code": "VN",
+        "name_en": "Vietname_ense",
+        "name_kh": "វៀតណាម"
+    },
+    {
+        "id": 3,
+        "code": "TH",
+        "name_en": "Thai",
+        "name_kh": "ថៃ"
+    },
+    {
+        "id": 4,
+        "code": "LA",
+        "name_en": "Lao",
+        "name_kh": "ឡាវ"
+    },
+    {
+        "id": 5,
+        "code": "MM",
+        "name_en": "Myanmar",
+        "name_kh": "មីយ៉ាន់ម៉ា"
+    },
+    {
+        "id": 6,
+        "code": "MY",
+        "name_en": "Malaysian",
+        "name_kh": "ម៉ាឡេស៊ី"
+    },
+    {
+        "id": 7,
+        "code": "SG",
+        "name_en": "Singaporean",
+        "name_kh": "សិង្ហបុរី"
+    },
+    {
+        "id": 8,
+        "code": "ID",
+        "name_en": "Indonesian",
+        "name_kh": "ឥណ្ឌូនេស៊ី"
+    },
+    {
+        "id": 9,
+        "code": "PH",
+        "name_en": "Filipino",
+        "name_kh": "ហ្វីលីពីន"
+    },
+    {
+        "id": 10,
+        "code": "BN",
+        "name_en": "Bruneian",
+        "name_kh": "ប្រ៊ុយណេ"
+    },
+    {
+        "id": 11,
+        "code": "CN",
+        "name_en": "Chinese",
+        "name_kh": "ចិន"
+    },
+    {
+        "id": 12,
+        "code": "JP",
+        "name_en": "Japanese",
+        "name_kh": "ជប៉ុន"
+    },
+    {
+        "id": 13,
+        "code": "KR",
+        "name_en": "South Korean",
+        "name_kh": "កូរ៉េខាងត្បូង"
+    },
+    {
+        "id": 14,
+        "code": "IN",
+        "name_en": "Indian",
+        "name_kh": "ឥណ្ឌា"
+    },
+    {
+        "id": 15,
+        "code": "US",
+        "name_en": "American",
+        "name_kh": "អាមេរិក"
+    },
+    {
+        "id": 16,
+        "code": "GB",
+        "name_en": "British",
+        "name_kh": "អង់គ្លេស"
+    },
+    {
+        "id": 17,
+        "code": "FR",
+        "name_en": "French",
+        "name_kh": "បារាំង"
+    },
+    {
+        "id": 18,
+        "code": "DE",
+        "name_en": "German",
+        "name_kh": "អាល្លឺម៉ង់"
+    },
+    {
+        "id": 19,
+        "code": "AU",
+        "name_en": "Australian",
+        "name_kh": "អូស្ត្រាលី"
+    },
+    {
+        "id": 20,
+        "code": "CA",
+        "name_en": "Canadian",
+        "name_kh": "កាណាដា"
+    }
+]

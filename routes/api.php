@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\MajorController;
 use App\Http\Controllers\Api\RoomMGTApiController;
 use App\Http\Controllers\Api\SaleMgtApiController;
 use App\Http\Controllers\Api\ShiftController;
+use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\SubjectController;
 use App\Http\Controllers\Api\TaxMgtApiController;
 use Illuminate\Support\Facades\Route;
@@ -26,7 +27,8 @@ Route::prefix('v1')->group(function () {
         'lecturers' => LecturerController::class,
         'subjects'  => SubjectController::class,
         'batches'   => BatchController::class,
-        'groups'   => GroupController::class,
+        'groups'    => GroupController::class,
+        'students'  => StudentController::class,
     ]);
 });
 

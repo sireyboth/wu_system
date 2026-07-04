@@ -1,10 +1,11 @@
 <?php
+
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class FacultyResource extends JsonResource
+class GuaedianResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -13,9 +14,6 @@ class FacultyResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return to_list($this, [
-            'shortcut' => $this->shortcut,
-            'majors'   => MajorResource::collection($this->whenLoaded('majors')),
-        ]);
+        return parent::toArray($request);
     }
 }

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
@@ -14,6 +13,17 @@ class StudentResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return to_list($this, [
+            'code'          => $this->code,
+            'admission_at'  => $this->admission_at?->format('Y-m-d'),
+            'bacc_2_code'   => $this->bacc_2_code,
+            'status'        => $this->status,
+            'entrance_exam' => $this->entrance_exam,
+            'exit_exam'     => $this->exit_exam,
+            'batch'         => new BatchResource($this->whenLoaded('batch')),
+            'major'         => new MajorResource($this->whenLoaded('major')),
+            'person'        => new PersonResource($this->whenLoaded('person')),
+            'guardians'     => GuardianResource::collection($this->whenLoaded('guardians')),
+        ], named: false);
     }
 }

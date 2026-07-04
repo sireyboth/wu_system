@@ -35,40 +35,40 @@ class GroupController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Group $group)
     {
-        return $this->view($id);
+        return $this->view($group);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(GroupRequest $request, string $id)
+    public function update(GroupRequest $request, Group $group)
     {
-        return $this->release($request, $id);
+        return $this->release($request, $group);
     }
 
     /**
      * Disable the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Group $group)
     {
-        return $this->disable($id);
+        return $this->disable($group);
     }
 
     /**
      * Restore a soft-deleted of the resource.
      */
-    public function restore(string $id)
+    public function restore(Group $group)
     {
-        return $this->enable($id);
+        return $this->enable($group);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function force_destroy(string $id)
+    public function force_destroy(Group $group)
     {
-        return $this->clear($id);
+        return $this->clear($group);
     }
 }

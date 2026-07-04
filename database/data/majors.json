@@ -1,0 +1,42 @@
+[
+    {
+        "id": 1,
+        "faculty_id": 1,
+        "name_kh": "វិទ្យាសាស្ត្រកុំព្យូទ័រ",
+        "name_en": "Computer Science",
+        "shortcut": "CS",
+        "remark": "Focuses on software engineering and AI"
+    },
+    {
+        "id": 2,
+        "faculty_id": 1,
+        "name_kh": "ព័ត៌មានវិទ្យា",
+        "name_en": "Information Technology",
+        "shortcut": "IT",
+        "remark": "Focuses on network administration and infrastructure"
+    },
+    {
+        "id": 3,
+        "faculty_id": 2,
+        "name_kh": "វិស្វកម្មស៊ីវិល",
+        "name_en": "Civil Engineering",
+        "shortcut": "CE",
+        "remark": null
+    },
+    {
+        "id": 4,
+        "faculty_id": 3,
+        "name_kh": "គ្រប់គ្រងពាណិជ្ជកម្ម",
+        "name_en": "Business Administration",
+        "shortcut": "BA",
+        "remark": "Highly requested major"
+    },
+    {
+        "id": 5,
+        "faculty_id": 5,
+        "name_kh": "អក្សរសាស្ត្រអង់គ្លេស",
+        "name_en": "English Literature",
+        "shortcut": "EL",
+        "remark": null
+    }
+]

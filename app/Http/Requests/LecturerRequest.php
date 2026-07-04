@@ -23,8 +23,11 @@ class LecturerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            ...DEFAULT_VALIDATE,
-            'code' => [
+            ...PERSON_VALIDATE,
+            ...ADDRESS_VALIDATE,
+            'major_id'  => 'required|exists:majors,id|integer',
+            'hired_at'  => 'required|date',
+            'code'      => [
                 'nullable',
                 'string',
                 'max:50',
@@ -35,3 +38,5 @@ class LecturerRequest extends FormRequest
         ];
     }
 }
+
+

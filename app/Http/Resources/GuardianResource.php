@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class FacultyResource extends JsonResource
+class GuardianResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,8 +14,10 @@ class FacultyResource extends JsonResource
     public function toArray(Request $request): array
     {
         return to_list($this, [
-            'shortcut' => $this->shortcut,
-            'majors'   => MajorResource::collection($this->whenLoaded('majors')),
-        ]);
+            'occupation'   => $this->occupation,
+            'relationship' => $this->pivot->relationship,
+            'is_primary'   => $this->pivot->is_primary,
+            'person'       => new PersonResource($this->whenLoaded('person')),
+        ], named: false);
     }
 }

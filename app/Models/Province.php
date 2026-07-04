@@ -1,18 +1,18 @@
 <?php
 namespace App\Models;
 
-use App\Helpers\IModel;
+use Illuminate\Database\Eloquent\Model;
 
-class Province extends IModel
+class Province extends Model
 {
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = DEFAULT_FIELD_PRIVATE;
-     public $incrementing = true;
-    protected $keyType = 'int';
+    protected $fillable  = DEFAULT_FIELD_PRIVATE;
+    public $incrementing = true;
+    protected $keyType   = 'int';
 
     public function districts()
     {

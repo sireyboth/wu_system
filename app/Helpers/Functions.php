@@ -5,8 +5,10 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 if (! function_exists('make_fields')) {
     function make_fields(string $name, callable $fn, bool $named = true, bool $increment = true): void
@@ -21,13 +23,13 @@ if (! function_exists('fields')) {
     function fields(Blueprint $table, callable $fn, bool $named = false, bool $increment = false): void
     {
         $increment ? $table->id() : $table->unsignedInteger('id')->primary();
-        $fn();
-
         if ($named) {
             $table->string('name_kh', 100);
             $table->string('name_en', 100);
             $table->string('name', 255)->nullable();
         }
+
+        $fn();
 
         if ($increment) {
             $table->text('remark')->nullable();
@@ -75,6 +77,7 @@ if (! function_exists('handle')) {
         try {
             return has_data($fn(), $message, $code);
         } catch (\Exception $err) {
+            Log::error($err);
             return no_data($err->getMessage(), $err->getCode() ?: 500);
         }
     }
@@ -85,9 +88,10 @@ if (! function_exists('execute')) {
     {
         try {
             return DB::transaction($fn);
-        } catch (\Throwable $e) {
-            report($e);
-            throw $e;
+        } catch (\Throwable $err) {
+            Log::error($err);
+            throw $err;
+            // return no_data($err->getMessage(), $err->getCode() ?: 500);
         }
     }
 }
@@ -137,12 +141,20 @@ if (! function_exists('api_routes')) {
         Route::apiResources($resources);
 
         foreach ($resources as $slug => $controller) {
+            $parameter = Str::singular($slug);
+
+            // Trash
+            Route::patch("{$slug}/{{$parameter}}/trash", [$controller, 'trash'])
+                ->withTrashed()
+                ->name("{$slug}.trash");
+
             // Restore
-            Route::post("/{$slug}/{id}/restore", [$controller, 'restore'])
+            Route::patch("{$slug}/{{$parameter}}/restore", [$controller, 'restore'])
+                ->withTrashed()
                 ->name("{$slug}.restore");
 
             // Force Delete
-            Route::delete("/{$slug}/{id}/clear", [$controller, 'force_destroy'])
+            Route::delete("{$slug}/{{$parameter}}/clear", [$controller, 'force_destroy'])
                 ->name("{$slug}.force-destroy");
         }
     }
@@ -159,21 +171,35 @@ if (! function_exists('web_routes')) {
 }
 
 if (! function_exists('set_data')) {
-    function set_data(string $name, array $fields = []): void
+    function set_data(string $name, array $fields = [], bool $named = true, bool $increment = true): void
     {
         $path = database_path("/data/{$name}.json");
         $rows = json_decode(file_get_contents($path), true);
 
         $now  = Carbon::now();
-        $data = array_map(function ($row) use ($now, $fields) {
+        $data = array_map(function ($row) use ($now, $fields, $named, $increment) {
             $name_en = $row['name_en'];
             $name_kh = $row['name_kh'];
+            $list    = [];
+
+            if ($named) {
+                $list = [
+                     ...$list,
+                    'name_en' => $name_en,
+                    'name_kh' => $name_kh,
+                    'name'    => "{$name_en} ({$name_kh})",
+                ];
+            }
+
+            if (! $increment) {
+                $list = [
+                     ...$list,
+                    'id' => $row['id'],
+                ];
+            }
 
             $item = [
-                'id'      => $row['id'],
-                'name_en' => $name_en,
-                'name_kh' => $name_kh,
-                'name'    => "{$name_en} ({$name_kh})",
+                 ...$list,
                 'created_at' => $now,
                 'updated_at' => $now,
             ];

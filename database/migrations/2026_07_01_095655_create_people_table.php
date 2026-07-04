@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('last_name', 100);
             $table->string('first_name_kh', 100);
             $table->string('last_name_kh', 100);
-            $table->foreignId('country_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('nationality_id')->constrained()->restrictOnDelete();
 
             $table->date('dob')->nullable();
             $table->enum('sex', ['female', 'male', 'other'])->default('other');

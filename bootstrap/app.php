@@ -1,6 +1,5 @@
 <?php
 
-use function App\Helpers\no_data;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Middleware;
 

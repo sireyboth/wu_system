@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -10,7 +9,7 @@ use Illuminate\Http\Request;
 
 class BatchController extends Controller
 {
-     public function __construct()
+    public function __construct()
     {
         $this->name     = 'Batch';
         $this->model    = Batch::class;
@@ -36,40 +35,40 @@ class BatchController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Batch $batch)
     {
-        return $this->view($id);
+        return $this->view($batch);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(BatchRequest $request, string $id)
+    public function update(BatchRequest $request, Batch $batch)
     {
-        return $this->release($request, $id);
+        return $this->release($request, $batch);
     }
 
     /**
      * Disable the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Batch $batch)
     {
-        return $this->disable($id);
+        return $this->disable($batch);
     }
 
     /**
      * Restore a soft-deleted of the resource.
      */
-    public function restore(string $id)
+    public function restore(Batch $batch)
     {
-        return $this->enable($id);
+        return $this->enable($batch);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function force_destroy(string $id)
+    public function force_destroy(Batch $batch)
     {
-        return $this->clear($id);
+        return $this->clear($batch);
     }
 }

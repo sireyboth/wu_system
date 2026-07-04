@@ -1,0 +1,52 @@
+[
+    {
+        "code": "CS101",
+        "name_kh": "សេចក្តីផ្តើមអំពីកម្មវិធីកុំព្យូទ័រ",
+        "name_en": "Introduction to Computer Programming",
+        "major_id": 1,
+        "year_level": 1,
+        "semester": 1,
+        "credit": 3,
+        "remark": "Uses C++ language"
+    },
+    {
+        "code": "IT202",
+        "name_kh": "ប្រព័ន្ធទិន្នន័យ I",
+        "name_en": "Database Systems I",
+        "major_id": 2,
+        "year_level": 2,
+        "semester": 1,
+        "credit": 4,
+        "remark": "Covers MySQL and relational design"
+    },
+    {
+        "code": "MATH111",
+        "name_kh": "គណិតវិទ្យាជាន់ខ្ពស់",
+        "name_en": "Advanced Mathematics",
+        "major_id": 3,
+        "year_level": 1,
+        "semester": 2,
+        "credit": 3,
+        "remark": null
+    },
+    {
+        "code": "BUS301",
+        "name_kh": "គោលការណ៍គ្រប់គ្រង",
+        "name_en": "Principles of Management",
+        "major_id": 4,
+        "year_level": 3,
+        "semester": 1,
+        "credit": 3,
+        "remark": "Case studies included"
+    },
+    {
+        "code": "ENG102",
+        "name_kh": "ការសរសេរភាសាអង់គ្លេសកម្រិតខ្ពស់",
+        "name_en": "Advanced English Writing",
+        "major_id": 5,
+        "year_level": 1,
+        "semester": 2,
+        "credit": 2,
+        "remark": null
+    }
+]
