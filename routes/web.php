@@ -11,6 +11,7 @@ use App\Http\Controllers\FacultyController;
 use App\Http\Controllers\MajorController;
 use App\Http\Controllers\BatchController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\CampusController;
 
 
 Route::get('/', function () {
@@ -32,6 +33,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('major', MajorController::class);
     Route::resource('batch', BatchController::class);
     Route::resource('group', GroupController::class);
+    Route::resource('campus', CampusController::class);
 });
 
 Route::middleware('auth')->group(function () {
