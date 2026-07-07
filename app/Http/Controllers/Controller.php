@@ -14,7 +14,7 @@ abstract class Controller
     protected string $name;
     protected string $model;
     protected string $resource;
-    protected array $relationships = [];
+    protected array|string $relationships;
 
     protected function not_found(string $id = '', string $message = 'not found'): JsonResponse
     {
@@ -24,10 +24,13 @@ abstract class Controller
     protected function list(Request $request)
     {
         $per_page = $request->integer('per_page', 10);
-        $response = $this->model::query()
-            ->when($request->filled('search'), fn($q) => $q->search($request->search))
-            ->when($request->filled('with'), fn($q) => $q->with(explode(',', $request->with)))
-            ->paginate($per_page);
+        // $response = $this->model::query()
+        //     ->when($request->filled('search'), fn($q) => $q->search($request->search))
+        //     ->when($request->filled('with'), fn($q) => $q->with(explode(',', $request->with)))
+        //     ->orderByDesc('created_at')
+        //     ->paginate($per_page);
+        $response = $this->model::query()->search($request->search)
+            ->with($this->relationships)->orderByDesc('created_at')->paginate($per_page);
         $this->related($response);
 
         return $this->resource::collection($response);

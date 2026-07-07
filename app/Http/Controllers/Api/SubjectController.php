@@ -11,9 +11,10 @@ class SubjectController extends Controller
 {
     public function __construct()
     {
-        $this->name     = 'Subject';
-        $this->model    = Subject::class;
-        $this->resource = SubjectResource::class;
+        $this->name          = 'Subject';
+        $this->model         = Subject::class;
+        $this->resource      = SubjectResource::class;
+        $this->relationships = 'major';
     }
 
     /**

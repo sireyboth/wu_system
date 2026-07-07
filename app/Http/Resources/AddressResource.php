@@ -17,10 +17,10 @@ class AddressResource extends JsonResource
             'type'     => $this->type,
             'street'   => $this->street,
             'house_no' => $this->house_no,
-            'province' => $this->province?->name,
-            'district' => $this->district?->name,
-            'commune'  => $this->commune?->name,
-            'village'  => $this->village?->name,
+            'province' => $this->province,
+            'district' => $this->district,
+            'commune'  => $this->commune,
+            'village'  => $this->village,
         ];
     }
 }

@@ -9,7 +9,7 @@ use Illuminate\Support\Arr;
 trait Generic
 {
     protected function sync_guardians(Student $student, array $guardians): void
-    {
+    { 
         $pivot = [];
         foreach ($guardians as $guardian_data) {
             $job = ['occupation' => $guardian_data['occupation'] ?? null];

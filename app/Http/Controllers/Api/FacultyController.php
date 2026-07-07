@@ -14,7 +14,7 @@ class FacultyController extends Controller
         $this->name          = 'Faculty';
         $this->model         = Faculty::class;
         $this->resource      = FacultyResource::class;
-        $this->relationships = ['majors:id,shortcut,faculty_id,name,name_en,name_kh'];
+        $this->relationships = 'majors';
     }
 
     /**
@@ -36,40 +36,40 @@ class FacultyController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Faculty $faculty)
     {
-        return $this->view($id);
+        return $this->view($faculty);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(FacultyRequest $request, string $id)
+    public function update(FacultyRequest $request, Faculty $faculty)
     {
-        return $this->release($request, $id);
+        return $this->release($request, $faculty);
     }
 
     /**
      * Disable the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Faculty $faculty)
     {
-        return $this->disable($id);
+        return $this->disable($faculty);
     }
 
     /**
      * Restore a soft-deleted of the resource.
      */
-    public function restore(string $id)
+    public function restore(Faculty $faculty)
     {
-        return $this->enable($id);
+        return $this->enable($faculty);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function force_destroy(string $id)
+    public function force_destroy(Faculty $faculty)
     {
-        return $this->clear($id);
+        return $this->clear($faculty);
     }
 }

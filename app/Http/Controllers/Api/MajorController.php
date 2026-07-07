@@ -14,6 +14,7 @@ class MajorController extends Controller
         $this->name     = 'Major';
         $this->model    = Major::class;
         $this->resource = MajorResource::class;
+        $this->relationships = 'faculty';
     }
 
     /**
