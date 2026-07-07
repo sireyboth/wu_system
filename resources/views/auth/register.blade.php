@@ -45,7 +45,7 @@
                     <p class="text-slate-500 dark:text-slate-400 text-sm">Create your professional account to begin.</p>
                 </div>
 
-                <form method="POST" action="{{ route('register') }}" class="space-y-5">
+                <form method="POST" action="{{ route('register') }}">
                     @csrf
 
                     <div>
@@ -93,11 +93,34 @@
                     </div>
                 </form>
             </div>
+
+            <!-- NODE 2: STRATEGIC INSCRIPTION CARD -->
+            <div class="bento-card bento-brand-panel">
+                <div class="brand-meta">Security Protocol</div>
+                <div class="brand-quote">
+                    Every immutable academic ledger entry <em>originates from a verified identity</em>.
+                </div>
+                <div class="brand-meta" style="color: rgba(255,255,255,0.45);">Office of the Registrar</div>
+            </div>
+
+            <!-- NODE 3: GRAPHICAL PENDING SECURITY INSIGNIA -->
+            <div class="bento-card bento-seal-panel">
+                <div class="animated-seal-container">
+                    <svg viewBox="0 0 110 110" fill="none">
+                        <circle cx="55" cy="55" r="48" stroke="var(--rg-badge-text)" stroke-width="1.2" stroke-dasharray="4 6" class="dash-ring"/>
+                        <circle cx="55" cy="55" r="36" fill="var(--rg-form-bg-dim)" stroke="var(--rg-form-border)" stroke-width="1"/>
+                        <path d="M42 62 C48 46, 62 40, 74 36" stroke="var(--rg-badge-text)" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                        <circle cx="74" cy="36" r="2" fill="var(--rg-badge-text)"/>
+                        <text x="55" y="76" text-anchor="middle" fill="var(--rg-badge-text)" font-family="IBM Plex Mono, monospace" font-size="5" letter-spacing="1">VERIFYING</text>
+                    </svg>
+                </div>
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; letter-spacing: 0.12em; color: var(--rg-form-subtext); margin-top: 1.2rem; text-align: center; text-transform: uppercase;">
+                    Awaiting Review
+                </div>
+            </div>
+
         </div>
     </div>
-</x-guest-layout>
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     // Configuration for a sleek "Toast" notification
