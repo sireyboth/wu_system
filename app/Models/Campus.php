@@ -5,5 +5,5 @@ use App\Helpers\IModel;
 
 class Campus extends IModel
 {
-    protected $fillable = DEFAULT_FIELD;
+    protected $fillable = DEFAULT_FIELD_AND_SHORTCUT;
 }

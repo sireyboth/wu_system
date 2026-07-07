@@ -1,6 +1,6 @@
 <?php
 
-const NAMES                      = ['name_kh', 'name_en'];
+const NAMES                      = ['name_kh', 'name_en', 'name'];
 const DEFAULT_FIELD              = [ ...NAMES, 'remark'];
 const DEFAULT_FIELD_AND_CODE     = [ ...DEFAULT_FIELD, 'code'];
 const DEFAULT_FIELD_AND_SHORTCUT = [ ...DEFAULT_FIELD, 'shortcut'];
