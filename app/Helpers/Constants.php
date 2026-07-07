@@ -1,6 +1,6 @@
 <?php
 
-const NAMES                      = ['name_kh', 'name_en'];
+const NAMES                      = ['name_kh', 'name_en', 'name'];
 const DEFAULT_FIELD              = [ ...NAMES, 'remark'];
 const DEFAULT_FIELD_AND_CODE     = [ ...DEFAULT_FIELD, 'code'];
 const DEFAULT_FIELD_AND_SHORTCUT = [ ...DEFAULT_FIELD, 'shortcut'];
@@ -13,7 +13,7 @@ const DEFAULT_VALIDATE = [
 ];
 
 const ADDRESS_VALIDATE = [
-    'addresses'               => 'required|array|min:1',
+    'addresses'               => 'nullable|array',
     'addresses.*.province_id' => 'required|exists:provinces,id',
     'addresses.*.district_id' => 'required|exists:districts,id',
     'addresses.*.commune_id'  => 'required|exists:communes,id',

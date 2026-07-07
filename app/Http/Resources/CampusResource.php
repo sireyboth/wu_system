@@ -13,6 +13,6 @@ class CampusResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return to_list($this);
+        return to_list($this, ['shortcut' => $this->shortcut]);
     }
 }

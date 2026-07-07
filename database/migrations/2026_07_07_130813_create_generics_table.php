@@ -11,8 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        make_fields('lecturers', function (Blueprint $table) {
-            $table->string('code', 50)->unique()->nullable();
+        Schema::create('generics', function (Blueprint $table) {
+            $table->id();
+            $table->string('name_kh', 100);
+            $table->string('name_en', 100);
+            $table->string('name', 255)->nullable();
+            $table->text('remark')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -21,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('lecturers');
+        Schema::dropIfExists('generics');
     }
 };

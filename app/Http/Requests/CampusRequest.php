@@ -3,6 +3,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CampusRequest extends FormRequest
 {
@@ -21,6 +22,14 @@ class CampusRequest extends FormRequest
      */
     public function rules(): array
     {
-        return DEFAULT_VALIDATE;
+        return [
+             ...DEFAULT_VALIDATE, 'shortcut' => [
+                'nullable',
+                'string',
+                'max:50',
+                Rule::unique('campuses', 'shortcut')
+                    ->ignore($this->route('campus'))
+                    ->withoutTrashed(),
+            ]];
     }
 }
