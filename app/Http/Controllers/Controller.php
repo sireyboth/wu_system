@@ -14,7 +14,7 @@ abstract class Controller
     protected string $name;
     protected string $model;
     protected string $resource;
-    protected array|string $relationships;
+    protected array|string $relationships = [];
 
     protected function not_found(string $id = '', string $message = 'not found'): JsonResponse
     {
