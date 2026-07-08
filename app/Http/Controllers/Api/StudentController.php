@@ -21,8 +21,18 @@ class StudentController extends Controller
             'batch',
             'major',
             'major.faculty',
+
             'person.addresses',
+            'person.addresses.province',
+            'person.addresses.district',
+            'person.addresses.commune',
+            'person.addresses.village',
+
             'guardians.person.addresses',
+            'guardians.person.addresses.province',
+            'guardians.person.addresses.district',
+            'guardians.person.addresses.commune',
+            'guardians.person.addresses.village',
         ];
     }
 

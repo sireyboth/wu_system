@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Api\BatchController;
 use App\Http\Controllers\Api\CampusController;
 use App\Http\Controllers\Api\DashboardApiController;
@@ -30,6 +31,13 @@ Route::prefix('v1')->group(function () {
         'groups'    => GroupController::class,
         'students'  => StudentController::class,
     ]);
+
+    Route::get('/provinces', [AddressController::class, 'provinces']);
+
+    // Using Model Binding
+    Route::get('/districts/{province}', [AddressController::class, 'districts']);
+    Route::get('/communes/{district}', [AddressController::class, 'communes']);
+    Route::get('/villages/{commune}', [AddressController::class, 'villages']);
 });
 
 // Route::name('api.')->group(function () {

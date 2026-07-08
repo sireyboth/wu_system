@@ -38,15 +38,6 @@ class Student extends IModel
         $this->searchable = array_merge($this->fillable, [
              ...$batch, ...$faculty, ...$person, ...$major, ...$nationality, ...$address, ...$guardian,
         ]);
-
-        $this->relationships = [
-            'person',
-            'batch', //
-            'major',
-            'major.faculty',
-            'person.addresses',
-            'guardians.person.addresses',
-        ];
     }
 
     protected function casts(): array

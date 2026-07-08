@@ -13,7 +13,7 @@ const DEFAULT_VALIDATE = [
 ];
 
 const ADDRESS_VALIDATE = [
-    'addresses'               => 'nullable|array',
+    'addresses'               => 'required|array|min:1',
     'addresses.*.province_id' => 'required|exists:provinces,id',
     'addresses.*.district_id' => 'required|exists:districts,id',
     'addresses.*.commune_id'  => 'required|exists:communes,id',
