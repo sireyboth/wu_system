@@ -9,7 +9,7 @@ use Illuminate\Support\Arr;
 trait Generic
 {
     protected function sync_guardians(Student $student, array $guardians): void
-    { 
+    {
         $pivot = [];
         foreach ($guardians as $guardian_data) {
             $job = ['occupation' => $guardian_data['occupation'] ?? null];
@@ -23,7 +23,7 @@ trait Generic
                 $guardian = $person->guardian()->create($job);
             }
 
-            $this->sync_addresses($guardian->person, $guardian_data['addresses'] ?? []);
+            // $this->sync_addresses($guardian->person, $guardian_data['addresses'] ?? []);
             $pivot[$guardian->id] = Arr::only($guardian_data, ['relationship', 'is_primary']);
         }
 

@@ -33,6 +33,7 @@ Route::prefix('v1')->group(function () {
     ]);
 
     Route::get('/provinces', [AddressController::class, 'provinces']);
+    Route::get('/nationalities', [AddressController::class, 'nationalities']);
 
     // Using Model Binding
     Route::get('/districts/{province}', [AddressController::class, 'districts']);

@@ -148,6 +148,8 @@
                     សាខា (Campus)
                 </x-sidebar-link>
 
+                <x-sidebar-nav-link route="sample.index" icon="atom" label="គម្រូ (Sample)" />
+
                 <!-- STAFF SECTION -->
                 <li class="pt-4 pb-1">
                     <span
@@ -156,7 +158,8 @@
 
                 <x-sidebar-link route="lecturer.index">
                     <x-slot name="icon">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
@@ -206,11 +209,17 @@
 
             <div
                 class="flex items-center px-2 py-1 bg-neutral-50/50 dark:bg-white/5 rounded-2xl p-2 border border-neutral-100 dark:border-white/5">
-                <img class="w-10 h-10 rounded-xl object-cover shadow-sm"
-                    src="https://ui-avatars.com/api/?name=Alex+Rivera&background=6366f1&color=fff" alt="User">
+                {{-- <img class="w-10 h-10 rounded-xl object-cover shadow-sm"
+                    src="https://ui-avatars.com/api/?name=Alex+Rivera&background=6366f1&color=fff" alt="User"> --}}
+                <div
+                    class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-semibold">
+                    {{ initials(auth()->user()->name) }}
+                </div>
+
                 <div class="ms-3 flex-1 overflow-hidden">
-                    <p class="text-sm font-bold text-neutral-900 dark:text-white truncate">Alex Rivera</p>
-                    <p class="text-xs text-neutral-500 dark:text-neutral-400 truncate">Administrator</p>
+                    <p class="text-sm font-bold text-neutral-900 dark:text-white truncate">{{ auth()->user()->name }}
+                    </p>
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400 truncate">{{ auth()->user()->email }}</p>
                 </div>
             </div>
         </div>

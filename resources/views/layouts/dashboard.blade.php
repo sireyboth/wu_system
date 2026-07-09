@@ -17,6 +17,7 @@
     @include('partials.sidebar')
 
     <main class="p-4 sm:ml-64">
+        
         @yield('content')
     </main>
 @stack('scripts')

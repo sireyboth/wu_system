@@ -28,7 +28,7 @@ class StudentController extends Controller
             'person.addresses.commune',
             'person.addresses.village',
 
-            'guardians.person.addresses',
+            // 'guardians.person.addresses',
             'guardians.person.addresses.province',
             'guardians.person.addresses.district',
             'guardians.person.addresses.commune',
@@ -64,9 +64,9 @@ class StudentController extends Controller
                     'occupation' => $guardian['occupation'] ?? null,
                 ]);
 
-                foreach ($guardian['addresses'] as $address) {
-                    $guardian_person->addresses()->create($address);
-                }
+                // foreach ($guardian['addresses'] as $address) {
+                //     $guardian_person->addresses()->create($address);
+                // }
 
                 $student->guardians()->attach($response->id, Arr::only($guardian, ['relationship', 'is_primary']));
             }
@@ -111,7 +111,7 @@ class StudentController extends Controller
             $student->person()->withTrashed()->first()?->addresses()->forceDelete();
 
             foreach ($student->guardians()->withTrashed()->get() as $guardian) {
-                $guardian->person()->withTrashed()->first()?->addresses()->forceDelete();
+                // $guardian->person()->withTrashed()->first()?->addresses()->forceDelete();
                 $guardian->forceDelete();
                 $guardian->person()->withTrashed()->forceDelete();
             }
@@ -137,8 +137,8 @@ class StudentController extends Controller
             foreach ($student->guardians()->withTrashed()->get() as $guardian) {
                 $guardian->restore();
                 $guardian->person()->withTrashed()->first()?->restore();
-                $guardian->person()->withTrashed()->first()?->addresses()
-                    ->withTrashed()->first()?->restore();
+                // $guardian->person()->withTrashed()->first()?->addresses()
+                //     ->withTrashed()->first()?->restore();
             }
 
             return new StudentResource($student->load($this->relationships));
@@ -153,7 +153,7 @@ class StudentController extends Controller
         return execute(function () use ($student) {
             $student->person->addresses()->delete();
             foreach ($student->guardians as $guardian) {
-                $guardian->person->addresses()->delete();
+                // $guardian->person->addresses()->delete();
                 $guardian->delete();
                 $guardian->person()->delete();
             }

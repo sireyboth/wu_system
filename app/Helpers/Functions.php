@@ -216,3 +216,18 @@ if (! function_exists('set_data')) {
         }
     }
 }
+
+if (!function_exists('initials')) {
+    function initials(string $name, int $limit = 2): string
+    {
+        $words = explode(' ', trim($name));
+
+        $initials = collect($words)
+            ->filter() // remove empty strings from extra spaces
+            ->map(fn($word) => strtoupper(mb_substr($word, 0, 1)))
+            ->take($limit)
+            ->implode('');
+
+        return $initials;
+    }
+}

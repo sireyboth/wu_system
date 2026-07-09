@@ -65,11 +65,11 @@ class StudentRequest extends FormRequest
             }
         }
 
-        if (is_array(ADDRESS_VALIDATE)) {
-            foreach (ADDRESS_VALIDATE as $k => $v) {
-                $rules['guardians.*.' . $k] = $v;
-            }
-        }
+        // if (is_array(ADDRESS_VALIDATE)) {
+        //     foreach (ADDRESS_VALIDATE as $k => $v) {
+        //         $rules['guardians.*.' . $k] = $v;
+        //     }
+        // }
 
         return $rules;
     }
