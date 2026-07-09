@@ -64,9 +64,9 @@ class StudentController extends Controller
                     'occupation' => $guardian['occupation'] ?? null,
                 ]);
 
-                foreach ($guardian['addresses'] as $address) {
-                    $guardian_person->addresses()->create($address);
-                }
+                // foreach ($guardian['addresses'] as $address) {
+                //     $guardian_person->addresses()->create($address);
+                // }
 
                 $student->guardians()->attach($response->id, Arr::only($guardian, ['relationship', 'is_primary']));
             }
