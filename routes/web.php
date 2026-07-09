@@ -11,6 +11,7 @@ use App\Http\Controllers\RoomMGTController;
 use App\Http\Controllers\SaleMGTController;
 use App\Http\Controllers\SampleController;
 use App\Http\Controllers\ShiftController;
+use App\Http\Controllers\StudentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -35,6 +36,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('campus', CampusController::class);
 
     Route::get('sample', SampleController::class)->name('sample.index');
+    Route::resource('student', StudentController::class);
 });
 
 Route::middleware('auth')->group(function () {
