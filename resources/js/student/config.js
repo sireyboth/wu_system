@@ -16,4 +16,5 @@ CONFIG.API_LOOKUPS = {
     villages: '/api/v1/villages',
     batches: '/api/v1/batches',
     majors: '/api/v1/majors',
+    nationalities: '/api/v1/nationalities',
 };
