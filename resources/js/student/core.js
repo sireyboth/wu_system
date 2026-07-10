@@ -4,8 +4,6 @@
  * files that DO have logic (api-service, student-form, index, etc.)
  */
 
-import { getById } from "../app";
-
 /**
  * Single shared mutable state object for the Student module.
  * Deliberately NOT frozen/exported as individual consts — every consumer
@@ -28,16 +26,14 @@ export const state = {
  */
 export function buildDom() {
     return {
-        form: getById("studentForm"),
-        tableBody: getById("student-table-body"),
-        searchInput: getById("studentSearchInput"),
-        loader: getById("loading-overlay"),
-        modal: getById("studentModal"),
-        modalCard: getById("modalCard"),
-        modalTitle: getById("modalTitle"),
-        submitBtn: getById("studentForm")?.querySelector(
-            'button[type="submit"]',
-        ),
+        form: document.getElementById('studentForm'),
+        tableBody: document.getElementById('student-table-body'),
+        searchInput: document.getElementById('studentSearchInput'),
+        loader: document.getElementById('loading-overlay'),
+        modal: document.getElementById('studentModal'),
+        modalCard: document.getElementById('modalCard'),
+        modalTitle: document.getElementById('modalTitle'),
+        submitBtn: document.getElementById('studentForm')?.querySelector('button[type="submit"]'),
     };
 }
 
@@ -46,13 +42,12 @@ export function buildDom() {
  * Falls back to console.log so the app doesn't crash on pages
  * that forget to load SweetAlert2.
  */
-export const Toast =
-    typeof Swal !== "undefined"
-        ? Swal.mixin({
-              toast: true,
-              position: "top-end",
-              showConfirmButton: false,
-              timer: 3000,
-              timerProgressBar: true,
-          })
-        : { fire: (opts) => console.log("[Toast fallback]", opts) };
+export const Toast = typeof Swal !== 'undefined'
+    ? Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+    })
+    : { fire: (opts) => console.log('[Toast fallback]', opts) };

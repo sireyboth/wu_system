@@ -1,5 +1,5 @@
-import { CONFIG } from "./config.js";
-import { escapeHtml } from "./form-utils.js";
+import { CONFIG } from './config.js';
+import { escapeHtml } from './form-utils.js';
 
 /**
  * Renders the student list into dom.tableBody.
@@ -19,83 +19,55 @@ export function renderTable(dom, students) {
     }
 
     dom.tableBody.className =
-        "grid grid-cols-1 gap-3 p-4 md:p-0 md:table-row-group md:gap-0 md:divide-y md:divide-neutral-200 md:dark:divide-white/5";
+        'grid grid-cols-1 gap-3 p-4 md:p-0 md:table-row-group md:gap-0 md:divide-y md:divide-neutral-200 md:dark:divide-white/5';
 
-    dom.tableBody.innerHTML = students
-        .map((student, index) => renderRow(student, index))
-        .join("");
+    dom.tableBody.innerHTML = students.map((student, index) => renderRow(student, index)).join('');
 }
 
 function renderRow(student, index) {
     const person = student.person || {};
     const major = student.major || {};
     const batch = student.batch || {};
-    const status = student?.status ?? {};
 
-    const nameKhmer =
-        person.first_name_kh || person.last_name_kh
-            ? escapeHtml(
-                  `${person.last_name_kh} ${person.first_name_kh}`.trim(),
-              )
-            : '<span class="text-neutral-400 italic">គ្មានទិន្នន័យ</span>';
+    const nameKhmer = person.first_name_kh || person.last_name_kh
+        ? escapeHtml(`${person.last_name_kh} ${person.first_name_kh}`.trim())
+        : '<span class="text-neutral-400 italic">គ្មានទិន្នន័យ</span>';
 
-    const nameEnglish =
-        person.first_name || person.last_name
-            ? escapeHtml(`${person.last_name} ${person.first_name}`.trim())
-            : '<span class="text-neutral-400 italic">N/A</span>';
+    const nameEnglish = person.first_name || person.last_name
+        ? escapeHtml(`${person.last_name} ${person.first_name}`.trim())
+        : '<span class="text-neutral-400 italic">N/A</span>';
 
     const dobFormatted = person.dob
-        ? new Date(person.dob).toLocaleDateString(CONFIG.LOCALE, {
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-          })
+        ? new Date(person.dob).toLocaleDateString(CONFIG.LOCALE, { day: '2-digit', month: 'short', year: 'numeric' })
         : '<span class="text-neutral-400 italic">Unknown</span>';
 
-    const officialDateFormatted = student.admission_date
-        ? new Date(student.admission_date).toLocaleDateString(CONFIG.LOCALE, {
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-          })
+    const officialDateFormatted = student.admission_at
+        ? new Date(student.admission_at).toLocaleDateString(CONFIG.LOCALE, { day: '2-digit', month: 'short', year: 'numeric' })
         : '<span class="text-neutral-400 italic">Not set</span>';
 
     let sexLabel = '<span class="text-neutral-400">-</span>';
-    if (person.sex === "male")
-        sexLabel =
-            '<span class="font-medium text-neutral-800 dark:text-neutral-200">ប្រុស (M)</span>';
-    if (person.sex === "female")
-        sexLabel =
-            '<span class="font-medium text-pink-600 dark:text-pink-400">ស្រី (F)</span>';
-    if (person.sex === "other")
-        sexLabel = '<span class="font-medium text-neutral-500">ផ្សេងៗ</span>';
+    if (person.sex === 'male') sexLabel = '<span class="font-medium text-neutral-800 dark:text-neutral-200">ប្រុស (M)</span>';
+    if (person.sex === 'female') sexLabel = '<span class="font-medium text-pink-600 dark:text-pink-400">ស្រី (F)</span>';
+    if (person.sex === 'other') sexLabel = '<span class="font-medium text-neutral-500">ផ្សេងៗ</span>';
 
-    const statusValue = (status?.name_en ?? "active").toLowerCase();
-    let statusBadgeClasses =
-        "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400";
-    let statusTextKhmer = "សិក្សា";
-    if (statusValue === "suspended" || statusValue === "dropped") {
-        statusBadgeClasses =
-            "bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400";
-        statusTextKhmer = "បោះបង់";
-    } else if (statusValue === "graduated") {
-        statusBadgeClasses =
-            "bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400";
-        statusTextKhmer = "បញ្ចប់ការសិក្សា";
+    const statusValue = (student.status || 'active').toLowerCase();
+    let statusBadgeClasses = 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400';
+    let statusTextKhmer = 'សិក្សា';
+    if (statusValue === 'suspended' || statusValue === 'dropped') {
+        statusBadgeClasses = 'bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400';
+        statusTextKhmer = 'បោះបង់';
+    } else if (statusValue === 'graduated') {
+        statusBadgeClasses = 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400';
+        statusTextKhmer = 'បញ្ចប់ការសិក្សា';
     }
 
-    const initialsSource = (
-        person.first_name_kh ||
-        person.first_name ||
-        student.code ||
-        "?"
-    ).toString();
+    const initialsSource = (person.first_name_kh || person.first_name || student.code || '?').toString();
     const initials = escapeHtml(initialsSource.trim().charAt(0).toUpperCase());
     const code = student.code
         ? escapeHtml(student.code)
         : '<span class="text-rose-500 italic font-normal">Missing</span>';
-    const majorName = escapeHtml(major.name ?? "No Major Assigned");
-    const batchName = escapeHtml(batch.name ?? "N/A");
+    const majorName = escapeHtml(major.name ?? 'No Major Assigned');
+    const batchName = escapeHtml(batch.name ?? 'N/A');
 
     return `
         <tr class="block md:table-row bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-2xl shadow-sm md:shadow-none md:border-0 md:border-b md:rounded-none overflow-hidden md:overflow-visible">
