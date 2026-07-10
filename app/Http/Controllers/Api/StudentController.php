@@ -21,17 +21,18 @@ class StudentController extends Controller
             'major',
             'shift',
             'major.faculty',
-            'group',
-            'status',
-            'guardians',
-            ...array_map(fn($r) => "person.{$r}", [
-                'nationality',
-                'addresses',
-                'addresses.province',
-                'addresses.district',
-                'addresses.commune',
-                'addresses.village',
-            ]),
+
+            'person.addresses',
+            'person.addresses.province',
+            'person.addresses.district',
+            'person.addresses.commune',
+            'person.addresses.village',
+
+            // 'guardians.person.addresses',
+            'guardians.person.addresses.province',
+            'guardians.person.addresses.district',
+            'guardians.person.addresses.commune',
+            'guardians.person.addresses.village',
         ];
     }
 
@@ -53,8 +54,22 @@ class StudentController extends Controller
             $person  = Person::create($data);
             $student = $person->student()->create($data);
 
-            $person->addresses()->createMany($data['addresses']);
-            $student->guardians()->createMany($data['guardians']);
+            foreach ($data['addresses'] as $address) {
+                $person->addresses()->create($address);
+            }
+
+            foreach ($data['guardians'] as $guardian) {
+                $guardian_person = Person::create($guardian);
+                $response        = $guardian_person->guardian()->create([
+                    'occupation' => $guardian['occupation'] ?? null,
+                ]);
+
+                // foreach ($guardian['addresses'] as $address) {
+                //     $guardian_person->addresses()->create($address);
+                // }
+
+                $student->guardians()->attach($response->id, Arr::only($guardian, ['relationship', 'is_primary']));
+            }
 
             return new StudentResource($student->load($this->relationships));
         });

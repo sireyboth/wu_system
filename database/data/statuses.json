@@ -1,7 +1,7 @@
 [
     {
         "id": 1,
-        "shortcut": "student",
+        "shortcut": "student_status",
         "name": "Active",
         "name_kh": "កំពុងសិក្សា",
         "name_en": "Active",
@@ -11,7 +11,7 @@
     },
     {
         "id": 2,
-        "shortcut": "student",
+        "shortcut": "student_status",
         "name": "Deferred",
         "name_kh": "ព្យួរការសិក្សា",
         "name_en": "Deferred",
@@ -21,7 +21,7 @@
     },
     {
         "id": 3,
-        "shortcut": "student",
+        "shortcut": "student_status",
         "name": "Dropout",
         "name_kh": "បោះបង់ការសិក្សា (ជូនដំណឹង)",
         "name_en": "Dropout",
@@ -31,7 +31,7 @@
     },
     {
         "id": 4,
-        "shortcut": "student",
+        "shortcut": "student_status",
         "name": "Quit",
         "name_kh": "បោះបង់ការសិក្សា (មិនជូនដំណឹង)",
         "name_en": "Quit",
@@ -41,7 +41,7 @@
     },
     {
         "id": 5,
-        "shortcut": "student",
+        "shortcut": "student_status",
         "name": "Re-enrolled",
         "name_kh": "ឈប់ហើយសុំចូលរៀនវិញ",
         "name_en": "Re-enrolled",
@@ -51,7 +51,7 @@
     },
     {
         "id": 6,
-        "shortcut": "student",
+        "shortcut": "student_status",
         "name": "Add Subject",
         "name_kh": "សិស្សបន្តផ្ទេររៀនថែមមុខវិជ្ជា",
         "name_en": "Add Subject",
@@ -61,7 +61,7 @@
     },
     {
         "id": 7,
-        "shortcut": "student",
+        "shortcut": "student_status",
         "name": "Retake Subject",
         "name_kh": "សិស្សរៀនសង",
         "name_en": "Retake Subject",
@@ -71,7 +71,7 @@
     },
     {
         "id": 8,
-        "shortcut": "student",
+        "shortcut": "student_status",
         "name": "Graduated",
         "name_kh": "សិស្សបញ្ចប់បរិញ្ញាបត្រ/បរិញ្ញាបត្ររង",
         "name_en": "Graduated",
@@ -81,7 +81,7 @@
     },
     {
         "id": 9,
-        "shortcut": "student",
+        "shortcut": "student_status",
         "name": "Transferred",
         "name_kh": "សិស្សផ្ទេរចូល",
         "name_en": "Transferred",
@@ -91,7 +91,7 @@
     },
     {
         "id": 10,
-        "shortcut": "student",
+        "shortcut": "student_status",
         "name": "Campus Move Out",
         "name_kh": "សិស្សផ្ទេរទៅសាខា",
         "name_en": "Campus Move Out",
@@ -101,7 +101,7 @@
     },
     {
         "id": 11,
-        "shortcut": "student",
+        "shortcut": "student_status",
         "name": "Campus Move In",
         "name_kh": "សិស្សផ្ទេរចូលសាខា",
         "name_en": "Campus Move In",

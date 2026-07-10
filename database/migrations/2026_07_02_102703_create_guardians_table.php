@@ -16,7 +16,7 @@ return new class extends Migration
             $table->json('phones')->nullable();
             $table->json('addresses')->nullable();
             $table->string('job', 100)->nullable();
-            $table->enum('relationship', ['father', 'mother', 'other']); 
+            $table->enum('relationship', ['father', 'mother', 'other']);
         });
     }
 

@@ -14,10 +14,12 @@ class GuardianResource extends JsonResource
     public function toArray(Request $request): array
     {
         return to_list($this, [
-            'job'   => $this->job,
-            'relationship' => $this->relationship,
+            'occupation'   => $this->occupation,
+            'relationship' => $this->pivot->relationship,
+            'is_primary'   => $this->pivot->is_primary,
             'phones'       => $this->phones ?? null,
             'addresses'    => $this->addresses ?? null,
+            // 'person'       => new PersonResource($this->whenLoaded('person')),
         ]);
     }
 }

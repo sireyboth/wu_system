@@ -12,7 +12,7 @@ class Guardian extends IModel
      */
     protected $fillable = [
          ...DEFAULT_FIELD,
-         'student_id',
+        'student_id',
         'phones',
         'addresses',
         'job',
