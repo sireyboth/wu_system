@@ -53,7 +53,7 @@ export async function handleEditAction(dom, ApiService, id) {
     if (!dom.form) return;
 
     // 1. Academic details
-    ['code', 'status', 'batch_id', 'major_id', 'admission_at', 'bacc_2_code', 'entrance_exam', 'exit_exam'].forEach((field) => {
+    ['code', 'status', 'batch_id', 'major_id', 'nationality_id', 'shift_id','admission_at', 'bacc_2_code', 'entrance_exam', 'exit_exam', 'degree_type'].forEach((field) => {
         const el = dom.form.querySelector(`[name="${field}"]`);
         if (el) el.value = payload[field] ?? '';
     });
@@ -188,11 +188,48 @@ export async function handleFormSubmit(dom, ApiService, e) {
             html: `<div class="text-left text-xs text-rose-500 mt-1 list-disc pl-4">${errorMessages.map((msg) => `<li>${msg}</li>`).join('')}</div>`,
         });
     } else {
+    // 1. Detect if the API returned a validation duplicate error string or status code
+    const isDuplicate = data?.status === 422 ||
+                        data?.message?.toLowerCase().includes('duplicate') ||
+                        data?.message?.toLowerCase().includes('already exists');
+
+    if (isDuplicate) {
+        Toast.fire({
+            icon: 'warning', // Warning icon fits validation constraint issues better
+            title: 'ទិន្នន័យស្ទួនគ្នា (Duplicate Records)',
+            text: 'លេខតុបាក់ឌុប ឬអត្តសញ្ញាណនិស្សិតនេះ មានក្នុងប្រព័ន្ធរួចហើយ។ (BACC II Code or Student ID already exists.)',
+        });
+    } else {
+    const errorMsg = data?.message || '';
+
+    // 1. Detect precise SQLite / Database Unique Constraint Failures
+    if (errorMsg.includes('students.bacc_2_code')) {
+        Toast.fire({
+            icon: 'warning',
+            title: 'លេខតុបាក់ឌុបស្ទួនគ្នា (Duplicate BACC II Code)',
+            text: 'លេខតុបាក់ឌុបនេះមានក្នុងប្រព័ន្ធរួចហើយ សូមពិនិត្យឡើងវិញ។ (This BACC II Code already exists.)',
+        });
+    } else if (errorMsg.includes('students.code')) {
+        Toast.fire({
+            icon: 'warning',
+            title: 'អត្តសញ្ញាណនិស្សិតស្ទួនគ្នា (Duplicate Student ID)',
+            text: 'អត្តសញ្ញាណប័ណ្ណនិស្សិត (ID Code) នេះមានក្នុងប្រព័ន្ធរួចហើយ។ (This Student ID Code already exists.)',
+        });
+    } else if (errorMsg.includes('UNIQUE constraint failed')) {
+        Toast.fire({
+            icon: 'warning',
+            title: 'ទិន្នន័យស្ទួនគ្នា (Duplicate Record)',
+            text: 'ព័ត៌មានខ្លះដែលអ្នកបានបញ្ចូលមានរួចរាល់នៅក្នុងប្រព័ន្ធហើយ។ (Some unique record attributes already exist.)',
+        });
+    } else {
+        // 2. Standard Fallback for unexpected crashes
         Toast.fire({
             icon: 'error',
             title: 'មានបញ្ហាភ្ជាប់ទៅកាន់ប្រព័ន្ធ',
-            text: data?.message || 'Internal Server Error (500).',
+            text: errorMsg || 'Internal Server Error (500).',
         });
+    }
+}
     }
     dom.submitBtn.disabled = false;
 }

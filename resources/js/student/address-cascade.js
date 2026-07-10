@@ -52,10 +52,11 @@ export function setupCascadeListener(ApiService, parentId, childId, apiEndpoint,
  * up the student + guardian cascading address selectors.
  */
 export async function initFormLookups(ApiService) {
-    const [batchesRes, majorsRes, provinceRes] = await Promise.all([
+    const [batchesRes, majorsRes, provinceRes, nationalityRes] = await Promise.all([
         ApiService.request(CONFIG.API_LOOKUPS.batches),
         ApiService.request(CONFIG.API_LOOKUPS.majors),
         ApiService.request(CONFIG.API_LOOKUPS.provinces),
+        ApiService.request(CONFIG.API_LOOKUPS.nationalities),
     ]);
 
     if (!batchesRes.error) {
@@ -63,6 +64,12 @@ export async function initFormLookups(ApiService) {
     }
     if (!majorsRes.error) {
         fillSelectOptions(document.getElementById('academic_major_id'), majorsRes.data?.data || majorsRes.data);
+    }
+    if (!nationalityRes.error) {
+        fillSelectOptions(document.getElementById('student_nationality'), nationalityRes.data?.data || nationalityRes.data);
+    }
+    if (!nationalityRes.error) {
+        fillSelectOptions(document.getElementById('guardian_nationality'), nationalityRes.data?.data || nationalityRes.data);
     }
 
     const provinceList = provinceRes.data?.data || provinceRes.data || [];

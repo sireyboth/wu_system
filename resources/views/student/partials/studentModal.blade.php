@@ -53,7 +53,7 @@
                             </select>
                         </div>
                         <div class="flex flex-col gap-1.5">
-                            <label class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">សញ្ជាតិនិស្សិត (Student Nationality) <span class="text-rose-500">*</span></label>
+                            <label class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">សញ្ជាតិនិស្សិត (Student Nationality)</label>
                             <select required name="nationality_id" id="student_nationality" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:border-indigo-500 dark:focus:border-indigo-500/50 transition-colors">
                                 <option value="" disabled selected>-- ជ្រើសរើសសញ្ជាតិ --</option>
                             </select>
@@ -62,20 +62,39 @@
                             <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">ថ្ងៃខែឆ្នាំកំណើត (Date of Birth)</label>
                             <input required type="date" name="dob" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
                         </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">លេខសញ្ញាបត្របាក់ឌុប (BACC II Exam Seat ID)</label>
+                            <input type="text" name="bacc_2_code" placeholder="e.g., 99402A" class="w-full px-4 py-2.5 text-sm font-mono bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
+                        </div>
+
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
-                    <div>
-                        <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">លេខទូរស័ព្ទនិស្សិត (Student Phone Number)</label>
-                        <input required type="tel" name="phone" placeholder="e.g., 012345678" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">អ៊ីមែល (Email Address)</label>
-                        <input type="email" name="email" placeholder="e.g., student@university.edu.kh" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
-                    </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 pt-2">
+                <div>
+                    <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">កម្រិតសិក្សា (Degree Type) <span class="text-rose-500">*</span></label>
+                    <select required name="degree_type" id="student_degree_type" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-colors">
+                        <option value="" disabled selected>-- ជ្រើសរើសកម្រិតសិក្សា --</option>
+                        <option value="Associate">បរិញ្ញាបត្ររង (Associate Degree)</option>
+                        <option value="Bachelor">បរិញ្ញាបត្រ (Bachelor Degree)</option>
+                        <option value="Master">បរិញ្ញាបត្រជាន់ខ្ពស់ (Master Degree)</option>
+                        <option value="PhD">បណ្ឌិត (PhD)</option>
+                    </select>
                 </div>
 
+                <div>
+                    <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">លេខទូរស័ព្ទនិស្សិត (Student Phone Number)</label>
+                    <input required type="tel" name="phone" placeholder="e.g., 012345678" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">អ៊ីមែល (Email Address)</label>
+                    <input type="email" name="email" placeholder="e.g., student@university.edu.kh" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
+                </div>
+
+            </div>
+
+{{-- Address --}}
                 <div class="pt-2">
                     <h4 class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-4 pb-1 border-b border-neutral-100 dark:border-white/5">អាសយដ្ឋានបច្ចុប្បន្នរបស់និស្សិត (Student Current Address)</h4>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
@@ -110,6 +129,11 @@
                         <input type="hidden" name="addresses[0][type]" value="current">
                     </div>
                 </div>
+
+                <div class="w-full pt-2">
+                    <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">កំណត់សម្គាល់ផ្សេងៗ (Remarks / Notes)</label>
+                    <textarea name="remark" rows="3" placeholder="បញ្ចូលព័ត៌មានបន្ថែម ឬកំណត់សម្គាល់ផ្សេងៗទីនេះ... (Enter additional student remarks or administrative logs here...)" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all resize-none"></textarea>
+                </div>
             </div>
 
             <div id="panel-academic" class="tab-panel hidden space-y-6">
@@ -117,7 +141,7 @@
                     <h4 class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-4 pb-1 border-b border-neutral-100 dark:border-white/5">ព័ត៌មានរដ្ឋបាលសិក្សា (Institutional Academic Routing)</h4>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                         <div>
-                            <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">អត្តលេខនិស្សិត (Student Identification Code)</label>
+                            <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">អត្តលេខនិស្សិត (Student Code)</label>
                             <input required type="text" name="code" placeholder="e.g., ST-2026-048" class="w-full px-4 py-2.5 text-sm font-mono bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
                         </div>
                         <div>
@@ -132,13 +156,38 @@
                                 <option value="" disabled selected>-- ជ្រើសរើសជំនាញ --</option>
                             </select>
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">ស្ថានភាពការសិក្សា (Enrollment Lifecycle Status)</label>
-                            <select name="status" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
-                                <option value="active">កំពុងសិក្សា (Active)</option>
-                                <option value="suspended">ព្យួរការសិក្សា (Suspended)</option>
-                                <option value="graduated">បញ្ចប់ការសិក្សា (Graduated)</option>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">វេននិស្សិត (Student Shift) <span class="text-rose-500">*</span></label>
+                            <select required name="shift_id" id="student_shift" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:border-indigo-500 dark:focus:border-indigo-500/50 transition-colors">
+                                <option value="" disabled selected>-- ជ្រើសរើសវេនសិក្សា --</option>
                             </select>
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">ក្រុមសិក្សា (Group) <span class="text-rose-500">*</span></label>
+                            <select required name="group_id" id="student_group" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:border-indigo-500 dark:focus:border-indigo-500/50 transition-colors">
+                                <option value="" disabled selected>-- ជ្រើសរើសវេនសិក្សា --</option>
+                            </select>
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">វគ្គសិក្សា (Intake) <span class="text-rose-500">*</span></label>
+                            <select required name="intake" id="student_intake" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:border-indigo-500 dark:focus:border-indigo-500/50 transition-colors">
+                                <option value="" disabled selected>-- ជ្រើសរើសវគ្គសិក្សា --</option>
+                                <option value="1">វគ្គទី១ (First Intake)</option>
+                                <option value="2">វគ្គទី២ (Second Intake)</option>
+                            </select>
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">ប្រភេទអាហាររូបករណ័ (Scholarship) <span class="text-rose-500">*</span></label>
+                            <select required name="intake" id="student_intake" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:border-indigo-500 dark:focus:border-indigo-500/50 transition-colors">
+                                <option value="" disabled selected>-- ជ្រើសរើសអាហាររូបករណ័ --</option>
+                                <option value="1">ក្រសួង</option>
+                                <option value="2">សម្ដេច</option>
+                                <option value="3">សាលា</option>
+                            </select>
+                        </div>
+                        <div class="relative group">
+                            <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">អតីតវិទ្យាល័យ (High School)<span class="text-rose-500">*</span></label>
+                            <input type="text" name="high-school" placeholder="e.g., វិទ្យាល័យ ជា ស៊ីម សាមគ្គី" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
                         </div>
                     </div>
                 </div>
@@ -147,17 +196,24 @@
                     <h4 class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-4 pb-1 border-b border-neutral-100 dark:border-white/5">កាលបរិច្ឆេទ និងលទ្ធផលវាយតម្លៃ (Metrics & Admission Timelines)</h4>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                         <div>
+                            <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">ស្ថានភាពការសិក្សា (Enrollment Status)</label>
+                            <select name="status" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
+                                <option value="active">កំពុងសិក្សា (Active)</option>
+                                <option value="suspended">ព្យួរការសិក្សា (Suspended)</option>
+                                <option value="graduated">បញ្ចប់ការសិក្សា (Graduated)</option>
+                            </select>
+                        </div>
+
+                        <div>
                             <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">ថ្ងៃចូលរៀនដំបូង (Official Admission Date)</label>
                             <input required type="date" name="admission_at" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
                         </div>
+
                         <div>
-                            <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">លេខតុប្រឡងបាក់ឌុប (BACC II Exam Seat ID)</label>
-                            <input type="text" name="bacc_2_code" placeholder="e.g., 99402A" class="w-full px-4 py-2.5 text-sm font-mono bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">លទ្ធផលប្រឡងចម្រាញ់ចូល (Entrance Result)</label>
+                            <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">លទ្ធផលប្រឡងចូល (Entrance Result)</label>
                             <select name="entrance_exam" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-colors">
                                 <option value="" disabled selected>-- ជ្រើសរើសលទ្ធផល --</option>
+                                <option value="0">មិនទាន់ប្រឡង</option>
                                 <option value="1">ជាប់ (Passed)</option>
                                 <option value="2">ធ្លាក់ (Failed)</option>
                             </select>
@@ -167,12 +223,14 @@
                             <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">លទ្ធផលប្រឡងបញ្ចប់ការសិក្សា (Exit Result)</label>
                             <select name="exit_exam" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-colors">
                                 <option value="" disabled selected>-- ជ្រើសរើសលទ្ធផល --</option>
+                                <option value="0">មិនទាន់ប្រឡង</option>
                                 <option value="1">ជាប់ (Passed)</option>
                                 <option value="2">ធ្លាក់ (Failed)</option>
                             </select>
                         </div>
                     </div>
                 </div>
+
             </div>
 
             <div id="panel-guardian" class="tab-panel hidden space-y-6">
@@ -207,7 +265,7 @@
                             <input type="date" name="guardians[0][dob]" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
                         </div>
                        <div class="flex flex-col gap-1.5">
-                            <label class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">សញ្ជាតិអាណាព្យាបាល (Guardian Nationality) <span class="text-rose-500">*</span></label>
+                            <label class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">សញ្ជាតិអាណាព្យាបាល (Guardian Nationality)</label>
                             <select required name="guardians[0][nationality_id]" id="guardian_nationality" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:border-indigo-500 dark:focus:border-indigo-500/50 transition-colors">
                                 <option value="" disabled selected>-- ជ្រើសរើសសញ្ជាតិ --</option>
                             </select>
