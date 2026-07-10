@@ -95,6 +95,6 @@
     @endsection
 
 @push('scripts')
-  @vite(['resources/js/student/student.js'])
+  @vite(['resources/js/student/index.js'])
   {{-- @vite(['resources/js/student/preview.js']) --}}
 @endpush

@@ -52,9 +52,12 @@
                                 <option value="female">ស្រី (Female)</option>
                             </select>
                         </div>
-                        <select required name="nationality_id" id="student_nationality">
-    <option value="1">ខ្មែរ (Khmer)</option>
-</select>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">សញ្ជាតិនិស្សិត (Student Nationality) <span class="text-rose-500">*</span></label>
+                            <select required name="nationality_id" id="student_nationality" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:border-indigo-500 dark:focus:border-indigo-500/50 transition-colors">
+                                <option value="" disabled selected>-- ជ្រើសរើសសញ្ជាតិ --</option>
+                            </select>
+                        </div>
                         <div class="relative group">
                             <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">ថ្ងៃខែឆ្នាំកំណើត (Date of Birth)</label>
                             <input required type="date" name="dob" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
@@ -152,12 +155,21 @@
                             <input type="text" name="bacc_2_code" placeholder="e.g., 99402A" class="w-full px-4 py-2.5 text-sm font-mono bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">ពិន្ទុប្រឡងចម្រាញ់ចូល (Entrance Score)</label>
-                            <input type="number" step="0.01" min="0" max="100" name="entrance_exam" placeholder="0.00" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
+                            <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">លទ្ធផលប្រឡងចម្រាញ់ចូល (Entrance Result)</label>
+                            <select name="entrance_exam" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-colors">
+                                <option value="" disabled selected>-- ជ្រើសរើសលទ្ធផល --</option>
+                                <option value="1">ជាប់ (Passed)</option>
+                                <option value="2">ធ្លាក់ (Failed)</option>
+                            </select>
                         </div>
+
                         <div>
-                            <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">ពិន្ទុប្រឡងបញ្ចប់ការសិក្សា (Exit Defense Score)</label>
-                            <input type="number" step="0.01" min="0" max="100" name="exit_exam" placeholder="0.00" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
+                            <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">លទ្ធផលប្រឡងបញ្ចប់ការសិក្សា (Exit Result)</label>
+                            <select name="exit_exam" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-colors">
+                                <option value="" disabled selected>-- ជ្រើសរើសលទ្ធផល --</option>
+                                <option value="1">ជាប់ (Passed)</option>
+                                <option value="2">ធ្លាក់ (Failed)</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -194,10 +206,12 @@
                             <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">ថ្ងៃខែឆ្នាំកំណើតអាណាព្យាបាល</label>
                             <input type="date" name="guardians[0][dob]" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
                         </div>
-                        <select required name="guardians[0][nationality_id]">
-                            <option value="1">ខ្មែរ (Khmer)</option>
-                        </select>
-
+                       <div class="flex flex-col gap-1.5">
+                            <label class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">សញ្ជាតិអាណាព្យាបាល (Guardian Nationality) <span class="text-rose-500">*</span></label>
+                            <select required name="guardians[0][nationality_id]" id="guardian_nationality" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:border-indigo-500 dark:focus:border-indigo-500/50 transition-colors">
+                                <option value="" disabled selected>-- ជ្រើសរើសសញ្ជាតិ --</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
