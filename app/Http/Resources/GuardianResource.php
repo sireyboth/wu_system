@@ -17,7 +17,9 @@ class GuardianResource extends JsonResource
             'occupation'   => $this->occupation,
             'relationship' => $this->pivot->relationship,
             'is_primary'   => $this->pivot->is_primary,
-            'person'       => new PersonResource($this->whenLoaded('person')),
-        ], named: false);
+            'phones'       => $this->phones ?? null,
+            'addresses'    => $this->addresses ?? null,
+            // 'person'       => new PersonResource($this->whenLoaded('person')),
+        ]);
     }
 }

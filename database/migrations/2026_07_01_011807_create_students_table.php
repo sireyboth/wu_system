@@ -13,8 +13,9 @@ return new class extends Migration
     {
         make_fields('students', function (Blueprint $table) {
             $table->foreignId('person_id')->constrained('people')->cascadeOnDelete();
-            $table->foreignId('batch_id')->constrained('batches');
+            $table->foreignId('batch_id')->constrained()->cascadeOnDelete();
             $table->foreignId('major_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('shift_id')->constrained()->cascadeOnDelete();
 
             $table->string('code', 50)->nullable()->unique();
             $table->date('admission_at')->nullable();

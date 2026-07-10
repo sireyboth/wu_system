@@ -12,7 +12,7 @@ trait Generic
     {
         $pivot = [];
         foreach ($guardians as $guardian_data) {
-            $job = ['occupation' => $guardian_data['occupation'] ?? null];
+            $job = Arr::only($guardian_data, ['occupation', 'phones', 'addresses']);
 
             if (! empty($guardian_data['id'])) {
                 $guardian = Guardian::findOrFail($guardian_data['id']);

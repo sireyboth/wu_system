@@ -12,10 +12,11 @@ window.toggleDarkMode = function () {
     localStorage.theme = isDark ? "dark" : "light";
 };
 
+const baseUri = (slug = "students") => `/api/v1/${slug}`;
 const getById = (hashtag = "") => document.getElementById(hashtag);
-const apiFetch = async (slug = "", options = {}) => {
+const apiFetch = async (slug = "students", options = {}) => {
     const type = "application/json";
-    const res = await fetch(`{/api/v1${slug}`, {
+    const res = await fetch(baseUri(slug), {
         ...options,
         headers: {
             "Content-Type": type,
@@ -28,4 +29,4 @@ const apiFetch = async (slug = "", options = {}) => {
     return res.json();
 };
 
-export { getById, apiFetch };
+export { getById, apiFetch, baseUri };

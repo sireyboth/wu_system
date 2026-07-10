@@ -20,5 +20,6 @@ class StructureSeeder extends Seeder
             'credit',
         ]);
         set_data('nationalities', ['code']);
+        set_data('statuses', ['shortcut']);
     }
 }

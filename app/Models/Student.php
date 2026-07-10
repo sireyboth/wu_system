@@ -12,8 +12,9 @@ class Student extends IModel
         $this->fillable = [
             'person_id',
             'batch_id',
-            'code',
+            'shift_id',
             'major_id',
+            'code',
             'admission_at',
             'bacc_2_code',
             'status',
@@ -33,7 +34,7 @@ class Student extends IModel
             'person.addresses.commune.name', 'person.addresses.commune.name_en', 'person.addresses.commune.name_en',
             'person.addresses.village.name', 'person.addresses.village.name_en', 'person.addresses.village.name_en',
         ];
-        $guardian = ['guardians.occupation', 'guardians.relationship', 'guardians.is_primary'];
+        $guardian = ['guardians.occupation', 'guardians.pivot.relationship', 'guardians.pivot.is_primary'];
 
         $this->searchable = array_merge($this->fillable, [
              ...$batch, ...$faculty, ...$person, ...$major, ...$nationality, ...$address, ...$guardian,
@@ -53,6 +54,11 @@ class Student extends IModel
     public function batch()
     {
         return $this->belongsTo(Batch::class);
+    }
+
+    public function shift()
+    {
+        return $this->belongsTo(Shift::class);
     }
 
     public function major()

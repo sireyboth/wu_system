@@ -20,8 +20,10 @@ class StudentController extends Controller
             'person',
             'batch',
             'major',
+            'shift',
             'major.faculty',
 
+            'person.nationality',
             'person.addresses',
             'person.addresses.province',
             'person.addresses.district',
@@ -29,10 +31,10 @@ class StudentController extends Controller
             'person.addresses.village',
 
             // 'guardians.person.addresses',
-            'guardians.person.addresses.province',
-            'guardians.person.addresses.district',
-            'guardians.person.addresses.commune',
-            'guardians.person.addresses.village',
+            // 'guardians.person.addresses.province',
+            // 'guardians.person.addresses.district',
+            // 'guardians.person.addresses.commune',
+            // 'guardians.person.addresses.village',
         ];
     }
 
@@ -60,9 +62,9 @@ class StudentController extends Controller
 
             foreach ($data['guardians'] as $guardian) {
                 $guardian_person = Person::create($guardian);
-                $response        = $guardian_person->guardian()->create([
-                    'occupation' => $guardian['occupation'] ?? null,
-                ]);
+                $response        = $guardian_person->guardian()->create(
+                    Arr::only($guardian, ['occupation', 'phones', 'addresses'])
+                );
 
                 // foreach ($guardian['addresses'] as $address) {
                 //     $guardian_person->addresses()->create($address);
