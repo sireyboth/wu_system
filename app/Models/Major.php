@@ -34,6 +34,11 @@ class Major extends IModel
         return $this->hasMany(Subject::class);
     }
 
+    public function student()
+    {
+        return $this->hasOne(Student::class);
+    }
+
     public function lecturers()
     {
         return $this->hasMany(Lecturer::class);

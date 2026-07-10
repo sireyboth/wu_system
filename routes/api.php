@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\MajorController;
 use App\Http\Controllers\Api\RoomMGTApiController;
 use App\Http\Controllers\Api\SaleMgtApiController;
 use App\Http\Controllers\Api\ShiftController;
+use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\SubjectController;
 use App\Http\Controllers\Api\TaxMgtApiController;
@@ -30,6 +31,7 @@ Route::prefix('v1')->group(function () {
         'batches'   => BatchController::class,
         'groups'    => GroupController::class,
         'students'  => StudentController::class,
+        'statuses'  => StatusController::class,
     ]);
 
     Route::get('/provinces', [AddressController::class, 'provinces']);

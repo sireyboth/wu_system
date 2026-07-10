@@ -21,6 +21,7 @@ class StudentResource extends JsonResource
             'entrance_exam' => $this->entrance_exam,
             'exit_exam'     => $this->exit_exam,
             'batch'         => new BatchResource($this->whenLoaded('batch')),
+            'shift'         => new ShiftResource($this->whenLoaded('shift')),
             'major'         => new MajorResource($this->whenLoaded('major')),
             'person'        => new PersonResource($this->whenLoaded('person')),
             'guardians'     => GuardianResource::collection($this->whenLoaded('guardians')),
