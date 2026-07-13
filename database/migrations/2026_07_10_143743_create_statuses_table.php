@@ -13,6 +13,7 @@ return new class extends Migration
     {
         make_fields('statuses', function (Blueprint $table) {
             $table->string('shortcut', 50)->nullable();
+            $table->index('shortcut');
         });
     }
 

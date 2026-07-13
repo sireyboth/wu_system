@@ -1,0 +1,17 @@
+[
+    {
+        "name_kh": "វេនព្រឹក",
+        "name_en": "Morning Shift",
+        "shortcut": "MS"
+    },
+    {
+        "name_kh": "វេនរសៀល",
+        "name_en": "Evening Shift",
+        "shortcut": "ES"
+    },
+    {
+        "name_kh": "វេនយប់",
+        "name_en": "Night Shift",
+        "shortcut": "NS"
+    }
+]

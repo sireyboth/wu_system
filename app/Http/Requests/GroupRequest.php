@@ -24,14 +24,7 @@ class GroupRequest extends FormRequest
     {
         return [
              ...DEFAULT_VALIDATE,
-            'shortcut'      => [
-                'nullable',
-                'string',
-                'max:50',
-                Rule::unique('groups', 'shortcut')
-                    ->ignore($this->route('group'))
-                    ->withoutTrashed(),
-            ],
+            ...check_unique('shortcut', 'groups'),
         ];
     }
 }

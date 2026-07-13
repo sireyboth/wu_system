@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -12,9 +11,9 @@ class StatusController extends Controller
 {
     public function __construct()
     {
-        $this->name          = 'Status';
-        $this->model         = Status::class;
-        $this->resource      = StatusResource::class;
+        $this->name     = 'Status';
+        $this->model    = Status::class;
+        $this->resource = StatusResource::class;
     }
 
     /**
@@ -22,7 +21,7 @@ class StatusController extends Controller
      */
     public function index(Request $request)
     {
-        return $this->list($request);
+        return $this->list($request)->where('shortcut', 'student_status');
     }
 
     /**

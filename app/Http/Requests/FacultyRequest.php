@@ -24,14 +24,7 @@ class FacultyRequest extends FormRequest
     {
         return [
              ...DEFAULT_VALIDATE,
-            'shortcut' => [
-                'nullable',
-                'string',
-                'max:50',
-                Rule::unique('faculties', 'shortcut')
-                    ->ignore($this->route('faculty'))
-                    ->withoutTrashed(),
-            ],
+            ...check_unique('shortcut', 'faculties'),
         ];
     }
 }

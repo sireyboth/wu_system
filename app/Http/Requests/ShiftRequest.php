@@ -24,14 +24,7 @@ class ShiftRequest extends FormRequest
     {
         return [
             ...DEFAULT_VALIDATE,
-            'shortcut' => [
-                'nullable',
-                'string',
-                'max:50',
-                Rule::unique('shifts', 'shortcut')
-                    ->ignore($this->route('shift'))
-                    ->withoutTrashed(),
-            ],
+            ...check_unique('shortcut', 'shifts'),
         ];
     }
 }

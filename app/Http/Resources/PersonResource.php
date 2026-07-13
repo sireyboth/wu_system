@@ -19,7 +19,6 @@ class PersonResource extends JsonResource
             'last_name'     => $this->last_name,
             'first_name_kh' => $this->first_name_kh,
             'last_name_kh'  => $this->last_name_kh,
-            'nationality_id'   => $this->nationality_id,
             'nationality'   => new NationalityResource($this->nationality),
             'dob'           => $this->dob?->format('Y-m-d'),
             'sex'           => $this->sex,

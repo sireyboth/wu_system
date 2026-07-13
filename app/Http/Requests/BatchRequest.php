@@ -24,14 +24,7 @@ class BatchRequest extends FormRequest
     {
         return [
              ...DEFAULT_VALIDATE,
-            'shortcut'      => [
-                'nullable',
-                'string',
-                'max:50',
-                Rule::unique('batches', 'shortcut')
-                    ->ignore($this->route('batch'))
-                    ->withoutTrashed(),
-            ],
+            ...check_unique('shortcut', 'batches'),
             'academic_year' => 'nullable|string',
         ];
     }

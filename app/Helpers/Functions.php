@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 if (! function_exists('make_fields')) {
     function make_fields(string $name, callable $fn, bool $named = true, bool $increment = true): void
@@ -56,7 +57,7 @@ if (! function_exists('to_list')) {
             $data['name_en'] = $object->name_en;
         }
 
-        $data['remark']     = $object->remark;
+        $data['remark']     = $object->remark ?? null;
         $data['created_at'] = $object->created_at?->format('Y-m-d H:i:s');
         $data['updated_at'] = $object->updated_at?->format('Y-m-d H:i:s');
 
@@ -187,7 +188,7 @@ if (! function_exists('set_data')) {
                      ...$list,
                     'name_en' => $name_en,
                     'name_kh' => $name_kh,
-                    'name'    => "{$name_en} ({$name_kh})",
+                    'name'    => "{$name_kh} ({$name_en})",
                 ];
             }
 
@@ -217,7 +218,7 @@ if (! function_exists('set_data')) {
     }
 }
 
-if (!function_exists('initials')) {
+if (! function_exists('initials')) {
     function initials(string $name, int $limit = 2): string
     {
         $words = explode(' ', trim($name));
@@ -231,3 +232,30 @@ if (!function_exists('initials')) {
         return $initials;
     }
 }
+
+if (! function_exists('check_unique')) {
+    function check_unique(string $name, string $table_name): array
+    {
+        return [
+            $name => [
+                'nullable',
+                'string',
+                'max:50',
+                Rule::unique($table_name, $name)
+                    ->ignore(request()->route(Str::singular($table_name)))
+                    ->withoutTrashed(),
+            ],
+        ];
+    }
+}
+
+if (! function_exists('check_exist')) {
+    function check_exist(string $name, string $table_name): array
+    {
+        return [
+            $name => "required|exists:{$table_name},id|integer",
+        ];
+    }
+}
+
+

@@ -1,7 +1,6 @@
 <?php
 namespace App\Helpers;
 
-use App\Models\Guardian;
 use App\Models\Person;
 use App\Models\Student;
 use Illuminate\Support\Arr;
@@ -10,41 +9,28 @@ trait Generic
 {
     protected function sync_guardians(Student $student, array $guardians): void
     {
-        $pivot = [];
-        foreach ($guardians as $guardian_data) {
-            $job = Arr::only($guardian_data, ['occupation', 'phones', 'addresses']);
+        $incoming_ids = collect($guardians)->pluck('id')->filter();
 
-            if (! empty($guardian_data['id'])) {
-                $guardian = Guardian::findOrFail($guardian_data['id']);
-                $guardian->person->update($guardian_data);
-                $guardian->update($job);
-            } else {
-                $person   = Person::create($guardian_data);
-                $guardian = $person->guardian()->create($job);
-            }
-
-            // $this->sync_addresses($guardian->person, $guardian_data['addresses'] ?? []);
-            $pivot[$guardian->id] = Arr::only($guardian_data, ['relationship', 'is_primary']);
+        $student->guardians()->whereNotIn('id', $incoming_ids)->delete();
+        foreach ($guardians as $guardian) {
+            $student->guardians()->updateOrCreate(
+                ['id' => $guardian['id'] ?? null],
+                Arr::except($guardian, ['id'])
+            );
         }
-
-        $student->guardians()->sync($pivot);
     }
 
     protected function sync_addresses(Person $person, array $addresses): void
     {
-        $types = [];
+        $incoming_types = collect($addresses)->pluck('type')->filter();
+
+        // remove address types no longer present in the payload
+        $person->addresses()->whereNotIn('type', $incoming_types)->delete();
         foreach ($addresses as $address) {
-            $types[] = $address['type'];
             $person->addresses()->updateOrCreate(
-                [
-                    'person_id' => $person->id,
-                    'type'      => $address['type'],
-                ],
-                $address
+                ['type' => $address['type']],         // match key: one row per type
+                Arr::except($address, ['id', 'type']) // don't overwrite the match key itself
             );
         }
-
-        // Remove address types that were omitted from the request
-        $person->addresses()->whereNotIn('type', $types)->delete();
     }
 }

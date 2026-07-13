@@ -29,4 +29,11 @@ const apiFetch = async (slug = "students", options = {}) => {
     return res.json();
 };
 
-export { getById, apiFetch, baseUri };
+const toList = (fields, dom, has_id = false) => {
+    Object.entries(fields).forEach(([field, value]) => {
+        const el = dom.form.querySelector(`[name="${field}"]`);
+        if (el) el.value = has_id ? value.id : (value ?? "");
+    });
+};
+
+export { getById, apiFetch, baseUri, toList };

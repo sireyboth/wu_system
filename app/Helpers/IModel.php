@@ -76,7 +76,7 @@ abstract class IModel extends Model
         $this->attributes['name']    = $this->combineName($this->name_kh ?? request('name_kh'), $value);
     }
 
-    private function combineName(string $name_kh, string $name_en): string
+    private function combineName(?string $name_kh, ?string $name_en): string
     {
         return "{$name_kh} ({$name_en})";
     }

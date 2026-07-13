@@ -1,9 +1,7 @@
 <?php
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class StudentRequest extends FormRequest
 {
@@ -38,41 +36,34 @@ class StudentRequest extends FormRequest
         }
 
         $rules = array_merge($rules, [
-            'code'                     => [
-                'nullable',
-                'string',
-                'max:50',
-                Rule::unique('students', 'code')->ignore($this->route('student'))->withoutTrashed(),
-            ],
-            'major_id'                 => 'required|exists:majors,id|integer',
-            'batch_id'                 => 'required|exists:batches,id|integer',
-            'admission_at'             => 'required|date',
-            'status'                   => 'nullable|string|max:50',
+             ...check_unique('code', 'students'),
+            ...check_exist('batch_id', 'batches'),
+            ...check_exist('major_id', 'majors'),
+            ...check_exist('group_id', 'groups'),
+            ...check_exist('shift_id', 'shifts'),
+            ...check_exist('status_id', 'statuses'),
+            'admission_date'           => 'nullable|date',
+            'from_school'              => 'nullable|string|max:100',
             'bacc_2_code'              => 'nullable|string|max:50',
-            'entrance_exam'            => 'nullable|string|max:50',
-            'exit_exam'                => 'nullable|string|max:50',
+            'entrance_exam'            => 'nullable|string',
+            'exit_exam'                => 'nullable|string',
+            'degree_type'              => 'nullable|string',
+            'intake'                   => 'nullable|string',
+            'scholarship'              => 'nullable|string',
 
-            'guardians'                => 'required|array|min:1',
+            'guardians'                => 'sometimes|array|min:1',
             'guardians.*.relationship' => 'required|string|max:50',
-            'guardians.*.is_primary'   => 'required|boolean',
-            'guardians.*.occupation'   => 'nullable|string|max:100',
+            'guardians.*.job'          => 'nullable|string|max:100',
             'guardians.*.remark'       => 'nullable|string|max:500',
-            'guardians.*.phones'       => 'nullable|array',
+            'guardians.*.phones'       => 'nullable',
             'guardians.*.addresses'    => 'nullable|array',
         ]);
 
-        // Add guardian-prefixed person/address rules
-        // if (is_array(PERSON_VALIDATE)) {
-        //     foreach (PERSON_VALIDATE as $k => $v) {
-        //         $rules['guardians.*.' . $k] = $v;
-        //     }
-        // }
-
-        // if (is_array(ADDRESS_VALIDATE)) {
-        //     foreach (ADDRESS_VALIDATE as $k => $v) {
-        //         $rules['guardians.*.' . $k] = $v;
-        //     }
-        // }
+        if (is_array(DEFAULT_VALIDATE)) {
+            foreach (DEFAULT_VALIDATE as $k => $v) {
+                $rules['guardians.*.' . $k] = $v;
+            }
+        }
 
         return $rules;
     }

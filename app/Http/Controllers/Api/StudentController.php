@@ -7,7 +7,6 @@ use App\Http\Resources\StudentResource;
 use App\Models\Person;
 use App\Models\Student;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 
 class StudentController extends Controller
 {
@@ -22,6 +21,9 @@ class StudentController extends Controller
             'major',
             'shift',
             'major.faculty',
+            'group',
+            'status',
+            'guardians',
 
             'person.nationality',
             'person.addresses',
@@ -56,22 +58,8 @@ class StudentController extends Controller
             $person  = Person::create($data);
             $student = $person->student()->create($data);
 
-            foreach ($data['addresses'] as $address) {
-                $person->addresses()->create($address);
-            }
-
-            foreach ($data['guardians'] as $guardian) {
-                $guardian_person = Person::create($guardian);
-                $response        = $guardian_person->guardian()->create(
-                    Arr::only($guardian, ['occupation', 'phones', 'addresses'])
-                );
-
-                // foreach ($guardian['addresses'] as $address) {
-                //     $guardian_person->addresses()->create($address);
-                // }
-
-                $student->guardians()->attach($response->id, Arr::only($guardian, ['relationship', 'is_primary']));
-            }
+            $person->addresses()->createMany($data['addresses']);
+            $student->guardians()->createMany($data['guardians']);
 
             return new StudentResource($student->load($this->relationships));
         });
@@ -110,16 +98,10 @@ class StudentController extends Controller
     public function destroy(Student $student)
     {
         return execute(function () use ($student) {
-            $student->person()->withTrashed()->first()?->addresses()->forceDelete();
-
-            foreach ($student->guardians()->withTrashed()->get() as $guardian) {
-                // $guardian->person()->withTrashed()->first()?->addresses()->forceDelete();
-                $guardian->forceDelete();
-                $guardian->person()->withTrashed()->forceDelete();
-            }
-
+            $student->person->addresses()->forceDelete(); // if addresses relation is via person, adjust accordingly
+            $student->guardians()->forceDelete();
+            $student->person->forceDelete();
             $student->forceDelete();
-            $student->person()->withTrashed()->forceDelete();
 
             return has_data(null, 'Permanently deleted.');
         });
@@ -133,15 +115,6 @@ class StudentController extends Controller
         return execute(function () use ($student) {
             $student->restore();
             $student->person()->withTrashed()->first()?->restore();
-            $student->person()->withTrashed()->first()?->addresses()
-                ->withTrashed()->first()?->restore();
-
-            foreach ($student->guardians()->withTrashed()->get() as $guardian) {
-                $guardian->restore();
-                $guardian->person()->withTrashed()->first()?->restore();
-                // $guardian->person()->withTrashed()->first()?->addresses()
-                //     ->withTrashed()->first()?->restore();
-            }
 
             return new StudentResource($student->load($this->relationships));
         });
@@ -153,16 +126,8 @@ class StudentController extends Controller
     public function trash(Student $student)
     {
         return execute(function () use ($student) {
-            $student->person->addresses()->delete();
-            foreach ($student->guardians as $guardian) {
-                // $guardian->person->addresses()->delete();
-                $guardian->delete();
-                $guardian->person()->delete();
-            }
-
             $student->delete();
-            $student->guardians()->detach();
-            $student->person()->delete();
+            $student->person->delete();
 
             return has_data(null, 'Moved to trash.');
         });

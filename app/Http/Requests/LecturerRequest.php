@@ -24,14 +24,7 @@ class LecturerRequest extends FormRequest
     {
         return [
              ...DEFAULT_VALIDATE,
-            'code' => [
-                'nullable',
-                'string',
-                'max:50',
-                Rule::unique('lecturers', 'code')
-                    ->ignore($this->route('lecturer'))
-                    ->withoutTrashed(),
-            ],
+             ...check_unique('code', 'lecturers'),
         ];
     }
 }

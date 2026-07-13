@@ -13,14 +13,14 @@ const DEFAULT_VALIDATE = [
 ];
 
 const ADDRESS_VALIDATE = [
-    'addresses'               => 'required|array|min:1',
+    'addresses'               => 'sometimes|array',
     'addresses.*.province_id' => 'required|exists:provinces,id',
     'addresses.*.district_id' => 'required|exists:districts,id',
     'addresses.*.commune_id'  => 'required|exists:communes,id',
     'addresses.*.village_id'  => 'required|exists:villages,id',
     'addresses.*.street'      => 'nullable|string',
     'addresses.*.house_no'    => 'nullable|string',
-    'addresses.*.type'        => 'nullable|string',
+    'addresses.*.type'        => 'required|in:current,birth',
 ];
 
 const PERSON_VALIDATE = [
@@ -33,6 +33,6 @@ const PERSON_VALIDATE = [
     'sex'            => 'required|in:female,male,other',
     'email'          => 'nullable|email|max:50',
     'remark'         => 'nullable|string|max:500',
-    'phones'         => ['nullable', 'array'],
-    'phones.*'       => ['string'],
+    'phones'         => 'nullable|array',
+    'phones.*'       => 'nullable',
 ];

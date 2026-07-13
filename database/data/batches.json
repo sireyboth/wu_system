@@ -1,0 +1,32 @@
+[
+    {
+        "name_kh": "ជំនាន់ទី១",
+        "name_en": "Batch 1",
+        "shortcut": "B1",
+        "academic_year": "2021-22"
+    },
+    {
+        "name_kh": "ជំនាន់ទី២",
+        "name_en": "Batch 2",
+        "shortcut": "B2",
+        "academic_year": "2022-23"
+    },
+    {
+        "name_kh": "ជំនាន់ទី៣",
+        "name_en": "Batch 3",
+        "shortcut": "B3",
+        "academic_year": "20223-24"
+    },
+    {
+        "name_kh": "ជំនាន់ទី៤",
+        "name_en": "Batch 4",
+        "shortcut": "B4",
+        "academic_year": "2024-25"
+    },
+    {
+        "name_kh": "ជំនាន់ទី៥",
+        "name_en": "Batch 5",
+        "shortcut": "B6",
+        "academic_year": "2025-26"
+    }
+]

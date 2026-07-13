@@ -12,13 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         make_fields('guardians', function (Blueprint $table) {
-            // $table->foreignId('person_id')
-            //     ->constrained('people')
-            //     ->cascadeOnDelete();
+            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
             $table->json('phones')->nullable();
             $table->json('addresses')->nullable();
-
-            $table->string('occupation', 100)->nullable();
+            $table->string('job', 100)->nullable();
+            $table->enum('relationship', ['father', 'mother', 'other']); 
         });
     }
 

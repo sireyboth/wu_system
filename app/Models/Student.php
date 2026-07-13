@@ -11,16 +11,24 @@ class Student extends IModel
 
         $this->fillable = [
             'person_id',
+            'guardian_id',
             'batch_id',
-            'shift_id',
             'major_id',
+            'group_id',
+            'shift_id',
+            'status_id',
             'code',
-            'admission_at',
+            'from_school',
+            'admission_date',
+            'degree_type',
             'bacc_2_code',
-            'status',
+            'intake',
+            'scholarship',
             'entrance_exam',
             'exit_exam',
+            'remark',
         ];
+
         $batch   = ['batch.name', 'batch.name_en', 'batch.name_kh', 'batch.shortcut', 'batch.academic_year', 'batch.remark'];
         $major   = ['major.name', 'major.name_kh', 'major.name_en', 'major.shortcut'];
         $faculty = ['major.faculty.name', 'major.faculty.name_kh', 'major.faculty.name_en', 'major.faculty.shortcut'];
@@ -34,16 +42,15 @@ class Student extends IModel
             'person.addresses.commune.name', 'person.addresses.commune.name_en', 'person.addresses.commune.name_en',
             'person.addresses.village.name', 'person.addresses.village.name_en', 'person.addresses.village.name_en',
         ];
-        $guardian = ['guardians.occupation', 'guardians.pivot.relationship', 'guardians.pivot.is_primary'];
 
         $this->searchable = array_merge($this->fillable, [
-             ...$batch, ...$faculty, ...$person, ...$major, ...$nationality, ...$address, ...$guardian,
+             ...$batch, ...$faculty, ...$person, ...$major, ...$nationality, ...$address,
         ]);
     }
 
     protected function casts(): array
     {
-        return ['admission_at' => 'date'];
+        return ['admission_date' => 'date'];
     }
 
     public function person()
@@ -68,7 +75,16 @@ class Student extends IModel
 
     public function guardians()
     {
-        return $this->belongsToMany(Guardian::class, StudentGuardian::class)
-            ->withPivot(['relationship', 'is_primary'])->withTimestamps();
+        return $this->hasMany(Guardian::class);
+    }
+
+    public function status()
+    {
+        return $this->belongsTo(Status::class);
+    }
+
+    public function group()
+    {
+        return $this->belongsTo(Group::class);
     }
 }

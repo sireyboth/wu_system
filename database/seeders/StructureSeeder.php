@@ -21,5 +21,8 @@ class StructureSeeder extends Seeder
         ]);
         set_data('nationalities', ['code']);
         set_data('statuses', ['shortcut']);
+        set_data('groups', ['shortcut']);
+        set_data('shifts', ['shortcut']);
+        set_data('batches', ['shortcut', 'academic_year']);
     }
 }

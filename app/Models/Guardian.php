@@ -10,18 +10,19 @@ class Guardian extends IModel
      *
      * @var array
      */
-    protected $fillable = ['phones', 'occupation', 'remark'];
+    protected $fillable = [
+         ...DEFAULT_FIELD,
+         'student_id',
+        'phones',
+        'addresses',
+        'job',
+        'relationship',
+    ];
 
     protected $casts = ['phones' => 'array', 'addresses' => 'array'];
 
-    public function person()
+    public function student()
     {
-        return $this->belongsTo(Person::class);
-    }
-
-    public function students()
-    {
-        return $this->belongsToMany(Student::class, StudentGuardian::class)
-            ->withPivot(['relationship', 'is_primary'])->withTimestamps();
+        return $this->belongsTo(Student::class);
     }
 }
