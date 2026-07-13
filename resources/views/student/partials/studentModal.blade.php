@@ -178,8 +178,8 @@
                         </div>
                         <div class="flex flex-col gap-1.5">
                             <label class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">ប្រភេទអាហាររូបករណ័ (Scholarship) <span class="text-rose-500">*</span></label>
-                            <select required name="intake" id="student_intake" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:border-indigo-500 dark:focus:border-indigo-500/50 transition-colors">
-                                <option value="" disabled selected>-- ជ្រើសរើសអាហាររូបករណ័ --</option>
+                            <select required name="scholarship" id="student_scholarship" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:border-indigo-500 dark:focus:border-indigo-500/50 transition-colors">
+                                <option value="" disabled selected>-- ជ្រើសរើសអាហាររូបករណ៍ --</option>
                                 <option value="1">ក្រសួង</option>
                                 <option value="2">សម្ដេច</option>
                                 <option value="3">សាលា</option>
