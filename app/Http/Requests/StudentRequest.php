@@ -53,22 +53,17 @@ class StudentRequest extends FormRequest
 
             'guardians'                => 'sometimes|array|min:1',
             'guardians.*.relationship' => 'required|string|max:50',
-            'guardians.*.is_primary'   => 'required|boolean',
-            'guardians.*.occupation'   => 'nullable|string|max:100',
+            'guardians.*.job'          => 'nullable|string|max:100',
+            'guardians.*.remark'       => 'nullable|string|max:500',
+            'guardians.*.phones'       => 'nullable',
+            'guardians.*.addresses'    => 'nullable|array',
         ]);
 
-        // Add guardian-prefixed person/address rules
-        if (is_array(PERSON_VALIDATE)) {
-            foreach (PERSON_VALIDATE as $k => $v) {
+        if (is_array(DEFAULT_VALIDATE)) {
+            foreach (DEFAULT_VALIDATE as $k => $v) {
                 $rules['guardians.*.' . $k] = $v;
             }
         }
-
-        // if (is_array(ADDRESS_VALIDATE)) {
-        //     foreach (ADDRESS_VALIDATE as $k => $v) {
-        //         $rules['guardians.*.' . $k] = $v;
-        //     }
-        // }
 
         return $rules;
     }

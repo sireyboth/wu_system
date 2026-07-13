@@ -21,6 +21,9 @@ class StudentController extends Controller
             'major',
             'shift',
             'major.faculty',
+            'group',
+            'status',
+            'guardians',
 
             'person.addresses',
             'person.addresses.province',
@@ -54,6 +57,7 @@ class StudentController extends Controller
             $person  = Person::create($data);
             $student = $person->student()->create($data);
 
+<<<<<<< HEAD
             foreach ($data['addresses'] as $address) {
                 $person->addresses()->create($address);
             }
@@ -70,6 +74,10 @@ class StudentController extends Controller
 
                 $student->guardians()->attach($response->id, Arr::only($guardian, ['relationship', 'is_primary']));
             }
+=======
+            $person->addresses()->createMany($data['addresses']);
+            $student->guardians()->createMany($data['guardians']);
+>>>>>>> 81f415e (done student info)
 
             return new StudentResource($student->load($this->relationships));
         });
