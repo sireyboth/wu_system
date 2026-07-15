@@ -50,7 +50,7 @@ function renderRow(student, index) {
     if (person.sex === 'female') sexLabel = '<span class="font-medium text-pink-600 dark:text-pink-400">ស្រី (F)</span>';
     if (person.sex === 'other') sexLabel = '<span class="font-medium text-neutral-500">ផ្សេងៗ</span>';
 
-    const statusValue = (student.status || 'active').toLowerCase();
+    const statusValue = (student.status.name_en|| 'Active').toLowerCase();
     let statusBadgeClasses = 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400';
     let statusTextKhmer = 'សិក្សា';
     if (statusValue === 'suspended' || statusValue === 'dropped') {

@@ -16,10 +16,9 @@
 
     @include('partials.sidebar')
 
-    <main class="p-4 sm:ml-64">
-        
+    <div id="main-content">
         @yield('content')
-    </main>
+    </div>
 @stack('scripts')
 </body>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

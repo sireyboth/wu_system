@@ -5,6 +5,8 @@ import { initFormLookups } from './address-cascade.js';
 import { toggleModal, togglePreviewModal, registerModalCloser, closeModalByName, switchTab } from './ui.js';
 import { handlePrintAction } from './print.js';
 import { loadStudents, handleEditAction, handleDeleteAction, handleFormSubmit } from './student-form.js';
+// resources/js/probisional/index.js
+import './student-picker.js';
 
 /**
  * THE single DOMContentLoaded listener for this page.
