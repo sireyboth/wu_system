@@ -6,3 +6,8 @@
 body {
   font-family: theme('fontFamily.sans');
 }
+@layer utilities {
+  .dark input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
+}

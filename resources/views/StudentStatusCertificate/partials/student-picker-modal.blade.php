@@ -100,7 +100,7 @@
                             <th class="px-4 py-3 w-12">N.O</th>
                             <th class="px-4 py-3">ឈ្មោះ / Name</th>
                             <th class="px-4 py-3 w-20">ភេទ</th>
-                            <th class="px-4 py-3">ថ្ងៃខែឆ្នាំ</th>
+                            <th class="px-4 py-3">ថ្ងៃខែឆ្នាំកំណើត</th>
                             <th class="px-4 py-3">Student ID</th>
                             <th class="px-4 py-3">ជំនាញ / Major</th>
                             <th class="px-4 py-3">ជំនាន់ / Batch</th>
@@ -153,7 +153,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 3l14 9-14 9V3z"/>
                     </svg>
-                    Begin
+                    បញ្ចូលពត៌មាន (Entry Data)
                 </button>
             </div>
         </div>
