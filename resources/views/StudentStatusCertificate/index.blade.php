@@ -110,6 +110,7 @@
 
     {{-- Student picker modal --}}
     @include('StudentStatusCertificate.partials.student-picker-modal')
+    @include('StudentStatusCertificate.partials.student-status-modal')
 
 @endsection
 
