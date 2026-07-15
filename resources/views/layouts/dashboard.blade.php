@@ -25,13 +25,19 @@
 
     <div class="flex min-h-screen w-full overflow-x-hidden">
 
+    <div class="flex min-h-screen w-full overflow-x-hidden">
+
+        @include('partials.sidebar')
         @include('partials.sidebar')
 
-    <div id="main-content">
-        @yield('content')
+        <div id="main-content" class="flex-1 min-w-0 p-6 transition-all duration-300">
+            @yield('content')
+        </div>
+
     </div>
+
 @stack('scripts')
-<script src="https://cdn.jsdelivr.net/gh/ThyrithSor/momentkh@3.0.3/momentkh.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
 </body>
 </html>
