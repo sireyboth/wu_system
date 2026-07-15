@@ -98,23 +98,15 @@ if (! function_exists('execute')) {
 }
 
 if (! function_exists('paginated')) {
-    function paginated(
-        LengthAwarePaginator $paginator,
-        string $resourceClass
-    ): JsonResponse {
-        return response()->json(
-            $resourceClass::collection($paginator)
-                ->response()->getData(true)
-        );
+    function paginated(LengthAwarePaginator $paginator, string $resourceClass)
+    {
+        return response()->json($resourceClass::collection($paginator)->response()->getData(true));
     }
 }
 
 if (! function_exists('has_data')) {
-    function has_data(
-        mixed $data = null,
-        string $message = 'OK',
-        int $code = 200
-    ): JsonResponse {
+    function has_data(mixed $data = null, string $message = 'OK', int $code = 200)
+    {
         return response()->json([
             'success' => true,
             'data'    => $data,
@@ -165,7 +157,7 @@ if (! function_exists('web_routes')) {
     function web_routes(array $actions, callable $fn): void
     {
         foreach ($actions as $slug => $controller) {
-            Route::get("/{$slug}", [$controller, $slug])->name($slug);
+            Route::get("/{$slug}", [$controller, $slug])->name("{$slug}.invoke");
             $fn();
         }
     }
@@ -218,6 +210,19 @@ if (! function_exists('set_data')) {
     }
 }
 
+if (! function_exists('set_records')) {
+    function set_records(string $name, callable $fn, bool $a = true): void
+    {
+        $path    = database_path("/data/{$name}.json");
+        $records = json_decode(file_get_contents($path), true);
+        $now     = Carbon::now();
+
+        foreach ($records as $data) {
+            $a ? $fn($data) : execute(fn() => $fn($data, $now));
+        }
+    }
+}
+
 if (! function_exists('initials')) {
     function initials(string $name, int $limit = 2): string
     {
@@ -257,5 +262,3 @@ if (! function_exists('check_exist')) {
         ];
     }
 }
-
-

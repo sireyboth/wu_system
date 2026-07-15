@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             LocationSeeder::class,
             StructureSeeder::class,
             TermSeeder::class,
+            StudentSeeder::class,
         ]);
     }
 }

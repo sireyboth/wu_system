@@ -15,7 +15,6 @@ class MajorResource extends JsonResource
     {
         return to_list($this, [
             'shortcut' => $this->shortcut,
-            'faculty_id'=> $this->faculty_id,
             'faculty'  => new FacultyResource($this->whenLoaded('faculty')),
         ]);
     }

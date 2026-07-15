@@ -21,7 +21,7 @@ class StatusController extends Controller
      */
     public function index(Request $request)
     {
-        return $this->list($request)->where('shortcut', 'student_status');
+        return $this->list($request);
     }
 
     /**
