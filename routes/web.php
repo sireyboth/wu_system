@@ -12,7 +12,7 @@ use App\Http\Controllers\SaleMGTController;
 use App\Http\Controllers\SampleController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\StudentController;
-use App\Http\Controllers\ProbisionalController;
+use App\Http\Controllers\StudentStatusController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -38,7 +38,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('sample', SampleController::class)->name('sample.index');
     Route::resource('student', StudentController::class);
-    Route::resource('probisional',ProbisionalController::class);
+    Route::resource('StudentStatusCertificate',StudentStatusController::class);
 });
 
 Route::middleware('auth')->group(function () {

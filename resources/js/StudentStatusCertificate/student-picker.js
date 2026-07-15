@@ -63,12 +63,7 @@ async function fetchStudents(search = '') {
     const url = `${CONFIG.API_URL}?search=${encodeURIComponent(search)}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`GET ${url} → ${res.status}`);
-    
     const json = await res.json();
-    
-    // ─── ADD LOGS HERE ───
-    console.log('%c[API Raw Response]', 'color: #10b981; font-weight: bold;', json);
-    
     return Array.isArray(json.data) ? json.data
          : Array.isArray(json)      ? json
          : [];
@@ -102,7 +97,6 @@ function renderTable(students) {
 }
 
 function buildRow(s, i) {
-    
     const isFemale = ['F', 'Female', 'ស្រី'].includes(s.sex);
     const sexBadge = isFemale
         ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
@@ -110,50 +104,28 @@ function buildRow(s, i) {
         : `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
                         bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-400">ប្រុស</span>`;
 
-                        // ─── 1. CREATE COMBINED STRINGS ONCE ───
-    // Combine Khmer Last Name + First Name (Standard Khmer format: Last Name first)
-    const fullNameKh = [s.person?.last_name_kh, s.person?.first_name_kh]
-        .filter(Boolean)
-        .join(' ') || '—';
-
-    // Combine English First Name + Last Name (Standard English format: First Name first)
-    const fullNameEn = [s.person?.first_name, s.person?.last_name]
-        .filter(Boolean)
-        .join(' ') || '—';
-
-    // Safely parse nested major and batch relation values to prevent [object Object] crashes
-    const majorName = s.major?.name ?? s.department ?? '—';
-    const batchName = s.batch?.name_en ?? s.generation ?? '—';
-    const dobFormatted = s.person?.dob ? formatDate(s.person.dob) : '—';
-
     return `
-        <tr class="picker-row cursor-pointer select-none hover:bg-indigo-50/60 dark:hover:bg-indigo-500/5 transition-colors duration-150"
-        data-id="${s.id}"
-        data-name-kh="${fullNameKh}"
-        data-name-en="${fullNameEn}"
-        data-sex="${s.sex ?? ''}"
-        data-student-code="${s.student_id ?? s.code ?? ''}"
-        data-dob="${s.person?.dob ?? ''}"
-        data-major="${majorName}">
+        <tr class="picker-row cursor-pointer select-none
+                   hover:bg-indigo-50/60 dark:hover:bg-indigo-500/5
+                   transition-colors duration-150"
+            data-id="${s.id}"
+            data-name-kh="${s.name_kh ?? ''}"
+            data-name-en="${s.name_en ?? ''}">
             <td class="px-4 py-3 text-neutral-400 font-mono text-xs">${i + 1}</td>
             <td class="px-4 py-3">
-                <div class="font-semibold text-neutral-900 dark:text-white leading-snug">
-                    ${[s.person?.first_name_kh, s.person?.last_name_kh].filter(Boolean).join(' ') || '—'}
-                </div>
-                <div class="text-xs text-neutral-400 font-mono mt-0.5">
-                    ${[s.person?.first_name, s.person?.last_name].filter(Boolean).join(' ') || '—'}
-                </div>
+                <div class="font-semibold text-neutral-900 dark:text-white leading-snug">${s.name_kh ?? '—'}</div>
+                <div class="text-xs text-neutral-400 font-mono mt-0.5">${s.name_en ?? ''}</div>
             </td>
             <td class="px-4 py-3">${sexBadge}</td>
-            <td class="px-4 py-3 text-xs text-neutral-500 font-mono whitespace-nowrap">${dobFormatted}</td>
+            <td class="px-4 py-3 text-xs text-neutral-500 font-mono whitespace-nowrap">${formatDate(s.dob)}</td>
             <td class="px-4 py-3 font-mono text-xs font-bold text-indigo-600 dark:text-indigo-400">
                 ${s.student_id ?? s.code ?? '—'}
             </td>
             <td class="px-4 py-3 text-sm text-neutral-700 dark:text-neutral-300">
-                ${majorName}
+                ${s.major ?? s.department ?? '—'}
             </td>
             <td class="px-4 py-3 text-sm text-neutral-500 dark:text-neutral-400">
-                ${batchName}
+                ${s.batch ?? s.generation ?? '—'}
             </td>
         </tr>`;
 }
@@ -173,15 +145,10 @@ function selectRow(row) {
         'ring-1', 'ring-inset', 'ring-indigo-300', 'dark:ring-indigo-500/40',
     );
 
-    // Capture all of the row's dataset fields so they hand off to the second modal cleanly
     state.selected = {
-        id:          row.dataset.id,
-        nameKh:      row.dataset.nameKh,
-        nameEn:      row.dataset.nameEn,
-        sex:         row.dataset.sex,         // <-- Add this
-        studentCode: row.dataset.studentCode, // <-- Add this
-        dob:         row.dataset.dob,         // <-- Add this
-        major:       row.dataset.major        // <-- Add this
+        id:     row.dataset.id,
+        nameKh: row.dataset.nameKh,
+        nameEn: row.dataset.nameEn,
     };
 
     const preview = El.preview();
@@ -282,23 +249,11 @@ function closeModal() {
 
 // ─── Begin ────────────────────────────────────────────────────────────────────
 
-// ─── Begin ────────────────────────────────────────────────────────────────────
-
 function beginCertificate() {
     if (!state.selected) return;
-
-    const student = { ...state.selected };
-    log('Handing off to status modal:', student);
-
-    closeModal();
-
-    setTimeout(() => {
-        if (window.StudentStatusModal) {
-            window.StudentStatusModal.open(student);
-        } else {
-            console.error('[StudentPicker] StudentStatusModal not found. Make sure student-status-modal.js is loaded.');
-        }
-    }, CONFIG.MODAL_ANIM_MS);
+    const url = `${CONFIG.CERT_ROUTE}/${state.selected.id}`;
+    log('Navigating to:', url);
+    window.location.href = url;
 }
 
 // ─── Event binding ────────────────────────────────────────────────────────────
@@ -358,4 +313,3 @@ if (document.readyState === 'loading') {
 } else {
     bindEvents();
 }
-

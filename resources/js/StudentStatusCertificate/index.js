@@ -7,7 +7,6 @@ import { handlePrintAction } from './print.js';
 import { loadStudents, handleEditAction, handleDeleteAction, handleFormSubmit } from './student-form.js';
 // resources/js/probisional/index.js
 import './student-picker.js';
-import './student-status-modal.js';
 
 /**
  * THE single DOMContentLoaded listener for this page.
