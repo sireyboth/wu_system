@@ -63,7 +63,12 @@ async function fetchStudents(search = '') {
     const url = `${CONFIG.API_URL}?search=${encodeURIComponent(search)}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`GET ${url} → ${res.status}`);
+    
     const json = await res.json();
+    
+    // ─── ADD LOGS HERE ───
+    console.log('%c[API Raw Response]', 'color: #10b981; font-weight: bold;', json);
+    
     return Array.isArray(json.data) ? json.data
          : Array.isArray(json)      ? json
          : [];
@@ -97,6 +102,7 @@ function renderTable(students) {
 }
 
 function buildRow(s, i) {
+    
     const isFemale = ['F', 'Female', 'ស្រី'].includes(s.sex);
     const sexBadge = isFemale
         ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
@@ -109,7 +115,7 @@ function buildRow(s, i) {
                    hover:bg-indigo-50/60 dark:hover:bg-indigo-500/5
                    transition-colors duration-150"
             data-id="${s.id}"
-            data-name-kh="${s.name_kh ?? ''}"
+            data-name-kh="${s.person.first_name_kh ?? ''}"
             data-name-en="${s.name_en ?? ''}">
             <td class="px-4 py-3 text-neutral-400 font-mono text-xs">${i + 1}</td>
             <td class="px-4 py-3">
@@ -313,3 +319,4 @@ if (document.readyState === 'loading') {
 } else {
     bindEvents();
 }
+
