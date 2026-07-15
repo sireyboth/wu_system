@@ -63,16 +63,23 @@ export function setupCascadeListener(
  * up the student + guardian cascading address selectors.
  */
 export async function initFormLookups(ApiService) {
-    const [batchesRes, majorsRes, provinceRes, nationalityRes, groupRes, shiftRes, statusRes] =
-        await Promise.all([
-            ApiService.request(CONFIG.API_LOOKUPS.batches),
-            ApiService.request(CONFIG.API_LOOKUPS.majors),
-            ApiService.request(CONFIG.API_LOOKUPS.provinces),
-            ApiService.request(CONFIG.API_LOOKUPS.nationalities),
-            ApiService.request(CONFIG.API_LOOKUPS.groups),
-            ApiService.request(CONFIG.API_LOOKUPS.shifts),
-            ApiService.request(CONFIG.API_LOOKUPS.statuses),
-        ]);
+    const [
+        batchesRes,
+        majorsRes,
+        provinceRes,
+        nationalityRes,
+        groupRes,
+        shiftRes,
+        statusRes,
+    ] = await Promise.all([
+        ApiService.request(CONFIG.API_LOOKUPS.batches),
+        ApiService.request(CONFIG.API_LOOKUPS.majors),
+        ApiService.request(CONFIG.API_LOOKUPS.provinces),
+        ApiService.request(CONFIG.API_LOOKUPS.nationalities),
+        ApiService.request(CONFIG.API_LOOKUPS.groups),
+        ApiService.request(CONFIG.API_LOOKUPS.shifts),
+        ApiService.request(CONFIG.API_LOOKUPS.statuses),
+    ]);
 
     if (!batchesRes.error) {
         fillSelectOptions(
@@ -111,9 +118,11 @@ export async function initFormLookups(ApiService) {
         );
     }
     if (!statusRes.error) {
+        const data = statusRes.data?.data ?? statusRes.data ?? [];
+
         fillSelectOptions(
             getById("student-status"),
-            statusRes.data?.data ?? statusRes.data,
+            data.filter((item) => item?.shortcut?.toLowerCase() === "student"),
         );
     }
 

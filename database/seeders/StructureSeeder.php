@@ -18,19 +18,13 @@ class StructureSeeder extends Seeder
      */
     public function run(): void
     {
-        set_data('faculties', ['shortcut']);
-        set_data('majors', ['shortcut', 'faculty_id']);
-        set_data('subjects', [
-            'code',
-            'year_level',
-            'major_id',
-            'semester',
-            'credit',
-        ]);
-        set_data('nationalities', ['code']);
-        set_data('statuses', ['shortcut']);
-        set_data('groups', ['shortcut']);
-        set_data('shifts', ['shortcut']);
-        set_data('batches', ['shortcut', 'academic_year']);
+        set_records('nationalities', fn($data) => Nationality::create($data));
+        set_records('faculties', fn($data) => Faculty::create([ ...$data, 'remark' => fake()->sentence()]));
+        set_records('majors', fn($data) => Major::create([ ...$data, 'remark' => fake()->sentence()]));
+        set_records('subjects', fn($data) => Subject::create([ ...$data, 'remark' => fake()->sentence()]));
+        set_records('statuses', fn($data) => Status::create([ ...$data, 'remark' => fake()->sentence()]));
+        set_records('groups', fn($data) => Group::create([ ...$data, 'remark' => fake()->sentence()]));
+        set_records('shifts', fn($data) => Shift::create([ ...$data, 'remark' => fake()->sentence()]));
+        set_records('batches', fn($data) => Batch::create([ ...$data, 'remark' => fake()->sentence()]));
     }
 }
