@@ -287,43 +287,56 @@
                                             fill="none" viewBox="0 0 24 24">
                                             <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
                                                 d="M4.5 17H4a1 1 0 0 1-1-1 3 3 0 0 1 3-3h1m0-3.05A2.5 2.5 0 1 1 9 5.5M19.5 17h.5a1 1 0 0 0 1-1 3 3 0 0 0-3-3h-1m0-3.05a2.5 2.5 0 1 0-2-4.45m.5 13.5h-7a1 1 0 0 1-1-1 3 3 0 0 1 3-3h3a3 3 0 0 1 3 3 1 1 0 0 1-1 1Zm-1-9.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z" />
-                                            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
-                                                xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                fill="none" viewBox="0 0 24 24">
-                                                <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
-                                                    d="M4.5 17H4a1 1 0 0 1-1-1 3 3 0 0 1 3-3h1m0-3.05A2.5 2.5 0 1 1 9 5.5M19.5 17h.5a1 1 0 0 0 1-1 3 3 0 0 0-3-3h-1m0-3.05a2.5 2.5 0 1 0-2-4.45m.5 13.5h-7a1 1 0 0 1-1-1 3 3 0 0 1 3-3h3a3 3 0 0 1 3 3 1 1 0 0 1-1 1Zm-1-9.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z" />
-                                            </svg>
+                                        </svg>
                                     </x-slot>
                                     ក្រុមសិក្សា (Group)
+                                </x-sidebar-link>
+
+                                <x-sidebar-link route="status.index">
+                                    <x-slot name="icon">
+                                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
+                                            xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            fill="none" viewBox="0 0 24 24">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
+                                                d="M4.5 17H4a1 1 0 0 1-1-1 3 3 0 0 1 3-3h1m0-3.05A2.5 2.5 0 1 1 9 5.5M19.5 17h.5a1 1 0 0 0 1-1 3 3 0 0 0-3-3h-1m0-3.05a2.5 2.5 0 1 0-2-4.45m.5 13.5h-7a1 1 0 0 1-1-1 3 3 0 0 1 3-3h3a3 3 0 0 1 3 3 1 1 0 0 1-1 1Zm-1-9.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z" />
+                                        </svg>
+                                    </x-slot>
+                                    ស្ថានភាព (Status)
                                 </x-sidebar-link>
                             </ul>
                         </div>
                     </div>
 
-        <div class="pt-4 mt-2 border-t border-neutral-200 dark:border-white/10 space-y-4">
-            <!-- Theme Toggle Button -->
-            <button onclick="toggleDarkMode()"
-                class="flex items-center justify-between w-full px-4 py-2.5 bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 rounded-xl transition-all duration-300 group">
-                <div class="flex items-center">
-                    <!-- Moon Icon (Visible in Light Mode, hidden in Dark Mode) -->
-                    <svg id="theme-icon-moon" class="w-5 h-5 text-indigo-600 dark:hidden transition-transform group-hover:-rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                    </svg>
+                    <div class="pt-4 mt-2 border-t border-neutral-200 dark:border-white/10 space-y-4">
+                        <!-- Theme Toggle Button -->
+                        <button onclick="toggleDarkMode()"
+                            class="flex items-center justify-between w-full px-4 py-2.5 bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 rounded-xl transition-all duration-300 group">
+                            <div class="flex items-center">
+                                <!-- Moon Icon (Visible in Light Mode, hidden in Dark Mode) -->
+                                <svg id="theme-icon-moon"
+                                    class="w-5 h-5 text-indigo-600 dark:hidden transition-transform group-hover:-rotate-12"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                                </svg>
 
-                    <!-- Sun Icon (Hidden in Light Mode, visible in Dark Mode) -->
-                    <svg id="theme-icon-sun" class="w-5 h-5 text-amber-500 hidden dark:block transition-transform group-hover:rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
-                    </svg>
+                                <!-- Sun Icon (Hidden in Light Mode, visible in Dark Mode) -->
+                                <svg id="theme-icon-sun"
+                                    class="w-5 h-5 text-amber-500 hidden dark:block transition-transform group-hover:rotate-45"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+                                </svg>
 
-                    <span class="ms-3 text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                        <span class="dark:hidden">រចនាប័ទ្ម (Light)</span>
-                        <span class="hidden dark:inline">រចនាប័ទ្ម (Dark)</span>
-                    </span>
-                </div>
+                                <span class="ms-3 text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                                    <span class="dark:hidden">រចនាប័ទ្ម (Light)</span>
+                                    <span class="hidden dark:inline">រចនាប័ទ្ម (Dark)</span>
+                                </span>
+                            </div>
 
-                <!-- Status Dot indicator -->
-                <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 dark:bg-amber-500 shadow-sm"></span>
-            </button>
+                            <!-- Status Dot indicator -->
+                            <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 dark:bg-amber-500 shadow-sm"></span>
+                        </button>
 
                         <form method="POST" action="{{ route('logout') }}" id="logout-form">
                             @csrf
