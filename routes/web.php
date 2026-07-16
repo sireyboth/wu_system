@@ -13,6 +13,7 @@ use App\Http\Controllers\SampleController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentStatusController;
+use App\Http\Controllers\StatusController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -39,6 +40,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('sample', SampleController::class)->name('sample.index');
     Route::resource('student', StudentController::class);
     Route::resource('StudentStatusCertificate',StudentStatusController::class);
+    Route::resource('status', StatusController::class);
 });
 
 Route::middleware('auth')->group(function () {
