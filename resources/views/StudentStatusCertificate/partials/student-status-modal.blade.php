@@ -42,21 +42,21 @@
     <input type="hidden" name="student_id" id="student_id" required>
 
     <div>
-        <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">ថកាលបរិច្ឆេទចេញសញ្ញាបត្រ(Date Issue)</label>
+        <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">កាលបរិច្ឆេទចេញសញ្ញាបត្រ(Date Issue)</label>
         <input type="date" name="dateEng" id="dateEng" required
             class="w-full rounded-lg border border-neutral-300 dark:border-white/10 dark:bg-white/5 dark:text-white px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all
                 [&::-webkit-calendar-picker-indicator]:dark:invert">
     </div>
 
     <div>
-        <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">ថ្ងៃទីខ្មែរ (Khmer Date - Full)</label>
+        <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">កាលបរិច្ឆេទចន្ទគតិ (Khmer Date)</label>
         <input type="text" name="dateKh" id="dateKh" readonly
             placeholder="បំពេញដោយស្វ័យប្រវត្តិ"
             class="w-full rounded-lg border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-white/5 dark:text-white px-3 py-2 text-sm">
     </div>
 
     <div>
-        <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">ថ្ងៃទីខ្មែរ (Khmer Date - Short)</label>
+        <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">កាលបរិច្ឆេទសាកល (Khmer Date - Short)</label>
         <input type="text" name="shortDateKh" id="shortDateKh" readonly
             placeholder="បំពេញដោយស្វ័យប្រវត្តិ"
             class="w-full rounded-lg border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-white/5 dark:text-white px-3 py-2 text-sm">
