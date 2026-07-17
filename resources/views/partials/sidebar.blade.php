@@ -1,4 +1,5 @@
 {{-- Sidebar --}}
+{{-- Sidebar --}}
 <style>
     #main-content {
         transition: margin-left 300ms ease-in-out, padding 300ms ease-in-out;
