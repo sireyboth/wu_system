@@ -21,7 +21,7 @@ abstract class Controller
         return no_data("{$this->name} {$message} with ID: {$id}", 404);
     }
 
-    protected function list(Request $request, ?array $data)
+    protected function list(Request $request)
     {
         $per_page = $request->integer('per_page', 10);
         // $response = $this->model::query()
