@@ -36,9 +36,9 @@ abstract class Controller
         return $this->resource::collection($response);
     }
 
-    protected function save(FormRequest $request)
+    protected function save(FormRequest $request, ?array $columns = [])
     {
-        $response = $this->model::create($request->validated());
+        $response = $this->model::create([ ...$request->validated(), ...$columns]);
         $this->related($response);
 
         return new $this->resource($response->fresh()->load($this->relationships));
@@ -50,9 +50,9 @@ abstract class Controller
         return new $this->resource($response->fresh()->load($this->relationships));
     }
 
-    protected function release(FormRequest $request, Model $response)
+    protected function release(FormRequest $request, Model $response, ?array $columns = [])
     {
-        $response->update($request->validated());
+        $response->update([ ...$request->validated(), ...$columns]);
         $this->related($response);
 
         return new $this->resource($response->fresh()->load($this->relationships));

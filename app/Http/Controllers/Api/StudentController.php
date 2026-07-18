@@ -24,19 +24,14 @@ class StudentController extends Controller
             'group',
             'status',
             'guardians',
-
-            'person.nationality',
-            'person.addresses',
-            'person.addresses.province',
-            'person.addresses.district',
-            'person.addresses.commune',
-            'person.addresses.village',
-
-            // 'guardians.person.addresses',
-            // 'guardians.person.addresses.province',
-            // 'guardians.person.addresses.district',
-            // 'guardians.person.addresses.commune',
-            // 'guardians.person.addresses.village',
+            ...array_map(fn($r) => "person.{$r}", [
+                'nationality',
+                'addresses',
+                'addresses.province',
+                'addresses.district',
+                'addresses.commune',
+                'addresses.village',
+            ]),
         ];
     }
 

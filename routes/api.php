@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Api\BatchController;
 use App\Http\Controllers\Api\CampusController;
+use App\Http\Controllers\Api\CertificateController;
 use App\Http\Controllers\Api\DashboardApiController;
 use App\Http\Controllers\Api\FacultyController;
 use App\Http\Controllers\Api\GroupController;
@@ -21,17 +22,20 @@ use Illuminate\Support\Facades\Route;
  * Route Api for application
  */
 Route::prefix('v1')->group(function () {
+    Route::get('/certificates/preview-number', [CertificateController::class, 'preview'])->name('certificates.preview');
+
     api_routes([
-        'faculties' => FacultyController::class,
-        'majors'    => MajorController::class,
-        'shifts'    => ShiftController::class,
-        'campuses'  => CampusController::class,
-        'lecturers' => LecturerController::class,
-        'subjects'  => SubjectController::class,
-        'batches'   => BatchController::class,
-        'groups'    => GroupController::class,
-        'students'  => StudentController::class,
-        'statuses'  => StatusController::class,
+        'faculties'    => FacultyController::class,
+        'majors'       => MajorController::class,
+        'shifts'       => ShiftController::class,
+        'campuses'     => CampusController::class,
+        'lecturers'    => LecturerController::class,
+        'subjects'     => SubjectController::class,
+        'batches'      => BatchController::class,
+        'groups'       => GroupController::class,
+        'students'     => StudentController::class,
+        'statuses'     => StatusController::class,
+        'certificates' => CertificateController::class,
     ]);
 
     Route::get('/provinces', [AddressController::class, 'provinces']);

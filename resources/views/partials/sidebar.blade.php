@@ -1,3 +1,4 @@
+{{-- Sidebar --}}
 <style>
     #main-content {
         transition: margin-left 300ms ease-in-out, padding 300ms ease-in-out;
@@ -283,4 +284,5 @@ document.addEventListener('click', function (e) {
         localStorage.setItem('sidebarOpen', 'false');
     }
 });
+
 </script>
