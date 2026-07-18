@@ -1,3 +1,5 @@
+{{-- App.blade --}}
+
 @props(['title' => config('app.name', 'Laravel')])
 
 <!DOCTYPE html>
@@ -9,6 +11,19 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ $title }}</title>
+
+    {{-- ============================================= --}}
+    {{-- NEW: Theme init script — ADDED to fix dark mode --}}
+    {{-- This MUST be here, before the fonts/@vite lines below --}}
+    <script>
+        if (localStorage.theme === 'dark' ||
+            (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+    {{-- ============================================= --}}
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
