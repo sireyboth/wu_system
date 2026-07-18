@@ -108,7 +108,7 @@ const ApiService = {
         state.isEditMode = true;
         state.editingstatusId = id;
 
-        if (DOM.modalTitle) DOM.modalTitle.textContent = 'កែប្រែព័ត៌មានវេន';
+        if (DOM.modalTitle) DOM.modalTitle.textContent = 'Edit status';
         if (DOM.submitBtn) DOM.submitBtn.textContent = 'ធ្វើបច្ចុប្បន្នភាព';
 
         if (DOM.form) {
@@ -212,9 +212,6 @@ const ApiService = {
                     <td class="px-6 py-4 font-bold text-indigo-600 dark:text-indigo-400">${status.name_kh ?? '<span class="text-neutral-400 italic">N/A</span>'}</td>
                     <td class="px-6 py-4">
                         <div class="flex items-center">
-                            <div class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mr-3">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                            </div>
                             <div>
                                 <div class="font-semibold text-neutral-900 dark:text-white">${status.name_kh}</div>
                                 <div class="text-xs text-neutral-400 font-mono">${status.name_en}</div>
@@ -284,7 +281,7 @@ const ApiService = {
         state.isEditMode = false;
         state.editingstatusId = null;
 
-        if (DOM.modalTitle) DOM.modalTitle.textContent = 'បន្ថែមសាស្ត្រាចារ្យថ្មី';
+        if (DOM.modalTitle) DOM.modalTitle.textContent = 'Create New status';
         if (DOM.submitBtn) DOM.submitBtn.textContent = 'រក្សាទុក';
 
         document.querySelectorAll('.smart-hint').forEach(hint => {
