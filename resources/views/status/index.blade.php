@@ -1,6 +1,5 @@
 @extends('layouts.dashboard')
 @section('content')
-
     <!-- {{-- Page Header --}} -->
     <div class="mb-8">
         <h1 class="text-2xl font-bold text-neutral-900 dark:text-white">
@@ -12,10 +11,10 @@
     </div>
 
     <div class="space-y-4">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex flex-col justify-between gap-4 md:flex-row md:items-center">
             <div class="relative w-full md:w-96 group">
-                <div class="absolute inset-y-0 left-0 flex items-center ps-3 pointer-events-none">
-                    <svg class="w-4 h-4 text-neutral-500 group-focus-within:text-indigo-500 transition-colors" fill="none"
+                <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none ps-3">
+                    <svg class="w-4 h-4 transition-colors text-neutral-500 group-focus-within:text-indigo-500" fill="none"
                         stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="m21 21-4.35-4.35M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" />
@@ -24,8 +23,8 @@
 
                 <form id="statusSearchForm" method="GET" action="{{ route('status.index') }}"
                     class="relative w-full md:w-96 group">
-                    <div class="absolute inset-y-0 left-0 flex items-center ps-3 pointer-events-none">
-                        <svg class="w-4 h-4 text-neutral-500 group-focus-within:text-indigo-500 transition-colors"
+                    <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none ps-3">
+                        <svg class="w-4 h-4 transition-colors text-neutral-500 group-focus-within:text-indigo-500"
                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="m21 21-4.35-4.35M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" />
@@ -41,34 +40,37 @@
             <!-- Button -->
             <div class="flex items-center gap-2">
                 <!-- <button type="button" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-neutral-700 bg-white border border-neutral-200 rounded-xl hover:bg-neutral-50 dark:bg-neutral-900 dark:text-neutral-300 dark:border-white/10 dark:hover:bg-white/5 transition-all">
-                    <svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2.586a1 1 0 0 1-.293.707l-6.414 6.414a1 1 0 0 0-.293.707V17l-4 4v-6.586a1 1 0 0 0-.293-.707L3.293 7.293A1 1 0 0 1 3 6.586V4Z"/></svg>
-                    Filters
-                </button> -->
+                        <svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2.586a1 1 0 0 1-.293.707l-6.414 6.414a1 1 0 0 0-.293.707V17l-4 4v-6.586a1 1 0 0 0-.293-.707L3.293 7.293A1 1 0 0 1 3 6.586V4Z"/></svg>
+                        Filters
+                    </button> -->
                 <button type="button" onclick="AppModal.toggle(true)"
-                class="inline-flex items-center px-4 py-2.5 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition-all active:scale-95">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-                Create New status
-            </button>
+                    class="inline-flex items-center px-4 py-2.5 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition-all active:scale-95">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Create New status
+                </button>
 
             </div>
         </div>
 
         <div
-            class="relative overflow-hidden bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-2xl shadow-sm transition-colors duration-300">
+            class="relative overflow-hidden transition-colors duration-300 bg-white border shadow-sm dark:bg-neutral-900 border-neutral-200 dark:border-white/10 rounded-2xl">
 
             <div id="loading-overlay"
-                class="hidden absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-neutral-900/50 backdrop-blur-[2px]">
-                <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
+                class="hidden absolute inset-0 z-10 items-center justify-center bg-white/50 dark:bg-neutral-900/50 backdrop-blur-[2px]">
+                <div class="w-10 h-10 border-b-2 border-indigo-600 rounded-full animate-spin"></div>
             </div>
 
             <div
                 class="overflow-x-auto max-h-[600px] scrollbar-thin scrollbar-thumb-neutral-200 dark:scrollbar-thumb-white/10">
-                <table class="w-full text-sm text-left text-neutral-500 dark:text-neutral-400 border-collapse">
+                <table class="w-full text-sm text-left border-collapse text-neutral-500 dark:text-neutral-400">
                     <thead
-                        class="sticky top-0 z-20 text-xs text-neutral-700 uppercase bg-neutral-50 dark:bg-neutral-800/50 dark:text-neutral-300 backdrop-blur-md">
+                        class="sticky top-0 z-20 text-xs uppercase text-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 dark:text-neutral-300 backdrop-blur-md">
                         <tr>
                             <th scope="col" class="px-6 py-4 font-bold tracking-wider">
-                                <div class="flex items-center cursor-pointer group hover:text-indigo-600 transition-colors">
+                                <div class="flex items-center transition-colors cursor-pointer group hover:text-indigo-600">
                                     N.O
                                     <svg class="w-3 h-3 ms-1.5 opacity-0 group-hover:opacity-100 transition-opacity"
                                         fill="currentColor" viewBox="0 0 24 24">
@@ -86,7 +88,7 @@
                         </tr>
                     </thead>
                     <tbody id="status-table-body" class="divide-y divide-neutral-200 dark:divide-white/5">
-                       <tr>
+                        <tr>
                             <td colspan="7" class="px-6 py-10 text-center">
                                 <span class="text-neutral-500">Loading data...</span>
                             </td>
@@ -102,8 +104,8 @@
     </div>
 
     @include('status.partials.statusModal')
-    @endsection
+@endsection
 
 @push('scripts')
-  @vite(['resources/js/status/status.js'])
+    @vite(['resources/js/status/status.js'])
 @endpush

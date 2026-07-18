@@ -14,13 +14,12 @@ class CertificateResource extends JsonResource
     public function toArray(Request $request): array
     {
         return to_list($this, [
-            'status'         => $this->status,
-            'type'         => $this->type,
+            'student'        => new StudentResource($this->whenLoaded('student')),
             'issue_date'     => $this->issue_date?->format('Y-m-d'),
             'full_date_kh'   => $this->full_date_kh,
             'short_date_kh'  => $this->short_date_kh,
             'certificate_no' => $this->certificate_no,
-            'student'        => new StudentResource($this->whenLoaded('student')),
+            'status'         => $this->status,
         ], false);
     }
 }
