@@ -87,4 +87,19 @@ class Student extends IModel
     {
         return $this->belongsTo(Group::class);
     }
+
+    public function certificates()
+    {
+        return $this->hasMany(Certificate::class);
+    }
+
+    public function provisionalCertificates()
+    {
+        return $this->certificates()->provisional();
+    }
+
+    public function statusCertificates()
+    {
+        return $this->certificates()->status();
+    }
 }
