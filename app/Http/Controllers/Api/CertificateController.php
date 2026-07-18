@@ -50,7 +50,9 @@ class CertificateController extends Controller
                 ? $query->provisional()
                 : $query->status();
         }
-        $query->with($this->relationships);
+        $query->search($request->search)
+            ->with($this->relationships)
+            ->orderByDesc('created_at')->paginate(10);
 
         return $this->resource::collection($query->latest()->paginate(20));
     }

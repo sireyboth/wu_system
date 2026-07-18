@@ -1,10 +1,10 @@
 <?php
 namespace App\Models;
 
+use App\Helpers\IModel;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 
-class Certificate extends Model
+class Certificate extends IModel
 {
     /**
      * The attributes that are mass assignable.
