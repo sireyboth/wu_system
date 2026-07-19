@@ -28,7 +28,7 @@ class StudentSeeder extends Seeder
                 'email'          => $faker->unique()->safeEmail(),
                 'remark'         => $faker->sentence(),
             ];
-            $person = Person::create($person_data);
+            $person = Person::firstOrCreate($person_data);
 
             // 2. Remap JSON keys -> Student columns
             $student_data = [
@@ -48,7 +48,7 @@ class StudentSeeder extends Seeder
                 'scholarship'    => $faker->randomElement(['none', 'ministry', 'prince', 'school']),
                 'remark'         => $faker->sentence(),
             ];
-            $student = $person->student()->create($student_data);
+            $student = $person->student()->firstOrCreate($student_data);
 
             // 3. Remap nested addresses
             $address_data = array_map(function ($a) use ($faker) {

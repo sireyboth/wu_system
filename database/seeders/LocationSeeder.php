@@ -14,7 +14,7 @@ class LocationSeeder extends Seeder
     public function run(): void
     {
         set_records('countries', function ($data) {
-            Country::create([
+            Country::firstOrCreate([
                 'name'        => $data['en_short_name'],
                 'ranking'     => $data['num_code'],
                 'alpha2'      => $data['alpha_2_code'],
