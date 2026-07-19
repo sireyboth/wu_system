@@ -14,9 +14,11 @@ use Illuminate\Validation\Rule;
 if (! function_exists('make_fields')) {
     function make_fields(string $name, callable $fn, bool $named = true, bool $increment = true): void
     {
-        Schema::create($name, fn(Blueprint $table) => fields($table, function () use ($table, $fn) {
-            $fn($table);
-        }, $named, $increment));
+        if (! Schema::hasTable($name)) {
+            Schema::create($name, fn(Blueprint $table) => fields($table, function () use ($table, $fn) {
+                $fn($table);
+            }, $named, $increment));
+        }
     }
 }
 
