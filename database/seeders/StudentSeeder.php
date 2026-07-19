@@ -2,6 +2,7 @@
 namespace Database\Seeders;
 
 use App\Models\Person;
+use Faker\Factory;
 use Illuminate\Database\Seeder;
 
 class StudentSeeder extends Seeder
@@ -12,7 +13,7 @@ class StudentSeeder extends Seeder
     public function run(): void
     {
         set_records('students', function ($data) {
-            $faker       = fake('km_KH');
+            $faker       = Factory::create('km_KH');
             $status_exam = ['none', 'passed', 'failed'];
 
             // 1. Remap JSON keys -> Person columns
