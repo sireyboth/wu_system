@@ -31,7 +31,7 @@ return new class extends Migration
             $table->enum('scholarship', ['none', 'ministry', 'prince', 'school'])->default('none');
             $table->enum('entrance_exam', $status_exam)->default($status_exam[0]);
             $table->enum('exit_exam', $status_exam)->default($status_exam[0]);
-        }, named: false);
+        }, false);
     }
 
     /**

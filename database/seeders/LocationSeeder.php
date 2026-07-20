@@ -2,7 +2,6 @@
 namespace Database\Seeders;
 
 use App\Models\Country;
-use Faker\Factory;
 use Illuminate\Database\Seeder;
 
 class LocationSeeder extends Seeder
@@ -15,8 +14,8 @@ class LocationSeeder extends Seeder
     public function run(): void
     {
         set_records('countries', function ($data) {
-            $faker = Factory::create('km_KH');
-            Country::firstOrCreate([
+            $faker = fake('km_KH');
+            Country::create([
                 'name'        => $data['en_short_name'],
                 'ranking'     => $data['num_code'],
                 'alpha2'      => $data['alpha_2_code'],

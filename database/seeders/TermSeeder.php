@@ -33,7 +33,7 @@ class TermSeeder extends Seeder
         ];
 
         foreach ($items as $item) {
-            Term::firstOrCreate($item);
+            Term::create($item);
         }
     }
 }

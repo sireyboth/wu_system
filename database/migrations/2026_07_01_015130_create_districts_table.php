@@ -12,9 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         make_fields('districts', function (Blueprint $table) {
-            $table->unsignedInteger('province_id');
-            $table->foreign('province_id')->references('id')->on('provinces')->cascadeOnDelete();
-        }, increment: false);
+            $table->foreignId('province_id')->constrained('provinces')->cascadeOnDelete();
+        }, is_defualt: false);
     }
 
     /**

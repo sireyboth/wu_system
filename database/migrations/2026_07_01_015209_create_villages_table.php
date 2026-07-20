@@ -12,9 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         make_fields('villages', function (Blueprint $table) {
-            $table->unsignedInteger('commune_id');
-            $table->foreign('commune_id')->references('id')->on('communes')->cascadeOnDelete();
-        }, increment: false);
+            $table->foreignId('commune_id')->constrained()->cascadeOnDelete();
+        }, is_defualt: false);
     }
 
     /**

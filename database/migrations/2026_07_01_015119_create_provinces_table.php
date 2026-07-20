@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        make_fields('provinces', function (Blueprint $table) {}, increment: false);
+        make_fields('provinces', function (Blueprint $table) {}, is_defualt: false);
     }
 
     /**

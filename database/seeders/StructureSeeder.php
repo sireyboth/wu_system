@@ -9,7 +9,6 @@ use App\Models\Nationality;
 use App\Models\Shift;
 use App\Models\Status;
 use App\Models\Subject;
-use Faker\Factory;
 use Illuminate\Database\Seeder;
 
 class StructureSeeder extends Seeder
@@ -19,7 +18,7 @@ class StructureSeeder extends Seeder
      */
     public function run(): void
     {
-        $faker = Factory::create('km_KH');
+        $faker = fake('km_KH');
         set_records('nationalities', fn($data) => Nationality::create($data));
         set_records('faculties', fn($data) => Faculty::create([ ...$data, 'remark' => $faker->sentence()]));
         set_records('majors', fn($data) => Major::create([ ...$data, 'remark' => $faker->sentence()]));

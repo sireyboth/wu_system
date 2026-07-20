@@ -42,7 +42,7 @@ return new class extends Migration
 
             // Prevent duplicate address types for the same person
             $table->unique(['person_id', 'type']);
-        }, named: false);
+        }, false);
     }
 
     /**
