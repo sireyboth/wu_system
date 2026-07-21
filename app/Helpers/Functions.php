@@ -12,19 +12,19 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 if (! function_exists('make_fields')) {
-    function make_fields(string $name, callable $fn, bool $named = true, bool $increment = true): void
+    function make_fields(string $name, callable $fn, bool $is_common = true, bool $is_defualt = true): void
     {
-        Schema::create($name, fn(Blueprint $table) => fields($table, function () use ($table, $fn) {
-            $fn($table);
-        }, $named, $increment));
+        Schema::create($name, function (Blueprint $table) use ($fn, $is_common, $is_defualt) {
+            fields($table, fn() => $fn($table), $is_common, $is_defualt);
+        });
     }
 }
 
 if (! function_exists('fields')) {
-    function fields(Blueprint $table, callable $fn, bool $named = false, bool $increment = false): void
+    function fields(Blueprint $table, callable $fn, bool $is_common = false, bool $is_defualt = false): void
     {
-        $increment ? $table->id() : $table->unsignedInteger('id')->primary();
-        if ($named) {
+        $table->id();
+        if ($is_common) {
             $table->string('name_kh', 100);
             $table->string('name_en', 100);
             $table->string('name', 255)->nullable();
@@ -32,7 +32,7 @@ if (! function_exists('fields')) {
 
         $fn();
 
-        if ($increment) {
+        if ($is_defualt) {
             $table->text('remark')->nullable();
             $table->timestamps();
             $table->softDeletes();
@@ -44,22 +44,22 @@ if (! function_exists('fields')) {
 }
 
 if (! function_exists('to_list')) {
-    function to_list(mixed $object, array $fields = [], bool $named = true): array
+    function to_list(mixed $self, array $fields = [], bool $named = true): array
     {
         $data = [
-            'id' => $object->id,
+            'id' => $self->id,
             ...$fields,
         ];
 
         if ($named) {
-            $data['name']    = $object->name;
-            $data['name_kh'] = $object->name_kh;
-            $data['name_en'] = $object->name_en;
+            $data['name']    = $self->name;
+            $data['name_kh'] = $self->name_kh;
+            $data['name_en'] = $self->name_en;
         }
 
-        $data['remark']     = $object->remark ?? null;
-        $data['created_at'] = $object->created_at?->format('Y-m-d H:i:s');
-        $data['updated_at'] = $object->updated_at?->format('Y-m-d H:i:s');
+        $data['remark']     = $self->remark ?? null;
+        $data['created_at'] = $self->created_at?->format('Y-m-d H:i:s');
+        $data['updated_at'] = $self->updated_at?->format('Y-m-d H:i:s');
 
         return $data;
     }

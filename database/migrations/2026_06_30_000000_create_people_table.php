@@ -22,7 +22,7 @@ return new class extends Migration
             $table->enum('sex', ['female', 'male', 'other'])->default('other');
             $table->string('email', 50)->nullable();
             $table->json('phones')->nullable();
-        }, named: false);
+        }, false);
     }
 
     /**

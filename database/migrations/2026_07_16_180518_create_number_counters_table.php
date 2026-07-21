@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('number_counters', function (Blueprint $table) {
-            $table->id();
+        make_fields('number_counters', function (Blueprint $table) {
             $table->unsignedSmallInteger('year');
             $table->string('type', 50)->default('status');
             $table->unsignedInteger('last_sequence')->default(0);
 
             $table->unique(['year', 'type']);
-            $table->timestamps();
-        });
+        }, false, false);
     }
 
     /**

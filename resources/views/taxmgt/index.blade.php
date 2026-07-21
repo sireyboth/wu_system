@@ -22,7 +22,7 @@
                 </div>
 
                 <form id="taxSearchForm" method="GET" action="{{ route('taxmgt.index') }}"
-                    class="relative w-full md:w-96 group">  
+                    class="relative w-full md:w-96 group">
                     <div class="absolute inset-y-0 left-0 flex items-center ps-3 pointer-events-none">
                         <svg class="w-4 h-4 text-neutral-500 group-focus-within:text-indigo-500 transition-colors"
                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -47,7 +47,7 @@
                 class="inline-flex items-center px-4 py-2.5 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition-all active:scale-95">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
                 Create New Tax
-            </button>   
+            </button>
 
             </div>
         </div>
@@ -56,7 +56,7 @@
             class="relative overflow-hidden bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-2xl shadow-sm transition-colors duration-300">
 
             <div id="loading-overlay"
-                class="hidden absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-neutral-900/50 backdrop-blur-[2px]">
+                class="hidden absolute inset-0 z-10 items-center justify-center bg-white/50 dark:bg-neutral-900/50 backdrop-blur-[2px]">
                 <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
             </div>
 
@@ -103,9 +103,9 @@
     </div>
     @include('taxmgt.partials.add_modal')
     @include('taxmgt.partials.invoice')
-    
+
     @endsection
-    
+
 @push('scripts')
   @vite(['resources/js/taxmgt/tax-mgt.js'])
 @endpush

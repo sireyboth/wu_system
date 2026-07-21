@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-       make_fields('countries', function (Blueprint $table) {
+        make_fields('countries', function (Blueprint $table) {
             $table->string('name', 100)->nullable();
             $table->string('ranking', 8)->nullable();
             $table->string('alpha2', 10)->nullable();
             $table->string('alpha3', 10)->nullable();
             $table->string('nationality', 50)->nullable();
-        }, named: false);
+        }, false);
     }
 
     /**
