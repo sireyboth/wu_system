@@ -66,12 +66,27 @@ export async function handleEditAction(dom, ApiService, id) {
     if (!dom.form) return;
 
     // 1. Academic details
-    ['code', 'status', 'batch_id', 'major_id', 'nationality_id', 'shift_id','admission_at', 'bacc_2_code', 'entrance_exam', 'exit_exam', 'degree_type',
-        'degree_type', 'intake', 'scholarship', 'high-school'
-    ].forEach((field) => {
-        const el = dom.form.querySelector(`[name="${field}"]`);
-        if (el) el.value = payload[field] ?? '';
-    });
+    const scalarFields = {
+        code: payload.code,
+        entrance_exam: payload.entrance_exam,
+        exit_exam: payload.exit_exam,
+        degree_type: payload.degree_type,
+        from_school: payload.from_school,
+        intake: payload.intake,
+        scholarship: payload.scholarship,
+        admission_date: payload.admission_date,
+        remark: payload.remark,
+    };
+    toList(scalarFields, dom);
+
+    const relationalFields = {
+        status_id: payload.status,
+        batch_id: payload.batch,
+        group_id: payload.group,
+        shift_id: payload.shift,
+        major_id: payload.major,
+    };
+    toList(relationalFields, dom, true);
 
     // 2. Student personal profile + address
     if (person) {

@@ -63,12 +63,12 @@ async function fetchStudents(search = '') {
     const url = `${CONFIG.API_URL}?search=${encodeURIComponent(search)}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`GET ${url} → ${res.status}`);
-
+    
     const json = await res.json();
-
+    
     // ─── ADD LOGS HERE ───
     console.log('%c[API Raw Response]', 'color: #10b981; font-weight: bold;', json);
-
+    
     return Array.isArray(json.data) ? json.data
          : Array.isArray(json)      ? json
          : [];
@@ -102,7 +102,7 @@ function renderTable(students) {
 }
 
 function buildRow(s, i) {
-
+    
     const isFemale = ['F', 'Female', 'ស្រី'].includes(s.sex);
     const sexBadge = isFemale
         ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
@@ -358,5 +358,4 @@ if (document.readyState === 'loading') {
 } else {
     bindEvents();
 }
-
 

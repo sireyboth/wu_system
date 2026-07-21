@@ -25,7 +25,6 @@ Route::middleware(['auth'])->group(function () {
     // This is the missing piece that connects to your Controller
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-
     // Additional routes based on your Controller methods
     Route::resource('roomsmgt', RoomMGTController::class);
     Route::resource('salemgt', SaleMGTController::class);
@@ -41,7 +40,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('sample', SampleController::class)->name('sample.index');
     Route::resource('student', StudentController::class);
     Route::resource('StudentStatusCertificate',StudentStatusController::class);
-    Route::resource('status', StatusController::class);
+    Route::resource('app-status', StatusController::class);
 });
 
 Route::middleware('auth')->group(function () {
@@ -49,7 +48,5 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
-require __DIR__.'/auth.php';
 
 require __DIR__ . '/auth.php';
