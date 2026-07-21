@@ -22,15 +22,15 @@
     }
 </style>
 
-<header id="mobile-top-bar" class="fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 h-16 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-white/10 shadow-sm sm:hidden transition-colors duration-300">
+<header id="mobile-top-bar" class="fixed top-0 left-0 right-0 z-30 flex items-center justify-between h-16 px-4 transition-colors duration-300 bg-white border-b shadow-sm dark:bg-neutral-900 border-neutral-200 dark:border-white/10 sm:hidden">
     <div class="flex items-center space-x-3">
-        <div class="w-8 h-8 bg-gradient-to-tr from-slate-900 to-indigo-950 dark:from-indigo-600 dark:to-violet-500 rounded-lg flex items-center justify-center text-white text-xs font-bold">
+        <div class="flex items-center justify-center w-8 h-8 text-xs font-bold text-white rounded-lg bg-gradient-to-tr from-slate-900 to-indigo-950 dark:from-indigo-600 dark:to-violet-500">
             R
         </div>
-        <span class="text-md font-bold text-slate-900 dark:text-white">Registrar</span>
+        <span class="font-bold text-md text-slate-900 dark:text-white">Registrar</span>
     </div>
-    
-    <button onclick="toggleSidebar()" type="button" class="p-2 rounded-xl text-neutral-500 hover:bg-neutral-100 dark:hover:bg-white/5 transition-colors focus:outline-none">
+
+    <button onclick="toggleSidebar()" type="button" class="p-2 transition-colors rounded-xl text-neutral-500 hover:bg-neutral-100 dark:hover:bg-white/5 focus:outline-none">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
@@ -38,16 +38,16 @@
 </header>
 
 <aside id="sidebar-multi-level-sidebar"
-    class="fixed top-0 left-0 z-40 w-64 h-screen -translate-x-full transition-transform duration-300 ease-in-out"
+    class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform duration-300 ease-in-out -translate-x-full"
     aria-label="Sidebar">
-    
-    <div class="h-full px-4 py-6 flex flex-col justify-between bg-white dark:bg-neutral-900 border-e border-neutral-200 dark:border-white/10 shadow-2xl transition-colors duration-300 overflow-hidden">
+
+    <div class="flex flex-col justify-between h-full px-4 py-6 overflow-hidden transition-colors duration-300 bg-white shadow-2xl dark:bg-neutral-900 border-e border-neutral-200 dark:border-white/10">
         <div class="flex flex-col flex-1 min-h-0">
-            <div class="flex items-center justify-between mb-6 pb-2 px-2 border-b border-transparent">
-                <div class="flex items-center group cursor-pointer">
-                    <div class="relative w-11 h-11 bg-gradient-to-tr from-slate-900 to-indigo-950 dark:from-indigo-600 dark:to-violet-500 rounded-xl flex items-center justify-center shadow-xl shadow-indigo-500/10 dark:shadow-indigo-500/20 overflow-hidden border border-white/10 transition-all duration-500 ease-out group-hover:scale-105 group-hover:shadow-indigo-500/30">
+            <div class="flex items-center justify-between px-2 pb-2 mb-6 border-b border-transparent">
+                <div class="flex items-center cursor-pointer group">
+                    <div class="relative flex items-center justify-center overflow-hidden transition-all duration-500 ease-out border shadow-xl w-11 h-11 bg-gradient-to-tr from-slate-900 to-indigo-950 dark:from-indigo-600 dark:to-violet-500 rounded-xl shadow-indigo-500/10 dark:shadow-indigo-500/20 border-white/10 group-hover:scale-105 group-hover:shadow-indigo-500/30">
                         <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2.5s_infinite] ease-in-out"></div>
-                        <svg class="w-5 h-5 text-white transform transition-transform duration-500 ease-out group-hover:rotate-12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <svg class="w-5 h-5 text-white transition-transform duration-500 ease-out transform group-hover:rotate-12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
                         <span class="absolute bottom-1.5 right-1.5 w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping opacity-75"></span>
@@ -56,7 +56,7 @@
 
                     <div class="flex flex-col ms-3.5 tracking-tight">
                         <div class="flex items-center space-x-1">
-                            <span class="text-xl font-extrabold text-slate-900 dark:text-white bg-clip-text transition-colors duration-300">
+                            <span class="text-xl font-extrabold transition-colors duration-300 text-slate-900 dark:text-white bg-clip-text">
                                 Registrar
                             </span>
                         </div>
@@ -67,7 +67,7 @@
                 </div>
 
                 <button onclick="toggleSidebar()" type="button"
-                    class="p-2 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 dark:hover:text-white dark:hover:bg-white/10 transition-all">
+                    class="p-2 transition-all rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 dark:hover:text-white dark:hover:bg-white/10">
                     <span class="sr-only">Close sidebar</span>
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
@@ -75,7 +75,7 @@
                 </button>
             </div>
 
-            <div class="flex-1 overflow-y-auto custom-scrollbar pr-1">
+            <div class="flex-1 pr-1 overflow-y-auto custom-scrollbar">
                 <ul class="space-y-2 font-medium">
                     <x-sidebar-link route="dashboard">
                         <x-slot name="icon">
@@ -87,7 +87,7 @@
                     </x-sidebar-link>
 
                     <li class="pt-4 pb-1">
-                        <span class="px-3 text-xs font-semibold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">Certificate</span>
+                        <span class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Certificate</span>
                     </li>
                     <x-sidebar-link route="StudentStatusCertificate.index">
                         <x-slot name="icon">
@@ -99,7 +99,7 @@
                     </x-sidebar-link>
 
                     <li class="pt-4 pb-1">
-                        <span class="px-3 text-xs font-semibold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">Statistic</span>
+                        <span class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Statistic</span>
                     </li>
                     <x-sidebar-link route="student.index">
                         <x-slot name="icon">
@@ -111,7 +111,7 @@
                     </x-sidebar-link>
 
                     <li class="pt-4 pb-1">
-                        <span class="px-3 text-xs font-semibold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">Academics</span>
+                        <span class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Academics</span>
                     </li>
 
                     <x-sidebar-link route="faculty.index">
@@ -160,7 +160,7 @@
                         ក្រុមសិក្សា (Group)
                     </x-sidebar-link>
 
-                    <x-sidebar-link route="status.index">
+                    <x-sidebar-link route="app-status.index">
                         <x-slot name="icon">
                             <svg class="w-[19px] h-[19px] text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
   <path stroke="currentColor" stroke-width="2" d="M11.083 5.104c.35-.8 1.485-.8 1.834 0l1.752 4.022a1 1 0 0 0 .84.597l4.463.342c.9.069 1.255 1.2.556 1.771l-3.33 2.723a1 1 0 0 0-.337 1.016l1.03 4.119c.214.858-.71 1.552-1.474 1.106l-3.913-2.281a1 1 0 0 0-1.008 0L7.583 20.8c-.764.446-1.688-.248-1.474-1.106l1.03-4.119A1 1 0 0 0 6.8 14.56l-3.33-2.723c-.698-.571-.342-1.702.557-1.771l4.462-.342a1 1 0 0 0 .84-.597l1.753-4.022Z"/>
@@ -174,27 +174,27 @@
             </div>
         </div>
 
-        <div class="pt-4 mt-2 border-t border-neutral-200 dark:border-white/10 space-y-4">
+        <div class="pt-4 mt-2 space-y-4 border-t border-neutral-200 dark:border-white/10">
             <!-- Theme Toggle Button -->
             <button onclick="toggleDarkMode()"
                 class="flex items-center justify-between w-full px-4 py-2.5 bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 rounded-xl transition-all duration-300 group">
                 <div class="flex items-center">
                     <!-- Moon Icon (Visible in Light Mode, hidden in Dark Mode) -->
-                    <svg id="theme-icon-moon" class="w-5 h-5 text-indigo-600 dark:hidden transition-transform group-hover:-rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <svg id="theme-icon-moon" class="w-5 h-5 text-indigo-600 transition-transform dark:hidden group-hover:-rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                     </svg>
-                    
+
                     <!-- Sun Icon (Hidden in Light Mode, visible in Dark Mode) -->
-                    <svg id="theme-icon-sun" class="w-5 h-5 text-amber-500 hidden dark:block transition-transform group-hover:rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <svg id="theme-icon-sun" class="hidden w-5 h-5 transition-transform text-amber-500 dark:block group-hover:rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
                     </svg>
-                    
-                    <span class="ms-3 text-sm font-medium text-neutral-700 dark:text-neutral-300">
+
+                    <span class="text-sm font-medium ms-3 text-neutral-700 dark:text-neutral-300">
                         <span class="dark:hidden">រចនាប័ទ្ម (Light)</span>
                         <span class="hidden dark:inline">រចនាប័ទ្ម (Dark)</span>
                     </span>
                 </div>
-                
+
                 <!-- Status Dot indicator -->
                 <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 dark:bg-amber-500 shadow-sm"></span>
             </button>
@@ -215,7 +215,7 @@
 
 <button id="sidebar-open-tab" onclick="toggleSidebar()" type="button"
     style="display: none;"
-    class="hidden sm:flex fixed top-1/2 left-0 -translate-y-1/2 z-30 items-center justify-center w-6 h-14 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-r-xl shadow-md text-neutral-500 hover:text-indigo-600 hover:w-7 transition-all">
+    class="fixed left-0 z-30 items-center justify-center hidden w-6 transition-all -translate-y-1/2 bg-white border shadow-md sm:flex top-1/2 h-14 dark:bg-neutral-900 border-neutral-200 dark:border-white/10 rounded-r-xl text-neutral-500 hover:text-indigo-600 hover:w-7">
     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
     </svg>
@@ -233,7 +233,7 @@
         sidebarEl.classList.toggle('-translate-x-full', !isOpen);
         document.body.classList.toggle('sidebar-open', isOpen);
         document.body.classList.toggle('sidebar-closed', !isOpen);
-        
+
         if (isDesktop) {
             // Desktop Mode Styles Coordination
             openTabEl.style.display = isOpen ? 'none' : 'flex';
@@ -272,12 +272,12 @@ document.addEventListener('click', function (e) {
     // 1. STRICT CHECK: If the screen is desktop (>= 640px), immediately stop execution.
     // This ensures clicking outside NEVER hides or alters the sidebar layout on desktop views.
     const isDesktop = window.matchMedia('(min-width: 640px)').matches;
-    if (isDesktop) return; 
-    
+    if (isDesktop) return;
+
     // 2. Mobile-Only execution path
     const isOpen = !sidebarEl.classList.contains('-translate-x-full');
-    
-    // If the sidebar drawer is active on mobile, and the user clicks outside both 
+
+    // If the sidebar drawer is active on mobile, and the user clicks outside both
     // the sidebar container and the top header navbar, safely toggle it closed.
     if (isOpen && !sidebarEl.contains(e.target) && !mobileTopBarEl.contains(e.target)) {
         applySidebarState(false);

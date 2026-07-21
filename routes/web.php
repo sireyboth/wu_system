@@ -40,7 +40,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('sample', SampleController::class)->name('sample.index');
     Route::resource('student', StudentController::class);
     Route::resource('StudentStatusCertificate',StudentStatusController::class);
-    Route::resource('status', StatusController::class);
+    Route::resource('app-status', StatusController::class);
 });
 
 Route::middleware('auth')->group(function () {
