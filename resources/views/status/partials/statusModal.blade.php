@@ -8,7 +8,7 @@
 
         <!-- Header -->
         <div class="px-6 py-4 border-b border-neutral-100 dark:border-white/5 flex items-center justify-between bg-white dark:bg-neutral-900">
-            <h3 id="modalTitle" class="text-lg font-bold text-neutral-900 dark:text-white">បន្ថែមវេនថ្មី</h3>
+            <h3 id="modalTitle" class="text-lg font-bold text-neutral-900 dark:text-white">Create New Status</h3>
             <button type="button" onclick="AppModal.toggle(false)" class="text-neutral-400 hover:text-neutral-600 dark:hover:text-white transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
