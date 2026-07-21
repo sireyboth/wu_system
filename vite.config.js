@@ -11,7 +11,7 @@ export default defineConfig({
                 // "resources/js/salemgt/sale-mgt.js",
                 // "resources/js/room-mgt/room-mgt.js",
                 // "resources/js/taxmgt/tax-mgt.js",
-                // "resources/js/students/index.js",
+                "resources/js/students/index.js",
             ],
             refresh: true,
         }),
