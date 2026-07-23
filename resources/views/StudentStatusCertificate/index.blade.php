@@ -4,7 +4,7 @@
     {{-- Page Header --}}
     <div class="mb-8">
         <h1 class="text-2xl font-bold text-neutral-900 dark:text-white">
-            សូមស្វាគមន៍មកកាន់ទំព័រ <span class="text-indigo-700">គ្រប់គ្រងសញ្ញាបត្របណ្ដោះអាសន្ន</span>
+            សូមស្វាគមន៍មកកាន់ទំព័រ <span class="text-indigo-700">គ្រប់គ្រងលិខិតបញ្ជាក់ការសិក្សា</span>
         </h1>
         <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
             Overview of your application
@@ -70,13 +70,13 @@
                         class="sticky top-0 z-20 hidden text-xs uppercase border-b md:table-header-group text-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 dark:text-neutral-300 backdrop-blur-md border-neutral-200 dark:border-white/5">
                         <tr>
                             <th class="w-12 px-6 py-4 font-bold tracking-wider">N.O</th>
-                            <th class="px-6 py-4">Student Identity (ឈ្មោះ/អត្តសញ្ញាណ)</th>
+                            <th class="px-6 py-4">Student Name (ឈ្មោះនិស្សិត)</th>
                             <th class="px-6 py-4">Student ID (កូដសម្គាល់)</th>
-                            <th class="px-6 py-4">Sex (ភេទ)</th>
                             <th class="px-6 py-4">Date of Birth (ថ្ងៃខែឆ្នាំកំណើត)</th>
-                            <th class="px-6 py-4">Academic Plan (ជំនាញ/ជំនាន់)</th>
+                            <th class="px-6 py-4">Sex (ភេទ)</th>
+                            <th class="px-6 py-4">ប្រភេទសញ្ញាបត្រ (Certificate Type)</th>
+                            <th class="px-6 py-4">លេខសញ្ញាបត្រ​ (Certificate N.O)</th>
                             <th class="px-6 py-4">Status (ស្ថានភាព)</th>
-                            <th class="px-6 py-4">Official Date (កាលបរិច្ឆេទ)</th>
                             <th class="px-6 py-4 text-right">Actions</th>
                         </tr>
                     </thead>
