@@ -3,7 +3,7 @@
  * No DOM access, no state — safe to import anywhere.
  */
 export const CONFIG = {
-    API_BASE: '/api/v1/students',
+    API_BASE: '/api/v1/certificates',
     DEBOUNCE_DELAY: 300,
     LOCALE: 'en-GB',
     PER_PAGE: 25, // used once server-side pagination is wired in (see api-service.js note)
