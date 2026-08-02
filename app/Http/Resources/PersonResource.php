@@ -1,25 +1,20 @@
 <?php
 namespace App\Http\Resources;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-
-class PersonResource extends JsonResource
+class PersonResource extends IResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(Request $request): array
+    protected function toList(): array
     {
         return [
             'id'            => $this->id,
-            'first_name'    => $this->first_name,
-            'last_name'     => $this->last_name,
             'first_name_kh' => $this->first_name_kh,
             'last_name_kh'  => $this->last_name_kh,
-            'nationality'   => new NationalityResource($this->nationality),
+            'full_name_kh' => $this->full_name_kh,
+
+            'first_name'    => $this->first_name,
+            'last_name'     => $this->last_name,
+            'full_name' => $this->full_name,
+            'nationality'   => new NationalityResource($this->whenLoaded('nationality')),
             'dob'           => $this->dob?->format('Y-m-d'),
             'sex'           => $this->sex,
             'email'         => $this->email ?? null,

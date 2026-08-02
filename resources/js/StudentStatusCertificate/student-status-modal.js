@@ -1,3 +1,5 @@
+import { baseUri } from "../app";
+
 const El = {
     modal:           () => document.getElementById('student-status-modal'),
     form:            () => document.getElementById('student-status-form'),
@@ -88,7 +90,7 @@ function handleSubmit(e) {
     e.preventDefault();
     const formData = new FormData(El.form());
 
-    fetch("/probisional-certificate/store", {
+    fetch( baseUri('certificates'), {
         method: 'POST',
         headers: { 'X-Requested-With': 'XMLHttpRequest' },
         body: formData,
@@ -100,7 +102,7 @@ function handleSubmit(e) {
 
 function bindEvents() {
     El.dateEng()?.addEventListener('change', handleDateChange);
-    El.form()?.addEventListener('submit', handleSubmit);
+    // El.form()?.addEventListener('submit', handleSubmit);
 
     document.getElementById('closeStudentStatusModalBtn')
         ?.addEventListener('click', close);

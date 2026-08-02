@@ -13,9 +13,9 @@ return new class extends Migration
     {
         make_fields('terms', function (Blueprint $table) {
             $table->integer('year')->comment('Starting year of academic year e.g. 2025');
-            $table->enum('semester', [1, 2])->comment('1 or 2');
-            $table->string('code')->unique()->comment('S1-2025, S2-2025');
-            $table->string('name')->comment('Display name: 2025-2026');
+            $table->tinyInteger('semester')->default(1)->comment('1 or 2');
+            $table->string('code', 50)->unique()->comment('S1-2025, S2-2025');
+            $table->string('display_name', 100)->comment('Display name: 2025-2026');
             $table->date('start_date');
             $table->date('end_date');
             $table->boolean('is_active')->default(false);

@@ -1,9 +1,9 @@
 <?php
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Helpers\IModel;
 
-class Province extends Model
+class Province extends IModel
 {
     /**
      * The attributes that are mass assignable.

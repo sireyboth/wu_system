@@ -17,12 +17,6 @@ class StudentController extends Controller
         $this->resource      = StudentResource::class;
         $this->relationships = [
             'person',
-            'batch',
-            'major',
-            'shift',
-            'major.faculty',
-            'group',
-            'status',
             'guardians',
             ...array_map(fn($r) => "person.{$r}", [
                 'nationality',

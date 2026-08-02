@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Builder;
 
 class Certificate extends IModel
 {
+    protected string $key_name = 'type';
+    public const STATUS        = 'status';
+    public const PROVISIONAL   = 'provisional';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -32,11 +36,11 @@ class Certificate extends IModel
     // Convenience scopes instead of separate models
     public function scopeProvisional(Builder $query)
     {
-        return $query->where('type', 'provisional');
+        return $this->get_by($query, self::PROVISIONAL);
     }
 
     public function scopeStatus(Builder $query)
     {
-        return $query->where('type', 'status');
+        return $this->get_by($query, self::STATUS);
     }
 }

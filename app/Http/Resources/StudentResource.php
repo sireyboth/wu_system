@@ -1,17 +1,9 @@
 <?php
 namespace App\Http\Resources;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-
-class StudentResource extends JsonResource
+class StudentResource extends IResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(Request $request): array
+    protected function toList(): array
     {
         return to_list($this, [
             'code'           => $this->code,
@@ -23,11 +15,6 @@ class StudentResource extends JsonResource
             'intake'         => $this->intake,
             'scholarship'    => $this->scholarship,
             'admission_date' => $this->admission_date?->format('Y-m-d'),
-            'status'         => new StatusResource($this->whenLoaded('status')),
-            'batch'          => new BatchResource($this->whenLoaded('batch')),
-            'group'          => new GroupResource($this->whenLoaded('group')),
-            'shift'          => new ShiftResource($this->whenLoaded('shift')),
-            'major'          => new MajorResource($this->whenLoaded('major')),
             'person'         => new PersonResource($this->whenLoaded('person')),
             'guardians'      => GuardianResource::collection($this->whenLoaded('guardians')),
         ], false);

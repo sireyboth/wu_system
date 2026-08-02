@@ -1,28 +1,13 @@
 <?php
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-
-class CampusRequest extends FormRequest
+class CampusRequest extends IRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
+    protected function formData(): array
     {
-        return true;
-    }
-
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
-    public function rules(): array
-    {
-        return [
-             ...DEFAULT_VALIDATE,
-            ...check_unique('shortcut', 'campuses'),
-        ];
+        return array_merge(
+            DEFAULT_VALIDATE,
+            check_unique('campuses'),
+        );
     }
 }

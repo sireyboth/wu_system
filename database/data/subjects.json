@@ -26,8 +26,7 @@
         "major_id": 3,
         "year_level": 1,
         "semester": 2,
-        "credit": 3,
-        "remark": null
+        "credit": 3
     },
     {
         "code": "BUS301",
@@ -46,7 +45,6 @@
         "major_id": 5,
         "year_level": 1,
         "semester": 2,
-        "credit": 2,
-        "remark": null
+        "credit": 2
     }
 ]

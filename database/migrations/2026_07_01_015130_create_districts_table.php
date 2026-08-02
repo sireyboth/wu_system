@@ -13,7 +13,7 @@ return new class extends Migration
     {
         make_fields('districts', function (Blueprint $table) {
             $table->foreignId('province_id')->constrained('provinces')->cascadeOnDelete();
-        }, is_defualt: false);
+        });
     }
 
     /**

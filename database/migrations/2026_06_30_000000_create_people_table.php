@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('nationality_id')->constrained()->restrictOnDelete();
 
             $table->date('dob')->nullable();
-            $table->enum('sex', ['female', 'male', 'other'])->default('other');
+            $table->string('sex', 20)->nullable()->default('other');
             $table->string('email', 50)->nullable();
             $table->json('phones')->nullable();
         }, false);

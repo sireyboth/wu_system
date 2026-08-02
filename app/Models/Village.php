@@ -1,10 +1,10 @@
 <?php
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Helpers\IModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Village extends Model
+class Village extends IModel
 {
     /**
      * The attributes that are mass assignable.

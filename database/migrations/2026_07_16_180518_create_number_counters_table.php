@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedInteger('last_sequence')->default(0);
 
             $table->unique(['year', 'type']);
-        }, false, false);
+        }, false);
     }
 
     /**

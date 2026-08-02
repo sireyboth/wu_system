@@ -5,11 +5,10 @@ use App\Helpers\IModel;
 
 class Shift extends IModel
 {
-    protected $fillable = [ ...DEFAULT_FIELD_AND_SHORTCUT];
+    protected $fillable = DEFAULT_FIELD_AND_SHORTCUT;
 
-
-    public function students()
+    public function snapshots()
     {
-        return $this->hasMany(Student::class);
+        return $this->hasMany(StudentSnapshot::class);
     }
 }

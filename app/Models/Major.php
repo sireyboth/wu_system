@@ -43,4 +43,9 @@ class Major extends IModel
     {
         return $this->hasMany(Lecturer::class);
     }
+
+    public function snapshots()
+    {
+        return $this->hasMany(StudentSnapshot::class);
+    }
 }

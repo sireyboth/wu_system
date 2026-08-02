@@ -1,17 +1,9 @@
 <?php
 namespace App\Http\Resources;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-
-class LecturerResource extends JsonResource
+class LecturerResource extends IResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(Request $request): array
+    protected function toList(): array
     {
         return to_list($this, ['code' => $this->code]);
     }

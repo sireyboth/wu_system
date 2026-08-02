@@ -5,15 +5,14 @@ use App\Helpers\IModel;
 
 class Batch extends IModel
 {
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [ ...DEFAULT_FIELD_AND_SHORTCUT, 'academic_year'];
 
-    public function student()
+    public function __construct()
     {
-        return $this->belongsTo(Student::class);
+        $this->fillable = array_merge(DEFAULT_FIELD_AND_SHORTCUT, ['academic_year']);
+    }
+
+    public function snapshots()
+    {
+        return $this->hasMany(StudentSnapshot::class);
     }
 }

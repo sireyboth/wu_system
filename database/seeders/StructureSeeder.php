@@ -2,6 +2,7 @@
 namespace Database\Seeders;
 
 use App\Models\Batch;
+use App\Models\Campus;
 use App\Models\Faculty;
 use App\Models\Group;
 use App\Models\Major;
@@ -27,5 +28,6 @@ class StructureSeeder extends Seeder
         set_records('groups', fn($data) => Group::create([ ...$data, 'remark' => $faker->sentence()]));
         set_records('shifts', fn($data) => Shift::create([ ...$data, 'remark' => $faker->sentence()]));
         set_records('batches', fn($data) => Batch::create([ ...$data, 'remark' => $faker->sentence()]));
+        set_records('campuses', fn($data) => Campus::create([ ...$data, 'remark' => $faker->sentence()]));
     }
 }

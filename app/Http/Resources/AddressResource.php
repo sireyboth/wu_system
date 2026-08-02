@@ -1,17 +1,9 @@
 <?php
 namespace App\Http\Resources;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-
-class AddressResource extends JsonResource
+class AddressResource extends IResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(Request $request): array
+    protected function toList(): array
     {
         return [
             'type'     => $this->type,
@@ -23,4 +15,5 @@ class AddressResource extends JsonResource
             'village'  => new VillageResource($this->whenLoaded('village')),
         ];
     }
+
 }

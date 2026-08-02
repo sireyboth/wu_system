@@ -10,11 +10,11 @@ class Term extends IModel
         'year',
         'semester',
         'code',
-        'name',
+        'display_name',
         'start_date',
         'end_date',
-        'remark',
         'is_active',
+        'remark',
     ];
 
     protected $casts = [
@@ -43,6 +43,6 @@ class Term extends IModel
 
     public function getFullNameAttribute(): string
     {
-        return "{$this->name} - Semester {$this->semester}";
+        return "{$this->display_name} - Semester {$this->semester}";
     }
 }

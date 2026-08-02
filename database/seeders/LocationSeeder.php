@@ -24,9 +24,9 @@ class LocationSeeder extends Seeder
                 'remark'      => $faker->sentence(),
             ]);
         });
-        set_data('provinces', increment: false);
-        set_data('districts', ['province_id'], increment: false);
-        set_data('communes', ['district_id'], increment: false);
-        set_data('villages', ['commune_id'], increment: false);
+        set_data('provinces');
+        set_data('districts', ['province_id']);
+        set_data('communes', ['district_id']);
+        set_data('villages', ['commune_id']);
     }
 }

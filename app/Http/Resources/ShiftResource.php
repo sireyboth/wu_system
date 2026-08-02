@@ -1,20 +1,10 @@
 <?php
 namespace App\Http\Resources;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-
-class ShiftResource extends JsonResource
+class ShiftResource extends IResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(Request $request): array
+    protected function toList(): array
     {
-        return to_list($this, [
-            'shortcut' => $this->shortcut,
-        ]);
+        return to_list($this, ['shortcut' => $this->shortcut]);
     }
 }

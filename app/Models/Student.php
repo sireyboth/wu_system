@@ -11,12 +11,7 @@ class Student extends IModel
 
         $this->fillable = [
             'person_id',
-            'guardian_id',
-            'batch_id',
-            'major_id',
-            'group_id',
-            'shift_id',
-            'status_id',
+            'year_level',
             'code',
             'from_school',
             'admission_date',
@@ -29,22 +24,14 @@ class Student extends IModel
             'remark',
         ];
 
-        $batch   = ['batch.name', 'batch.name_en', 'batch.name_kh', 'batch.shortcut', 'batch.academic_year', 'batch.remark'];
-        $major   = ['major.name', 'major.name_kh', 'major.name_en', 'major.shortcut'];
-        $faculty = ['major.faculty.name', 'major.faculty.name_kh', 'major.faculty.name_en', 'major.faculty.shortcut'];
-        $person  = ['person.first_name', 'person.last_name', 'person.first_name_kh', 'person.last_name_kh',
-            'person.dob', 'person.sex', 'person.email',
-        ];
-        $nationality = ['person.nationality.name', 'person.nationality.name_en', 'person.nationality.name_kh', 'person.nationality.code'];
-        $address     = ['person.addresses.type', 'person.addresses.street', 'person.addresses.house_no',
-            'person.addresses.province.name', 'person.addresses.province.name_en', 'person.addresses.province.name_en',
-            'person.addresses.district.name', 'person.addresses.district.name_en', 'person.addresses.district.name_en',
-            'person.addresses.commune.name', 'person.addresses.commune.name_en', 'person.addresses.commune.name_en',
-            'person.addresses.village.name', 'person.addresses.village.name_en', 'person.addresses.village.name_en',
-        ];
-
-        $this->searchable = array_merge($this->fillable, [
-             ...$batch, ...$faculty, ...$person, ...$major, ...$nationality, ...$address,
+        $this->searchable = array_map(fn($p) => "person.{$p}", [
+            'first_name',
+            'last_name',
+            'first_name_kh',
+            'last_name_kh',
+            'dob',
+            'sex',
+            'email',
         ]);
     }
 
@@ -58,34 +45,9 @@ class Student extends IModel
         return $this->belongsTo(Person::class);
     }
 
-    public function batch()
-    {
-        return $this->belongsTo(Batch::class);
-    }
-
-    public function shift()
-    {
-        return $this->belongsTo(Shift::class);
-    }
-
-    public function major()
-    {
-        return $this->belongsTo(Major::class);
-    }
-
     public function guardians()
     {
         return $this->hasMany(Guardian::class);
-    }
-
-    public function status()
-    {
-        return $this->belongsTo(Status::class);
-    }
-
-    public function group()
-    {
-        return $this->belongsTo(Group::class);
     }
 
     public function certificates()
@@ -101,5 +63,10 @@ class Student extends IModel
     public function statusCertificates()
     {
         return $this->certificates()->status();
+    }
+
+    public function snapshots()
+    {
+        return $this->hasMany(StudentSnapshot::class);
     }
 }

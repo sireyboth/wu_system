@@ -38,7 +38,7 @@ return new class extends Migration
             $table->string('house_no', 50)->nullable();
 
             // Address type
-            $table->enum('type', ['current', 'birth']);
+            $table->string('type', 50)->default('current');
 
             // Prevent duplicate address types for the same person
             $table->unique(['person_id', 'type']);

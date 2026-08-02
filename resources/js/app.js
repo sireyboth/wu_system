@@ -1,10 +1,12 @@
 import "./bootstrap";
 import "flowbite";
-import dataTable from "./components/data-table";
 import Alpine from "alpinejs";
+import listTable from "./utilities/global";
 
 window.Alpine = Alpine;
-Alpine.data("dataTable", dataTable);
+document.addEventListener("alpine:init", () => {
+    Alpine.data("listTable", listTable);
+});
 
 Alpine.start();
 // resources/js/app.js

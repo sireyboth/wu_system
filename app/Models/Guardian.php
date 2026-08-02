@@ -12,7 +12,7 @@ class Guardian extends IModel
      */
     protected $fillable = [
          ...DEFAULT_FIELD,
-         'student_id',
+        'student_id',
         'phones',
         'addresses',
         'job',
@@ -24,5 +24,16 @@ class Guardian extends IModel
     public function student()
     {
         return $this->belongsTo(Student::class);
+    }
+
+    public function getFullGuardianAttribute(): string
+    {
+        return collect([
+            $this->name,
+            $this->job,
+            $this->relationship,
+            imploded($this->phones),
+            imploded($this->addresses),
+        ])->filter()->implode(', ');
     }
 }

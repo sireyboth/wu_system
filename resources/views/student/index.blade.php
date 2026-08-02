@@ -1,9 +1,11 @@
 @extends('layouts.dashboard')
+
+@section('title', 'Student')
 @section('content')
     <!-- {{-- Page Header --}} -->
     <div class="mb-8">
         <h1 class="text-2xl font-bold text-neutral-900 dark:text-white">
-            សូមស្វាគមន៍មកកាន់ទំព័រ <span class="text-indigo-700">គ្រប់គ្រងវេនសិក្សា</span>
+            សូមស្វាគមន៍មកកាន់ទំព័រ <span class="text-indigo-700">គ្រប់គ្រងសិស្សនិសិ្សត</span>
         </h1>
         <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
             Overview of your application
@@ -39,9 +41,11 @@
             <!-- Button -->
             <div class="flex items-center gap-2">
                 <!-- <button type="button" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-neutral-700 bg-white border border-neutral-200 rounded-xl hover:bg-neutral-50 dark:bg-neutral-900 dark:text-neutral-300 dark:border-white/10 dark:hover:bg-white/5 transition-all">
-                        <svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2.586a1 1 0 0 1-.293.707l-6.414 6.414a1 1 0 0 0-.293.707V17l-4 4v-6.586a1 1 0 0 0-.293-.707L3.293 7.293A1 1 0 0 1 3 6.586V4Z"/></svg>
-                        Filters
-                    </button> -->
+                                                                <svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2.586a1 1 0 0 1-.293.707l-6.414 6.414a1 1 0 0 0-.293.707V17l-4 4v-6.586a1 1 0 0 0-.293-.707L3.293 7.293A1 1 0 0 1 3 6.586V4Z"/></svg>
+                                                                Filters
+                                                            </button> -->
+
+
                 <button type="button" onclick="AppModal.toggle(true)"
                     class="inline-flex items-center px-4 py-2.5 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition-all active:scale-95">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,6 +54,7 @@
                     </svg>
                     Create New student
                 </button>
+
 
             </div>
         </div>

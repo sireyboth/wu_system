@@ -12,6 +12,8 @@ abstract class IModel extends Model
     use HasFactory, SoftDeletes;
 
     protected array $searchable = [];
+    protected string $key_name  = 'shortcut';
+    protected string $operator  = '=';
 
     public function __construct(array $attributes = [])
     {
@@ -63,23 +65,31 @@ abstract class IModel extends Model
         });
     }
 
+    public function getNameAttribute()
+    {
+        return to_name($this);
+    }
+
+    protected function get_by(Builder $query, mixed $value = null)
+    {
+        return $query->where($this->key_name, $this->operator, $value);
+    }
+
     // Auto combine when creating/updating
-    public function setNameKhAttribute(string $value)
-    {
-        $this->attributes['name_kh'] = $value;
-        $this->attributes['name']    = $this->combineName($value, $this->name_en ?? request('name_en'));
-    }
+    // public function setNameKhAttribute(string $value)
+    // {
+    //     $this->attributes['name_kh'] = $value;
+    //     $this->attributes['name']    = $this->combineName($value, $this->name_en ?? request('name_en'));
+    // }
 
-    public function setNameEnAttribute(string $value)
-    {
-        $this->attributes['name_en'] = $value;
-        $this->attributes['name']    = $this->combineName($this->name_kh ?? request('name_kh'), $value);
-    }
+    // public function setNameEnAttribute(string $value)
+    // {
+    //     $this->attributes['name_en'] = $value;
+    //     $this->attributes['name']    = $this->combineName($this->name_kh ?? request('name_kh'), $value);
+    // }
 
-    private function combineName(?string $name_kh, ?string $name_en): string
-    {
-        return "{$name_kh} ({$name_en})";
-    }
+    // private function combineName(?string $name_kh, ?string $name_en): string
+    // {
+    //     return "{$name_kh} ({$name_en})";
+    // }
 }
-
-

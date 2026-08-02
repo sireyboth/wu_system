@@ -21,7 +21,17 @@ class StatusController extends Controller
      */
     public function index(Request $request)
     {
-        return $this->list($request);
+        return $this->list($request, function ($query) use ($request) {
+            if ($request->shortcut === Status::PAYMENT) {
+                return $query->payment();
+            }
+
+            if ($request->shortcut === Status::ENROLLMENT) {
+                return $query->enrollment();
+            }
+
+            return $query->student();
+        });
     }
 
     /**

@@ -33,11 +33,6 @@ class StudentSeeder extends Seeder
             // 2. Remap JSON keys -> Student columns
             $student_data = [
                 'code'           => $data['code'],
-                'major_id'       => $faker->numberBetween(1, 5),
-                'batch_id'       => $faker->numberBetween(1, 5),
-                'status_id'      => $faker->numberBetween(1, 10),
-                'group_id'       => $faker->numberBetween(1, 6),
-                'shift_id'       => $faker->numberBetween(1, 3),
                 'admission_date' => $faker->date(),
                 'bacc_2_code'    => $data['bacc_2_code'],
                 'entrance_exam'  => $faker->randomElement($status_exam),

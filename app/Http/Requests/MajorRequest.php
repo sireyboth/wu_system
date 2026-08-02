@@ -1,29 +1,14 @@
 <?php
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-
-class MajorRequest extends FormRequest
+class MajorRequest extends IRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
+    protected function formData(): array
     {
-        return true;
-    }
-
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
-    public function rules(): array
-    {
-        return [
-             ...DEFAULT_VALIDATE,
-            ...check_exist('faculty_id', 'faculties'),
-            ...check_unique('shortcut', 'majors'),
-        ];
+        return array_merge(
+            DEFAULT_VALIDATE,
+            check_exist('faculty_id', 'faculties'),
+            check_unique('majors'),
+        );
     }
 }

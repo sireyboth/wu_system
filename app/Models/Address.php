@@ -46,4 +46,15 @@ class Address extends IModel
     {
         return $this->belongsTo(Village::class);
     }
+
+    public function getFullAddressAttribute(): string
+    {
+        return collect([
+            $this->type,
+            $this->village?->name,
+            $this->commune?->name,
+            $this->district?->name,
+            $this->province?->name,
+        ])->filter()->implode(', ');
+    }
 }

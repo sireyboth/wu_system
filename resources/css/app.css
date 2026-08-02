@@ -1,13 +1,17 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import "flowbite/src/themes/default";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@plugin "flowbite/plugin";
+@source "../../node_modules/flowbite";
 
 
 body {
-  font-family: theme('fontFamily.sans');
+    font-family: theme("fontFamily.sans");
 }
 @layer utilities {
-  .dark input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
-  }
+    .dark input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+    }
 }
