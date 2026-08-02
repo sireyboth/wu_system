@@ -16,17 +16,8 @@ class CertificateController extends Controller
         $this->name          = 'Certificate';
         $this->model         = Certificate::class;
         $this->resource      = CertificateResource::class;
-        $this->relationships = array_map(
-            fn($r) => "student.$r", array_merge(['person', 'guardians',
-                array_map(fn($r) => "person.{$r}", [
-                    'nationality',
-                    'addresses',
-                    'addresses.province',
-                    'addresses.commune',
-                    'addresses.district',
-                    'addresses.village',
-                ])])
-        );
+        $this->relationships = $this->withStudent();
+
     }
 
     /**
@@ -34,9 +25,11 @@ class CertificateController extends Controller
      */
     public function index(Request $request)
     {
-        return $this->list($request, fn($query) => $request->type === Certificate::PROVISIONAL
-                ? $query->provisional()
-                : $query->status());
+        // return $this->list($request, fn($query) => $request->type === Certificate::PROVISIONAL
+        //         ? $query->provisional()
+        //         : $query->status());
+
+        return $this->list($request);
     }
 
     /**

@@ -15,18 +15,7 @@ class StudentController extends Controller
         $this->name          = 'Student';
         $this->model         = Student::class;
         $this->resource      = StudentResource::class;
-        $this->relationships = [
-            'person',
-            'guardians',
-            ...array_map(fn($r) => "person.{$r}", [
-                'nationality',
-                'addresses',
-                'addresses.province',
-                'addresses.district',
-                'addresses.commune',
-                'addresses.village',
-            ]),
-        ];
+        $this->relationships = $this->withPerson();
     }
 
     /**

@@ -3,13 +3,14 @@ import "flowbite";
 import Alpine from "alpinejs";
 import listTable from "./utilities/global";
 
-window.Alpine = Alpine;
 document.addEventListener("alpine:init", () => {
     Alpine.data("listTable", listTable);
 });
 
-Alpine.start();
-// resources/js/app.js
+if (!window.Alpine) {
+    window.Alpine = Alpine;
+    Alpine.start();
+}
 
 window.toggleDarkMode = function () {
     const isDark = document.documentElement.classList.toggle("dark");

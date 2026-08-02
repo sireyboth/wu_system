@@ -16,18 +16,7 @@ class StudentSnapshotController extends Controller
         $this->resource      = StudentSnapshotResource::class;
         $this->relationships = array_merge(
             ['batch', 'campus', 'major', 'group', 'shift', 'status'],
-            array_map(fn($s) => "student.{$s}",
-                array_merge(['person', 'guardians'],
-                    array_map(fn($r) => "person.{$r}", [
-                        'nationality',
-                        'addresses',
-                        'addresses.province',
-                        'addresses.district',
-                        'addresses.commune',
-                        'addresses.village',
-                    ])
-                )
-            )
+            $this->withStudent()
         );
     }
 

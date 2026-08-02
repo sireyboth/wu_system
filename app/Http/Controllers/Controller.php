@@ -95,4 +95,20 @@ abstract class Controller
             'failures' => $data->failures(), // rows that failed validation
         ];
     }
+
+    protected function withStudent(string $key = 'student')
+    {
+        return array_map(fn($s) => "{$key}.{$s}",
+            array_merge(['person', 'guardians'], $this->withPerson())
+        );
+    }
+
+    protected function withPerson(string $key = 'person', string $otherKey = 'addresses')
+    {
+        return array_map(fn($p) => "{$key}.{$p}",
+            array_merge(['nationality', 'addresses'],
+                array_map(fn($a) => "{$otherKey}.$a", ['province', 'district', 'commune', 'village'])
+            )
+        );
+    }
 }
