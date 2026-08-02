@@ -8,45 +8,41 @@
     <x-core.table-card endpoint="/student-snapshots" sort="name">
 
         <x-slot:toolbar>
-            <x-ui.primary-button x-on:click="$dispatch('open-modal', 'product-form')">
-                <x-ui.icon-svg name="plus" />
-                Add
+            <x-ui.primary-button x-on:click="$dispatch('open-modal', 'form')">
+                <x-ui.icon-svg class="h-4 w-4" name="plus" />
+                <span>Add</span>
             </x-ui.primary-button>
         </x-slot:toolbar>
 
         <x-slot:head>
             {{-- <x-core.sortable field="name" label="Product name" /> --}}
-            <x-core.th>Student Name</x-core.th>
-            <x-core.th>Sex</x-core.th>
-            <x-core.th>Nationality</x-core.th>
-            <x-core.th>Date of Birth</x-core.th>
-            <x-core.th>Bath</x-core.th>
-            <x-core.th>Campus</x-core.th>
-            <x-core.th>Major</x-core.th>
-            <x-core.th>Group</x-core.th>
-            <x-core.th>Status</x-core.th>
-            <x-core.th>Effective Date</x-core.th>
-            <x-core.th>Actions</x-core.th>
+            <x-core.table-header label="Name" />
+            <x-core.table-header label="Sex" />
+            <x-core.table-header label="Nationality" />
+            <x-core.table-header label="DOB" />
+            <x-core.table-header label="Bath" />
+            <x-core.table-header label="Campus" />
+            <x-core.table-header label="Major" />
+            <x-core.table-header label="Group" />
+            <x-core.table-header label="Status" />
+            <x-core.table-header label="Effective Date" />
+            <x-core.table-header label="Actions" />
         </x-slot:head>
 
-        <template x-for="row in rows" :key="row.id">
-            <tr class="border-b dark:border-gray-700">
-                <th scope="row" class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                    x-text="row.student.person.full_name"></th>
-                <td class="px-4 py-3" x-text="row.student.person.sex"></td>
-                <td class="px-4 py-3 whitespace-normal" x-text="row.student.person.nationality.name"></td>
-                <td class="px-4 py-3" x-text="row.student.person.dob"></td>
-                <td class="px-4 py-3" x-text="row.batch.name"></td>
-                <td class="px-4 py-3" x-text="row.campus.name"></td>
-                <td class="px-4 py-3" x-text="row.major.name"></td>
-                <td class="px-4 py-3" x-text="row.group.name"></td>
-                <td class="px-4 py-3" x-text="row.status.name"></td>
-                <td class="px-4 py-3" x-text="row.effective_date"></td>
-                <td class="px-4 py-3 flex items-center justify-end">
-                    <x-core.actions resource="student-snapshots" />
-                </td>
-            </tr>
-        </template>
+        {{-- body data --}}
+        <x-core.table-data x-text="row.student.person.full_name" />
+        <x-core.table-data x-text="row.student.person.sex?.charAt(0).toUpperCase()" />
+        <x-core.table-data x-text="row.student.person.nationality.name" />
+        <x-core.table-data x-text="row.student.person.dob" />
+        <x-core.table-data x-text="row.batch.name" />
+        <x-core.table-data x-text="row.campus.name" />
+        <x-core.table-data x-text="row.major.name" />
+        <x-core.table-data x-text="row.group.name" />
+        <x-core.table-data x-text="row.status.name" />
+        <x-core.table-data x-text="row.effective_date" />
+        <x-core.table-data class="flex items-center justify-end">
+            <x-core.actions resource="student-snapshots" />
+        </x-core.table-data>
 
     </x-core.table-card>
 @endsection

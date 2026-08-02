@@ -31,9 +31,9 @@
 
         @include('partials.sidebar')
 
-        <div id="main-content" class="flex-1 min-w-0 p-6 transition-all duration-300">
+        <main id="main-content" class="flex-1 min-w-0 p-6 transition-all duration-300">
             @yield('content')
-        </div>
+        </main>
 
     </div>
 

@@ -8,7 +8,14 @@
       head     - <tr> contents for the <thead>
       default  - the <template x-for="row in rows"> row markup
 --}}
-@props(['endpoint', 'sort' => null, 'direction' => 'asc', 'perPage' => 10, 'noData' => 'No records found.'])
+@props([
+    'endpoint',
+    'sort' => null,
+    'direction' => 'asc',
+    'perPage' => 10,
+    'noData' => 'No records found.',
+    'showIndex' => true,
+])
 
 
 <div x-data="listTable({
@@ -18,7 +25,7 @@
     perPage: {{ $perPage }},
 })" class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
     {{-- toolbar --}}
-    <div class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
+    <div class=" flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
         <div class="w-full md:w-1/2">
             <x-ui.search-input />
         </div>
@@ -39,13 +46,25 @@
     {{-- table --}}
     <div class="overflow-x-auto">
         <table class="min-w-full whitespace-nowrap text-sm text-left text-gray-500 dark:text-gray-400">
-            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <thead class="text-sm text-gray-700 capitalize bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
+                    @if ($showIndex)
+                        <x-core.table-header label="#" />
+                    @endif
+
                     {{ $head }}
                 </tr>
             </thead>
             <tbody>
-                {{ $slot }}
+                <template x-for="(row, index) in rows" :key="row.id">
+                    <tr class="border-b dark:border-gray-700">
+                        @if ($showIndex)
+                            <x-core.table-data x-text="(meta.current_page - 1) * perPage + index + 1" />
+                        @endif
+
+                        {{ $slot }}
+                    </tr>
+                </template>
 
                 <tr x-show="!loading && rows.length === 0" style="display: none;">
                     <td colspan="100%" class="px-4 py-6 text-center text-gray-500 dark:text-gray-400">

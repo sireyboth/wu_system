@@ -23,6 +23,8 @@ class StudentSnapshot extends IModel
         'remark',
     ];
 
+    protected array $searchable = ['sudent.person.first_name'];
+
     protected $casts = ['effective_date' => 'date', 'is_current' => 'boolean'];
 
     public function student()

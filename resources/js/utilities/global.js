@@ -77,6 +77,7 @@ export default function listTable(config = {}) {
             }
             if (current < total - 2) pages.push("...");
             pages.push(total);
+
             return pages;
         },
 
@@ -97,8 +98,6 @@ export default function listTable(config = {}) {
                 });
                 this.rows = data.data;
                 this.meta = data.meta;
-                console.table(this.rows);
-
             } catch (e) {
                 console.error("listTable: fetch failed", e);
             } finally {
@@ -112,6 +111,7 @@ export default function listTable(config = {}) {
                 if (Array.isArray(value) && value.length)
                     out[key] = value.join(",");
             }
+            
             return out;
         },
 

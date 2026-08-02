@@ -22,3 +22,4 @@
         {{ $slot }}
     @endif
 </svg>
+
