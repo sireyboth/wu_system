@@ -35,40 +35,40 @@ class LecturerController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Lecturer $lecturer)
     {
-        return $this->view($id);
+        return $this->view($lecturer);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(LecturerRequest $request, string $id)
+    public function update(LecturerRequest $request, Lecturer $lecturer)
     {
-        return $this->release($request, $id);
+        return $this->release($request, $lecturer);
     }
 
     /**
      * Disable the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Lecturer $lecturer)
     {
-        return $this->disable($id);
+        return $this->disable($lecturer);
     }
 
     /**
      * Restore a soft-deleted of the resource.
      */
-    public function restore(string $id)
+    public function restore(Lecturer $lecturer)
     {
-        return $this->enable($id);
+        return $this->enable($lecturer);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function force_destroy(string $id)
+    public function force_destroy(Lecturer $lecturer)
     {
-        return $this->clear($id);
+        return $this->clear($lecturer);
     }
 }

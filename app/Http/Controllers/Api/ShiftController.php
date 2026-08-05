@@ -35,40 +35,40 @@ class ShiftController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Shift $shift)
     {
-        return $this->view($id);
+        return $this->view($shift);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(ShiftRequest $request, string $id)
+    public function update(ShiftRequest $request, Shift $shift)
     {
-        return $this->release($request, $id);
+        return $this->release($request, $shift);
     }
 
     /**
      * Disable the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Shift $shift)
     {
-        return $this->disable($id);
+        return $this->disable($shift);
     }
 
     /**
      * Restore a soft-deleted of the resource.
      */
-    public function restore(string $id)
+    public function restore(Shift $shift)
     {
-        return $this->enable($id);
+        return $this->enable($shift);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function force_destroy(string $id)
+    public function force_destroy(Shift $shift)
     {
-        return $this->clear($id);
+        return $this->clear($shift);
     }
 }

@@ -1,0 +1,188 @@
+[
+    {
+        "first_name": "LANN",
+        "last_name": "Phorlly",
+        "first_name_kh": "ឡាន់",
+        "last_name_kh": "ផល្លី",
+        "nationality_id": 1,
+        "code": "ST-IT8800",
+        "major_id": 1,
+        "batch_id": 1,
+        "status_id": 1,
+        "group_id": 1,
+        "shift_id": 1,
+        "bacc_2_code": "BACC_II097",
+        "addresses": [
+            {
+                "province_id": 11,
+                "district_id": 1102,
+                "commune_id": 110206,
+                "village_id": 11020607,
+                "type": "current"
+            },
+            {
+                "province_id": 11,
+                "district_id": 1102,
+                "commune_id": 110206,
+                "village_id": 11020607,
+                "type": "birth"
+            }
+        ],
+        "guardians": [{ "name_en": "MEN Lann", "name_kh": "ម៉ែន ឡាន់" }]
+    },
+    {
+        "first_name": "SOK",
+        "last_name": "Chantha",
+        "first_name_kh": "សុខ",
+        "last_name_kh": "ចន្ថា",
+        "nationality_id": 1,
+        "code": "ST-IT8801",
+        "major_id": 1,
+        "batch_id": 1,
+        "status_id": 1,
+        "group_id": 1,
+        "shift_id": 1,
+        "bacc_2_code": "BACC_II098",
+        "addresses": [
+            {
+                "province_id": 1,
+                "district_id": 102,
+                "commune_id": 10203,
+                "village_id": 1020304,
+                "type": "current"
+            },
+            {
+                "province_id": 1,
+                "district_id": 102,
+                "commune_id": 10203,
+                "village_id": 1020304,
+                "type": "birth"
+            }
+        ],
+        "guardians": [{ "name_en": "SOK Vuthy", "name_kh": "សុខ វុទ្ធី" }]
+    },
+    {
+        "first_name": "KIM",
+        "last_name": "Sreyneath",
+        "first_name_kh": "គីម",
+        "last_name_kh": "ស្រីនាថ",
+        "nationality_id": 1,
+        "code": "ST-BM8802",
+        "major_id": 2,
+        "batch_id": 2,
+        "status_id": 1,
+        "group_id": 2,
+        "shift_id": 1,
+        "bacc_2_code": "BACC_II105",
+        "addresses": [
+            {
+                "province_id": 24,
+                "district_id": 2401,
+                "commune_id": 240102,
+                "village_id": 24010203,
+                "type": "current"
+            },
+            {
+                "province_id": 2,
+                "district_id": 203,
+                "commune_id": 20303,
+                "village_id": 2030301,
+                "type": "birth"
+            }
+        ],
+        "guardians": [{ "name_en": "KIM Rithy", "name_kh": "គីម រិទ្ធី" }]
+    },
+    {
+        "first_name": "CHEA",
+        "last_name": "Vibol",
+        "first_name_kh": "ជា",
+        "last_name_kh": "វិបុល",
+        "nationality_id": 1,
+        "code": "ST-IT8803",
+        "major_id": 1,
+        "batch_id": 1,
+        "status_id": 1,
+        "group_id": 1,
+        "shift_id": 2,
+        "bacc_2_code": "BACC_II099",
+        "addresses": [
+            {
+                "province_id": 7,
+                "district_id": 701,
+                "commune_id": 70104,
+                "village_id": 7010401,
+                "type": "current"
+            },
+            {
+                "province_id": 7,
+                "district_id": 701,
+                "commune_id": 70104,
+                "village_id": 7010401,
+                "type": "birth"
+            }
+        ],
+        "guardians": [{ "name_en": "CHEA Sophal", "name_kh": "ជា សុផល" }]
+    },
+    {
+        "first_name": "PICH",
+        "last_name": "Sophea",
+        "first_name_kh": "ពេជ្រ",
+        "last_name_kh": "សុភា",
+        "nationality_id": 1,
+        "code": "ST-AC8804",
+        "major_id": 3,
+        "batch_id": 2,
+        "status_id": 1,
+        "group_id": 3,
+        "shift_id": 1,
+        "bacc_2_code": "BACC_II102",
+        "addresses": [
+            {
+                "province_id": 12,
+                "district_id": 1202,
+                "commune_id": 120201,
+                "village_id": 12020101,
+                "type": "current"
+            },
+            {
+                "province_id": 12,
+                "district_id": 1202,
+                "commune_id": 120201,
+                "village_id": 12020101,
+                "type": "birth"
+            }
+        ],
+        "guardians": [{ "name_en": "PICH Saroeun", "name_kh": "ពេជ្រ សារ៉ៅន៍" }]
+    },
+    {
+        "first_name": "HENG",
+        "last_name": "Sokun",
+        "first_name_kh": "ហេង",
+        "last_name_kh": "សុគន្ធ",
+        "nationality_id": 1,
+        "code": "ST-IT8805",
+        "major_id": 1,
+        "batch_id": 1,
+        "status_id": 1,
+        "group_id": 1,
+        "shift_id": 1,
+        "bacc_2_code": "BACC_II110",
+        "addresses": [
+            {
+                "province_id": 4,
+                "district_id": 402,
+                "commune_id": 40205,
+                "village_id": 4020501,
+                "type": "current"
+            },
+            {
+                "province_id": 4,
+                "district_id": 402,
+                "commune_id": 40205,
+                "village_id": 4020501,
+                "type": "birth"
+            }
+        ],
+        "guardians": [{ "name_en": "HENG Bunly", "name_kh": "ហេង ប៊ុនលី" }]
+    }
+]

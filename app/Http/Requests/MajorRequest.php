@@ -1,9 +1,7 @@
 <?php
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class MajorRequest extends FormRequest
 {
@@ -23,18 +21,9 @@ class MajorRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'faculty_id' => 'required|exists:faculties,id|integer',
-            'name_kh'    => 'required|string|min:3|max:255',
-            'name_en'    => 'required|string|min:3|max:255',
-            'shortcut'   => [
-                'nullable',
-                'string',
-                'max:50',
-                Rule::unique('majors', 'shortcut')
-                    ->ignore($this->route('major'))
-                    ->withoutTrashed(),
-            ],
-            'remark'     => 'nullable|string|max:500',
+             ...DEFAULT_VALIDATE,
+            ...check_exist('faculty_id', 'faculties'),
+            ...check_unique('shortcut', 'majors'),
         ];
     }
 }

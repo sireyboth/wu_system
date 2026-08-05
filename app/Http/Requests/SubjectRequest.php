@@ -1,9 +1,7 @@
 <?php
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class SubjectRequest extends FormRequest
 {
@@ -23,20 +21,12 @@ class SubjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name_kh'  => 'required|string|min:3|max:255',
-            'name_en'  => 'required|string|min:3|max:255',
-            'code'     => [
-                'nullable',
-                'string',
-                'max:50',
-                Rule::unique('subjects', 'code')
-                    ->ignore($this->route('subject'))
-                    ->withoutTrashed(),
-            ],
-            'year'     => 'nullable|string|max:50',
-            'semester' => 'nullable|string|max:50',
-            'credit'   => 'nullable|string|max:10',
-            'remark'   => 'nullable|string|max:500',
+             ...DEFAULT_VALIDATE,
+            ...check_exist('major_id', 'majors'),
+            ...check_unique('code', 'subjects'),
+            'year_level' => 'nullable|string|max:50',
+            'semester'   => 'nullable|string|max:50',
+            'credit'     => 'nullable|integer',
         ];
     }
 }

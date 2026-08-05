@@ -59,6 +59,7 @@ public function show($id)
     return response()->json($room);
 }
 
+
 //Update
 public function update(Request $request, $id)
 {
@@ -105,6 +106,7 @@ public function destroy($id)
         'message' => 'Room deleted successfully.'
     ], 200);
 }
+
 
 }
 

@@ -1,7 +1,6 @@
 <?php
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CampusRequest extends FormRequest
@@ -22,9 +21,8 @@ class CampusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name_kh' => 'required|string|min:3|max:255',
-            'name_en' => 'required|string|min:3|max:255',
-            'remark'  => 'nullable|string|max:500',
+             ...DEFAULT_VALIDATE,
+            ...check_unique('shortcut', 'campuses'),
         ];
     }
 }
