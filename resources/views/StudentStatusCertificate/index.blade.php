@@ -37,6 +37,16 @@
 
             {{-- Actions --}}
             <div class="flex items-center gap-2">
+                <button type="button" id="openReportBtn"
+                    class="inline-flex items-center px-4 py-2.5 text-sm font-bold text-neutral-700 dark:text-neutral-200
+                           bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-xl
+                           hover:bg-neutral-50 dark:hover:bg-white/5 transition-all active:scale-95">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 17v-6h6v6m-9 4h12a2 2 0 002-2V5a2 2 0 00-2-2H6a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                    Report
+                </button>
                 <button type="button" id="openPickerBtn"
                     class="inline-flex items-center px-4 py-2.5 text-sm font-bold text-white
                            bg-indigo-600 rounded-xl hover:bg-indigo-700
@@ -100,6 +110,7 @@
     @include('StudentStatusCertificate.partials.student-picker-modal')
     @include('StudentStatusCertificate.partials.student-status-modal')
     @include('StudentStatusCertificate.partials.certificate-print')
+    @include('StudentStatusCertificate.partials.certificate-report-modal')
 @endsection
 
 @push('scripts')

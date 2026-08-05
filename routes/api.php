@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Route;
  */
 Route::prefix('v1')->group(function () {
     Route::get('/certificates/preview-number', [CertificateController::class, 'preview'])->name('certificates.preview');
+    Route::get('/certificates/report', [CertificateController::class, 'report'])->name('certificates.report');
 
     api_routes([
         'faculties'    => FacultyController::class,

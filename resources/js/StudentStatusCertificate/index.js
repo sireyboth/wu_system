@@ -5,6 +5,7 @@ import { createApiService } from './api-service.js';
 import { handlePrintAction } from './print.js';
 import { loadStudents} from './student-form.js';
 import { handleEditAction, handleDeleteAction } from './certificate-action.js';
+import { handleReportAction } from './report.js';
 // resources/js/probisional/index.js
 import './student-picker.js';
 import './student-status-modal.js';
@@ -27,6 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initEvents(dom, ApiService) {
+    document.getElementById('openReportBtn')?.addEventListener('click', () => handleReportAction(ApiService));
+
     // Search input, debounced
     dom.searchInput?.addEventListener('input', (e) => {
         clearTimeout(state.debounceTimer);
