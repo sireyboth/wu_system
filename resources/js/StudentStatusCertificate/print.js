@@ -87,26 +87,44 @@ export async function handlePrintAction(ApiService, id) {
     // layout's scroll/overflow container when print positions it absolutely.
     document.body.appendChild(printArea);
     printArea.classList.remove('hidden');
-    window.addEventListener('afterprint', () => printArea.classList.add('hidden'), { once: true });
+
+    // window.print() gives JS no way to know if the user actually printed or
+    // hit Cancel, so ask explicitly once the print dialog has closed instead
+    // of assuming success.
+    window.addEventListener('afterprint', async () => {
+        printArea.classList.add('hidden');
+
+        const { isConfirmed: printedOk } = await Swal.fire({
+            title: 'តើបានបោះពុម្ពជោគជ័យទេ?',
+            text: 'ចុច "បាទ/ចាស" ដើម្បីធ្វើបច្ចុប្បន្នភាពស្ថានភាពទៅ "បានបោះពុម្ព"',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'បាទ/ចាស',
+            cancelButtonText: 'ទេ / បោះបង់',
+        });
+
+        if (!printedOk) return;
+
+        const { error: markError } = await ApiService.request(`${CONFIG.API_BASE}/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                student_id: student.id,
+                issue_date: cert.issue_date,
+                full_date_kh: cert.full_date_kh,
+                short_date_kh: cert.short_date_kh,
+                type: cert.type,
+                remark: cert.remark,
+                status: 'printed',
+            }),
+        });
+
+        if (markError) {
+            Toast.fire({ icon: 'warning', title: 'ធ្វើបច្ចុប្បន្នភាពស្ថានភាពមិនបានទេ' });
+        } else if (typeof window.reloadCertificateTable === 'function') {
+            window.reloadCertificateTable();
+        }
+    }, { once: true });
+
     window.print();
-
-    const { error: markError } = await ApiService.request(`${CONFIG.API_BASE}/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            student_id: student.id,
-            issue_date: cert.issue_date,
-            full_date_kh: cert.full_date_kh,
-            short_date_kh: cert.short_date_kh,
-            type: cert.type,
-            remark: cert.remark,
-            status: 'printed',
-        }),
-    });
-
-    if (markError) {
-        Toast.fire({ icon: 'warning', title: 'បានបោះពុម្ព ប៉ុន្តែធ្វើបច្ចុប្បន្នភាពស្ថានភាពមិនបាន' });
-    } else if (typeof window.reloadCertificateTable === 'function') {
-        window.reloadCertificateTable();
-    }
 }

@@ -37,16 +37,34 @@
 
             {{-- Actions --}}
             <div class="flex items-center gap-2">
-                <button type="button" id="openReportBtn"
-                    class="inline-flex items-center px-4 py-2.5 text-sm font-bold text-neutral-700 dark:text-neutral-200
-                           bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-xl
-                           hover:bg-neutral-50 dark:hover:bg-white/5 transition-all active:scale-95">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 17v-6h6v6m-9 4h12a2 2 0 002-2V5a2 2 0 00-2-2H6a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                    </svg>
-                    Report
-                </button>
+                <button type="button" id="openReportBtn" aria-label="Open Report"
+    class="group relative inline-flex items-center justify-center gap-2.5 px-5 py-3 text-sm font-semibold tracking-wide text-neutral-800 dark:text-neutral-100 bg-neutral-900/5 dark:bg-neutral-100/10 backdrop-blur-md rounded-2xl border border-neutral-300/60 dark:border-white/15 shadow-sm hover:shadow-xl hover:shadow-indigo-500/10 dark:hover:shadow-indigo-400/20 hover:border-indigo-500/50 dark:hover:border-indigo-400/50 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97] transition-all duration-300 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-neutral-950 overflow-hidden">
+
+    <!-- Ambient Animated Glow Background -->
+    <span class="absolute inset-0 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl pointer-events-none"></span>
+
+    <!-- Subtle Shimmer Sweep Overlay -->
+    <span class="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 dark:via-white/10 to-transparent transition-transform duration-1000 ease-in-out pointer-events-none"></span>
+
+    <!-- Icon Container with Animated Hover Dynamics -->
+    <span class="relative flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-6deg] text-indigo-600 dark:text-indigo-400">
+        <!-- Default State: Report Chart Icon -->
+        <svg id="btnIcon" class="w-4 h-4 transition-all duration-300" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-6h6v6m-9 4h12a2 2 0 002-2V5a2 2 0 00-2-2H6a2 2 0 00-2 2v14a2 2 0 002 2z" />
+        </svg>
+
+        <!-- Loading State: Spinner (Hidden by default) -->
+        <svg id="btnSpinner" class="hidden w-4 h-4 animate-spin text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+    </span>
+
+    <!-- Button Text Label -->
+    <span id="btnText" class="relative z-10 font-bold transition-colors duration-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-300">
+        Generate Report
+    </span>
+</button>
                 <button type="button" id="openPickerBtn"
                     class="inline-flex items-center px-4 py-2.5 text-sm font-bold text-white
                            bg-indigo-600 rounded-xl hover:bg-indigo-700
