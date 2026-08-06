@@ -261,8 +261,8 @@ export async function handleFormSubmit(dom, ApiService, e) {
             if (errorMsg.includes("students.bacc_2_code")) {
                 Toast.fire({
                     icon: "warning",
-                    title: "លេខតុបាក់ឌុបស្ទួនគ្នា (Duplicate BACC II Code)",
-                    text: "លេខតុបាក់ឌុបនេះមានក្នុងប្រព័ន្ធរួចហើយ សូមពិនិត្យឡើងវិញ។ (This BACC II Code already exists.)",
+                    title: "លេខបាក់ឌុបស្ទួនគ្នា (Duplicate BACC II Code)",
+                    text: "លេខបាក់ឌុបនេះមានក្នុងប្រព័ន្ធរួចហើយ សូមពិនិត្យឡើងវិញ។ (This BACC II Code already exists.)",
                 });
             } else if (errorMsg.includes("students.code")) {
                 Toast.fire({

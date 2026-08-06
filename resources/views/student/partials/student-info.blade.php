@@ -89,7 +89,7 @@
             <label
                 class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">លេខទូរស័ព្ទនិស្សិត
                 (Student Phone Number)</label>
-            <input required type="tel" name="phones[0]" placeholder="e.g., 012345678"
+            <input type="tel" name="phones[0]" placeholder="e.g., 012345678"
                 class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
         </div>
 
@@ -113,7 +113,7 @@
                 <label
                     class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">ផ្ទះ
                     / ផ្លូវ (Street/House)</label>
-                <input required type="text" name="addresses[0][street]" placeholder="លំនៅដ្ឋាន លេខផ្ទះ ឬផ្លូវ"
+                <input  type="text" name="addresses[0][street]" placeholder="លំនៅដ្ឋាន លេខផ្ទះ ឬផ្លូវ"
                     class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none">
             </div>
             <div>
