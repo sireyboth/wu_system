@@ -7,7 +7,12 @@
     <div x-data="resourceForm({
         name: '{{ $modal_name }}',
         endpoint: '{{ $endpoint }}',
-        defaults: { name: '', price: '' }
+        defaults: {
+            is_active: false,
+            start_date: '',
+            shift_ids: [],
+            user_ids: []
+        }
     })">
         {{-- header (fixed) --}}
         <x-core.form-header modal-name="{{ $modal_name }}" />
@@ -21,7 +26,19 @@
 
             <x-ui.toggle name="is_active" label="Active" />
 
-           <x-ui.checkbox name="remember" label="Remember me" />
+            <x-ui.checkbox name="remember" label="Remember me" />
+
+            <x-ui.checkbox-group name="shift_ids" label="Select Shifts" :options="[
+                ['id' => 1, 'name' => 'Morning'],
+                ['id' => 2, 'name' => 'Afternoon'],
+                ['id' => 3, 'name' => 'Night'],
+            ]" inline />
+
+            <x-ui.multi-select name="user_ids" :options="[
+                ['id'=> 1, 'name'=> 'LANN Phorlly'],
+                ['id'=> 2, 'name'=> 'THAI Ngounleng'],
+                ['id'=> 3, 'name'=> 'SEAM Saron'],
+            ]" hint="Dropdown search" />
 
             <x-ui.input-group label="Price" name="price" type="number" />
         </div>

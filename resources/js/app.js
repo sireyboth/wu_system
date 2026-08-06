@@ -5,12 +5,16 @@ import { listTable } from "./utilities/global";
 import { resourceForm } from "./utilities/form";
 import { datepicker } from "./utilities/datepicker";
 import { dropdown } from "./utilities/dropdown";
+import { apiCrud } from "./utilities/config";
+import { multiSelect } from "./utilities/multi-select";
 
 document.addEventListener("alpine:init", () => {
+    Alpine.magic("api", () => apiCrud);
     Alpine.data("listTable", listTable);
     Alpine.data("resourceForm", resourceForm);
     Alpine.data("datepicker", datepicker);
     Alpine.data("dropdown", dropdown);
+    Alpine.data("multiSelect", multiSelect);
 });
 
 if (!window.Alpine) {

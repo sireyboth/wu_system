@@ -23,7 +23,7 @@
     sort: {{ $sort ? "'{$sort}'" : 'null' }},
     direction: '{{ $direction }}',
     perPage: {{ $perPage }},
-})" class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
+})" class="bg-white dark:bg-gray-900 relative shadow-md sm:rounded-lg overflow-hidden">
     {{-- toolbar --}}
     <div class=" flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
         <div class="w-full md:w-1/2">
