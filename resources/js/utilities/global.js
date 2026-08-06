@@ -1,6 +1,6 @@
-import apiCRUD from "./config";
+import { apiCrud } from "./config";
 
-export default function listTable(config = {}) {
+export function listTable(config = {}) {
     let searchTimer = null;
 
     return {
@@ -86,7 +86,7 @@ export default function listTable(config = {}) {
             this.loading = true;
 
             try {
-                const { data } = await apiCRUD.get(this.endpoint, {
+                const { data } = await apiCrud.get(this.endpoint, {
                     params: {
                         page,
                         per_page: this.perPage,
@@ -111,7 +111,7 @@ export default function listTable(config = {}) {
                 if (Array.isArray(value) && value.length)
                     out[key] = value.join(",");
             }
-            
+
             return out;
         },
 
@@ -120,7 +120,7 @@ export default function listTable(config = {}) {
             if (!confirm(confirmMessage)) return;
 
             try {
-                await apiCRUD.delete(`${this.endpoint}/${row.id}`);
+                await apiCrud.delete(`${this.endpoint}/${row.id}`);
                 this.fetchData();
             } catch (e) {
                 console.error("listTable: delete failed", e);

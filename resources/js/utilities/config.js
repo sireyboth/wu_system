@@ -1,7 +1,7 @@
 import axios from "axios";
 import { type } from "../bootstrap";
 
-const apiCRUD = axios.create({
+export const apiCrud = axios.create({
     baseURL: "/api/v1",
     headers: {
         "X-Requested-With": "XMLHttpRequest",
@@ -11,7 +11,7 @@ const apiCRUD = axios.create({
 });
 
 // Optional: centralize error handling (401 → redirect to login, etc.)
-apiCRUD.interceptors.response.use(
+apiCrud.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) window.location.href = "/login";
@@ -19,5 +19,3 @@ apiCRUD.interceptors.response.use(
         return Promise.reject(error);
     },
 );
-
-export default apiCRUD;

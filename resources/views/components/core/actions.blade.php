@@ -5,10 +5,10 @@
 --}}
 @props(['resource'])
 
-<x-ui.dropdown align="right" width="w-44">
+<x-ui.dropdown>
     <x-slot:trigger>
         <x-ui.icon-button label="Actions">
-            <x-ui.icon-svg name="ellipsis-vertical" class="w-5 h-5" />
+            <x-ui.icon-svg name="ellipsis-vertical" />
         </x-ui.icon-button>
     </x-slot:trigger>
 

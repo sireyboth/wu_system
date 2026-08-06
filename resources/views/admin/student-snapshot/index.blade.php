@@ -8,7 +8,7 @@
     <x-core.table-card endpoint="/student-snapshots" sort="name">
 
         <x-slot:toolbar>
-            <x-ui.primary-button x-on:click="$dispatch('open-modal', 'form')">
+            <x-ui.primary-button x-on:click="$dispatch('open-modal', { name: 'form', mode: 'create' })">
                 <x-ui.icon-svg class="h-4 w-4" name="plus" />
                 <span>Add</span>
             </x-ui.primary-button>
@@ -45,6 +45,8 @@
         </x-core.table-data>
 
     </x-core.table-card>
+
+    @include('admin.student-snapshot.form')
 @endsection
 
 {{-- @push('scripts')

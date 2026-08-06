@@ -1,10 +1,16 @@
 import "./bootstrap";
 import "flowbite";
 import Alpine from "alpinejs";
-import listTable from "./utilities/global";
+import { listTable } from "./utilities/global";
+import { resourceForm } from "./utilities/form";
+import { datepicker } from "./utilities/datepicker";
+import { dropdown } from "./utilities/dropdown";
 
 document.addEventListener("alpine:init", () => {
     Alpine.data("listTable", listTable);
+    Alpine.data("resourceForm", resourceForm);
+    Alpine.data("datepicker", datepicker);
+    Alpine.data("dropdown", dropdown);
 });
 
 if (!window.Alpine) {
