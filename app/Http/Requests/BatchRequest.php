@@ -1,31 +1,14 @@
 <?php
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
-
-class BatchRequest extends FormRequest
+class BatchRequest extends IRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
+    protected function formData(): array
     {
-        return true;
-    }
-
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
-    public function rules(): array
-    {
-        return [
-             ...DEFAULT_VALIDATE,
-            ...check_unique('shortcut', 'batches'),
-            'academic_year' => 'nullable|string',
-        ];
+        return array_merge(
+            DEFAULT_VALIDATE,
+            check_unique('shortcut', 'batches'),
+            ['academic_year' => 'nullable|string']
+        );
     }
 }

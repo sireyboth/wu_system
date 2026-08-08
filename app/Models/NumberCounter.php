@@ -1,9 +1,7 @@
 <?php
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class NumberCounter extends Model
+class NumberCounter extends IModel
 {
     /**
      * The attributes that are mass assignable.

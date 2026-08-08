@@ -43,6 +43,7 @@ class StudentSeeder extends Seeder
                 'entrance_exam'  => $faker->randomElement($status_exam),
                 'exit_exam'      => $faker->randomElement($status_exam),
                 'degree_type'    => $faker->randomElement(['associate', 'bachelor', 'master', 'phd']),
+                'payment_as'     => $faker->randomElement(['none', 'yearly', 'semester']),
                 'from_school'    => $faker->company(),
                 'intake'         => $faker->randomElement(['primary', 'secondary']),
                 'scholarship'    => $faker->randomElement(['none', 'ministry', 'prince', 'school']),

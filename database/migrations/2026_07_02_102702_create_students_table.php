@@ -25,12 +25,14 @@ return new class extends Migration
             $table->string('code', 50)->nullable()->unique();
             $table->string('from_school', 100)->nullable();
             $table->date('admission_date')->nullable();
-            $table->enum('degree_type', $degree)->default($degree[1]);
+            $table->unsignedTinyInteger('year_level')->default(1);
+            $table->string('degree_type', 50)->default('associate');
             $table->string('bacc_2_code', 50)->nullable()->unique();
-            $table->enum('intake', ['primary', 'secondary'])->default('primary');
-            $table->enum('scholarship', ['none', 'ministry', 'prince', 'school'])->default('none');
-            $table->enum('entrance_exam', $status_exam)->default($status_exam[0]);
-            $table->enum('exit_exam', $status_exam)->default($status_exam[0]);
+            $table->string('intake', 50)->default('primary');
+            $table->string('payment_as', 50)->default('none');
+            $table->string('scholarship', 50)->default('none');
+            $table->string('entrance_exam', 50)->default('none');
+            $table->string('exit_exam', 50)->default('none');
         }, false);
     }
 

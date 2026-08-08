@@ -1,25 +1,16 @@
 <?php
-
 namespace App\Http\Resources;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-
-class CommuneResource extends JsonResource
+class CommuneResource extends IResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(Request $request): array
+    public function toList(): array
     {
         return [
-            'id'      => $this->id,
-            'district_id'      => $this->district_id,
-            'name'    => $this->name,
-            'name_en' => $this->name_en,
-            'name_kh' => $this->name_kh,
+            'id'          => $this->id,
+            'district_id' => $this->district_id,
+            'name'        => $this->name,
+            'name_en'     => $this->name_en,
+            'name_kh'     => $this->name_kh,
         ];
     }
 }

@@ -3,7 +3,6 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
@@ -12,61 +11,65 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 if (! function_exists('make_fields')) {
-    function make_fields(string $name, callable $fn, bool $is_common = true, bool $is_defualt = true): void
-    {
-        Schema::create($name, function (Blueprint $table) use ($fn, $is_common, $is_defualt) {
-            fields($table, fn() => $fn($table), $is_common, $is_defualt);
+    function make_fields(string $table_name,
+        ? callable $fn = null,
+        bool $is_common = true,
+    ) : void {
+        Schema::create($table_name, function (Blueprint $table) use ($fn, $is_common) {
+            fields($table, fn() => $fn($table), $is_common);
         });
     }
 }
 
 if (! function_exists('fields')) {
-    function fields(Blueprint $table, callable $fn, bool $is_common = false, bool $is_defualt = false): void
-    {
+    function fields(Blueprint $table,
+        ? callable $fn = null,
+        bool $is_common = false,
+    ) : void {
         $table->id();
         if ($is_common) {
-            $table->string('name_kh', 100);
             $table->string('name_en', 100);
-            $table->string('name', 255)->nullable();
+            $table->string('name_kh', 100);
+            // $table->string('name', 255)->nullable();
         }
 
-        $fn();
-
-        if ($is_defualt) {
-            $table->text('remark')->nullable();
-            $table->timestamps();
-            $table->softDeletes();
-        } else {
-            $table->timestamps();
-        }
+        $fn($table);
+        $table->text('remark')->nullable();
+        $table->timestamps();
+        $table->softDeletes();
 
     }
 }
 
 if (! function_exists('to_list')) {
-    function to_list(mixed $self, array $fields = [], bool $named = true): array
+    function to_list(object $self, array $fields = [], bool $is_common = true, $is_extra = true): array
     {
-        $data = [
-            'id' => $self->id,
-            ...$fields,
-        ];
-
-        if ($named) {
+        $data = array_merge(['id' => $self->id], $fields);
+        if ($is_common) {
             $data['name']    = $self->name;
             $data['name_kh'] = $self->name_kh;
             $data['name_en'] = $self->name_en;
         }
 
-        $data['remark']     = $self->remark ?? null;
-        $data['created_at'] = $self->created_at?->format('Y-m-d H:i:s');
-        $data['updated_at'] = $self->updated_at?->format('Y-m-d H:i:s');
+        if ($is_extra) {
+            $data['remark']     = $self->remark ?? null;
+            $data['created_at'] = $self->created_at?->format('Y-m-d H:i:s');
+            $data['updated_at'] = $self->updated_at?->format('Y-m-d H:i:s');
+        }
 
         return $data;
     }
 }
 
 if (! function_exists('to_name')) {
-    function to_name(mixed $object): string
+    function to_name(object $object): string
+    {
+        return "{$object->name_kh} ({$object->name_en})";
+    }
+}
+
+if (! function_exists('dated_format')) {
+    function dated_format(object $object): string
     {
         return "{$object->name_kh} ({$object->name_en})";
     }
@@ -134,7 +137,7 @@ if (! function_exists('api_routes')) {
         Route::apiResources($resources);
 
         foreach ($resources as $slug => $controller) {
-            $parameter = Str::singular($slug);
+            $parameter = str_replace('-', '_', Str::singular($slug));
 
             // Trash
             Route::patch("{$slug}/{{$parameter}}/trash", [$controller, 'trash'])
@@ -148,7 +151,7 @@ if (! function_exists('api_routes')) {
 
             // Force Delete
             Route::delete("{$slug}/{{$parameter}}/clear", [$controller, 'force_destroy'])
-                ->name("{$slug}.force-destroy");
+                ->name("{$slug}.remove");
         }
     }
 }
@@ -164,61 +167,62 @@ if (! function_exists('web_routes')) {
 }
 
 if (! function_exists('set_data')) {
-    function set_data(string $name, array $fields = [], bool $named = true, bool $increment = true): void
+    function set_data(string $filename, array $keys = [], bool $is_common = true): void
     {
-        $path = database_path("/data/{$name}.json");
-        $rows = json_decode(file_get_contents($path), true);
+        $records = get_data($filename);
+        $now     = now();
+        $data    = array_map(function ($row) use ($now, $keys, $is_common) {
+            $item = $is_common
+                ? [
+                'id'      => $row['id'] ?? null,
+                'name_en' => $row['name_en'] ?? null,
+                'name_kh' => $row['name_kh'] ?? null,
+                // 'name'    => trim(($row['name_kh'] ?? '') . ' (' . ($row['name_en'] ?? '') . ')', ' ()'),
+            ]
+                : [];
 
-        $now  = Carbon::now();
-        $data = array_map(function ($row) use ($now, $fields, $named, $increment) {
-            $name_en = $row['name_en'];
-            $name_kh = $row['name_kh'];
-            $list    = [];
-
-            if ($named) {
-                $list = [
-                     ...$list,
-                    'name_en' => $name_en,
-                    'name_kh' => $name_kh,
-                    'name'    => "{$name_kh} ({$name_en})",
-                ];
+            foreach ($keys as $key) {
+                $item[$key] = $row[$key] ?? null;
             }
 
-            if (! $increment) {
-                $list = [
-                     ...$list,
-                    'id' => $row['id'],
-                ];
-            }
-
-            $item = [
-                 ...$list,
-                'created_at' => $now,
-                'updated_at' => $now,
-            ];
-
-            foreach ($fields as $field) {
-                $item[$field] = $row[$field] ?? null;
-            }
+            $item['created_at'] = $now;
+            $item['updated_at'] = $now;
 
             return $item;
-        }, $rows);
+        }, $records);
 
         foreach (array_chunk($data, 500) as $chunk) {
-            DB::table($name)->insertOrIgnore($chunk);
+            DB::table($filename)->insertOrIgnore($chunk);
         }
     }
 }
 
-if (! function_exists('set_records')) {
-    function set_records(string $name, callable $fn, bool $a = true): void
+if (! function_exists('get_data')) {
+    function get_data(string $filename): array
     {
-        $path    = database_path("/data/{$name}.json");
-        $records = json_decode(file_get_contents($path), true);
-        $now     = Carbon::now();
+        $path = database_path("data/{$filename}.json");
 
-        foreach ($records as $data) {
-            $a ? $fn($data) : execute(fn() => $fn($data, $now));
+        if (! file_exists($path)) {
+            throw new \RuntimeException("Seed file not found: {$filename}.json");
+        }
+
+        $rows = json_decode(file_get_contents($path), true);
+
+        if (! is_array($rows)) {
+            throw new \RuntimeException("Invalid JSON in seed file: {$filename}.json");
+        }
+
+        return $rows;
+    }
+}
+
+if (! function_exists('set_records')) {
+    function set_records(string $filename, callable $fn, bool $single = true): void
+    {
+        $records = get_data($filename);
+        foreach ($records as $record) {
+            $now = now();
+            $single ? $fn($record, $now) : execute(fn() => $fn($record, $now));
         }
     }
 }
@@ -239,26 +243,100 @@ if (! function_exists('initials')) {
 }
 
 if (! function_exists('check_unique')) {
-    function check_unique(string $name, string $table_name): array
-    {
+    function check_unique(
+        string $table_name,
+        string $key = 'shortcut',
+        bool $required = false,
+        int $max = 50,
+        string $type = 'string',
+        ?string $route_param = null,
+    ): array {
         return [
-            $name => [
-                'nullable',
-                'string',
-                'max:50',
-                Rule::unique($table_name, $name)
-                    ->ignore(request()->route(Str::singular($table_name)))
+            $key => [
+                $required ? 'required' : 'nullable',
+                $type,
+                "max:{$max}",
+                Rule::unique($table_name, $key)
+                    ->ignore(request()
+                            ->route($route_param ?? Str::singular($table_name)))
                     ->withoutTrashed(),
             ],
         ];
     }
 }
 
-if (! function_exists('check_exist')) {
-    function check_exist(string $name, string $table_name): array
+function check_exist(
+    string $key,
+    string $table_name,
+    string $column = 'id',
+    bool $required = true,
+    bool $numeric = true
+): array {
+    $rules = array_filter([
+        $required ? 'required' : 'nullable',
+        $numeric ? 'integer' : null,
+        "exists:{$table_name},{$column}",
+    ]);
+
+    return [$key => implode('|', $rules)];
+}
+
+if (! function_exists('check_exist_many')) {
+    function check_exist_many(array $map, bool $required = true): array
     {
+        return collect($map)
+            ->mapWithKeys(fn($table, $name) => check_exist($name, $table, required: $required))
+            ->all();
+    }
+}
+
+if (! function_exists('grouped')) {
+    function grouped(mixed $data, array $keys = []): array
+    {
+        return collect($keys)->map(fn($key) => data_get($data, $key, ''))->all();
+    }
+}
+
+if (! function_exists('imploded')) {
+    function imploded(mixed $data, ?string $key = null, string $symbol = '|'): string
+    {
+        $items = collect($data)
+            ->map(fn($item) => $key ? data_get($item, $key) : $item)
+            ->filter(fn($item) => filled($item))
+            ->all();
+
+        return implode(" {$symbol} ", $items);
+    }
+}
+
+if (! function_exists('split_full_name')) {
+    /**
+     * Cambodian convention: first word = family/last name,
+     * everything after it = given/first name.
+     */
+    function split_full_name(?string $full_name): array
+    {
+        $name = trim((string) $full_name);
+        if ($name === '') {
+            return ['first_name' => null, 'last_name' => null];
+        }
+
+        // limit=2 so "last_name" swallows every remaining word,
+        // not just the second one
+        $parts = preg_split('/\s+/u', $name, 2);
+
         return [
-            $name => "required|exists:{$table_name},id|integer",
+            'last_name'  => $parts[0] ?? null,
+            'first_name' => $parts[1] ?? null,
         ];
+    }
+}
+
+if (! function_exists('join_full_name')) {
+    function join_full_name(?string $first_name, ?string $last_name): ?string
+    {
+        $joined = collect([$last_name, $first_name])->filter()->implode(' ');
+
+        return $joined === '' ? null : $joined;
     }
 }

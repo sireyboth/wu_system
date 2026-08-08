@@ -16,27 +16,8 @@ class CertificateController extends Controller
         $this->name          = 'Certificate';
         $this->model         = Certificate::class;
         $this->resource      = CertificateResource::class;
-        $this->relationships = array_map(
-            fn($r) => "student.$r",
-            [
-                'person',
-                'batch',
-                'major',
-                'shift',
-                'major.faculty',
-                'group',
-                'status',
-                'guardians',
-                ...array_map(fn($r) => "person.{$r}", [
-                    'nationality',
-                    'addresses',
-                    'addresses.province',
-                    'addresses.district',
-                    'addresses.commune',
-                    'addresses.village',
-                ]),
-            ]
-        );
+        $this->relationships = $this->withStudent();
+
     }
 
     /**
@@ -44,17 +25,9 @@ class CertificateController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Certificate::query();
-        if ($request->filled('type')) {
-            $request->type === 'provisional'
+        return $this->list($request, fn($query) => $request->type === Certificate::PROVISIONAL
                 ? $query->provisional()
-                : $query->status();
-        }
-        $query->search($request->search)
-            ->with($this->relationships)
-            ->orderByDesc('created_at')->paginate(10);
-
-        return $this->resource::collection($query->latest()->paginate(20));
+                : $query->status());
     }
 
     /**
@@ -111,20 +84,6 @@ class CertificateController extends Controller
     public function force_destroy(Certificate $certificate)
     {
         return $this->clear($certificate);
-    }
-
-    public function report()
-    {
-        $counts = Certificate::selectRaw('status, count(*) as total')
-            ->groupBy('status')
-            ->pluck('total', 'status');
-
-        return response()->json([
-            'total'   => (int) $counts->sum(),
-            'pending' => (int) ($counts['pending'] ?? 0),
-            'printed' => (int) ($counts['printed'] ?? 0),
-            'other'   => (int) $counts->except(['pending', 'printed'])->sum(),
-        ]);
     }
 
     public function preview(Request $request)

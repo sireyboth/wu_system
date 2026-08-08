@@ -1,9 +1,7 @@
 <?php
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class Commune extends Model
+class Commune extends IModel
 {
     /**
      * The attributes that are mass assignable.

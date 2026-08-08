@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Maatwebsite\Excel\Facades\Excel;
 
 abstract class Controller
 {
@@ -21,41 +23,33 @@ abstract class Controller
         return no_data("{$this->name} {$message} with ID: {$id}", 404);
     }
 
-    protected function list(Request $request)
+    protected function list(Request $request,  ? callable $fn = null)
     {
-        $per_page = $request->integer('per_page', 10);
-        // $response = $this->model::query()
-        //     ->when($request->filled('search'), fn($q) => $q->search($request->search))
-        //     ->when($request->filled('with'), fn($q) => $q->with(explode(',', $request->with)))
-        //     ->orderByDesc('created_at')
-        //     ->paginate($per_page);
-        $response = $this->model::query()->search($request->search)
-            ->with($this->relationships)->orderByDesc('created_at')->paginate($per_page);
-        $this->related($response);
+        $limit    = $request->integer('per_page', 10);
+        $response = $this->model::query();
+        if ($fn) {
+            $response = $fn($response);
+        }
+        $response = $response->search($request->search)->with($this->relationships);
 
-        return $this->resource::collection($response);
+        return $this->resource::collection($response->latest()->paginate($limit));
     }
 
     protected function save(FormRequest $request, ?array $columns = [])
     {
-        $response = $this->model::create([ ...$request->validated(), ...$columns]);
-        $this->related($response);
-
-        return new $this->resource($response->fresh()->load($this->relationships));
+        $response = ($this->model)::create(array_merge($request->validated(), $columns));
+        return new $this->resource($this->reload($response));
     }
 
     protected function view(Model $response)
     {
-        $this->related($response);
-        return new $this->resource($response->fresh()->load($this->relationships));
+        return new $this->resource($this->reload($response));
     }
 
     protected function release(FormRequest $request, Model $response, ?array $columns = [])
     {
-        $response->update([ ...$request->validated(), ...$columns]);
-        $this->related($response);
-
-        return new $this->resource($response->fresh()->load($this->relationships));
+        $response->update(array_merge($request->validated(), $columns));
+        return new $this->resource($this->reload($response));
     }
 
     protected function disable(Model $response)
@@ -67,9 +61,7 @@ abstract class Controller
     protected function enable(Model $response)
     {
         $response->restore();
-        $this->related($response);
-
-        return new $this->resource($response->fresh()->load($this->relationships));
+        return new $this->resource($this->reload($response));
     }
 
     protected function clear(Model $response)
@@ -78,8 +70,39 @@ abstract class Controller
         return has_data(null, 'Permanently deleted.');
     }
 
-    private function related(mixed $data)
+    protected function reload(object $data)
     {
-        return $this->relationships ? $data->load($this->relationships) : [];
+        return $data->fresh()->load($this->relationships ?? []);
+    }
+
+    protected function export(object $data, string $file_name = 'student')
+    {
+        $time = now()->format('Y_m_d_His');
+        return Excel::download($data, "{$file_name}_{$time}.xlsx");
+    }
+
+    protected function import(object $data, UploadedFile $file) : array
+    {
+        Excel::import($data, $file);
+        return [
+            'imported' => true,
+            'failures' => $data->failures(), // rows that failed validation
+        ];
+    }
+
+    protected function withStudent(string $key = 'student')
+    {
+        return array_map(fn($s) => "{$key}.{$s}",
+            array_merge(['person', 'guardians'], $this->withPerson())
+        );
+    }
+
+    protected function withPerson(string $key = 'person', string $otherKey = 'addresses')
+    {
+        return array_map(fn($p) => "{$key}.{$p}",
+            array_merge(['nationality', 'addresses'],
+                array_map(fn($a) => "{$otherKey}.$a", ['province', 'district', 'commune', 'village'])
+            )
+        );
     }
 }

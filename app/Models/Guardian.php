@@ -1,8 +1,6 @@
 <?php
 namespace App\Models;
 
-use App\Helpers\IModel;
-
 class Guardian extends IModel
 {
     /**
@@ -12,7 +10,7 @@ class Guardian extends IModel
      */
     protected $fillable = [
          ...DEFAULT_FIELD,
-         'student_id',
+        'student_id',
         'phones',
         'addresses',
         'job',
