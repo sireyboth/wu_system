@@ -1,17 +1,9 @@
 <?php
 namespace App\Http\Resources;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-
-class StudentResource extends JsonResource
+class StudentResource extends IResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(Request $request): array
+    public function toList(): array
     {
         return to_list($this, [
             'code'           => $this->code,
@@ -19,6 +11,8 @@ class StudentResource extends JsonResource
             'entrance_exam'  => $this->entrance_exam,
             'exit_exam'      => $this->exit_exam,
             'degree_type'    => $this->degree_type,
+            'payment_as'     => $this->payment_as,
+            'year_level'     => $this->year_level,
             'from_school'    => $this->from_school,
             'intake'         => $this->intake,
             'scholarship'    => $this->scholarship,

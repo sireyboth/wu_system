@@ -1,9 +1,7 @@
 <?php
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class Nationality extends Model
+class Nationality extends IModel
 {
     /**
      * The attributes that are mass assignable.

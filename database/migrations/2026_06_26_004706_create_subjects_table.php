@@ -14,8 +14,8 @@ return new class extends Migration
         make_fields('subjects', function (Blueprint $table) {
             $table->foreignId('major_id')->constrained()->cascadeOnDelete();
             $table->string('code', 50)->unique()->nullable();
-            $table->enum('year_level', [1, 2, 3, 4])->default(1);
-            $table->enum('semester', [1, 2])->default(1);
+            $table->unsignedTinyInteger('year_level')->default(1);
+            $table->unsignedTinyInteger('semester')->default(1);
             $table->integer('credit')->default(0);
         });
     }

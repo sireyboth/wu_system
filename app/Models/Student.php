@@ -1,10 +1,15 @@
 <?php
 namespace App\Models;
 
-use App\Helpers\IModel;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 
 class Student extends IModel
 {
+    protected string $keyName = 'payment_as';
+    public const NONE         = 'none';
+    public const YEARLY       = 'yearly';
+    public const SEMESTER     = 'semester';
+
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
@@ -18,6 +23,8 @@ class Student extends IModel
             'shift_id',
             'status_id',
             'code',
+            'payment_as',
+            'year_level',
             'from_school',
             'admission_date',
             'degree_type',
@@ -29,22 +36,14 @@ class Student extends IModel
             'remark',
         ];
 
-        $batch   = ['batch.name', 'batch.name_en', 'batch.name_kh', 'batch.shortcut', 'batch.academic_year', 'batch.remark'];
-        $major   = ['major.name', 'major.name_kh', 'major.name_en', 'major.shortcut'];
-        $faculty = ['major.faculty.name', 'major.faculty.name_kh', 'major.faculty.name_en', 'major.faculty.shortcut'];
-        $person  = ['person.first_name', 'person.last_name', 'person.first_name_kh', 'person.last_name_kh',
-            'person.dob', 'person.sex', 'person.email',
-        ];
-        $nationality = ['person.nationality.name', 'person.nationality.name_en', 'person.nationality.name_kh', 'person.nationality.code'];
-        $address     = ['person.addresses.type', 'person.addresses.street', 'person.addresses.house_no',
-            'person.addresses.province.name', 'person.addresses.province.name_en', 'person.addresses.province.name_en',
-            'person.addresses.district.name', 'person.addresses.district.name_en', 'person.addresses.district.name_en',
-            'person.addresses.commune.name', 'person.addresses.commune.name_en', 'person.addresses.commune.name_en',
-            'person.addresses.village.name', 'person.addresses.village.name_en', 'person.addresses.village.name_en',
-        ];
-
-        $this->searchable = array_merge($this->fillable, [
-             ...$batch, ...$faculty, ...$person, ...$major, ...$nationality, ...$address,
+        $this->searchable = array_map(fn($p) => "person.{$p}", [
+            'first_name',
+            'last_name',
+            'first_name_kh',
+            'last_name_kh',
+            'dob',
+            'sex',
+            'email',
         ]);
     }
 
@@ -101,5 +100,20 @@ class Student extends IModel
     public function statusCertificates()
     {
         return $this->certificates()->status();
+    }
+
+    public function scopeYearly(Builder $query)
+    {
+        return $this->getBy($query, self::YEARLY);
+    }
+
+    public function scopeSemester(Builder $query)
+    {
+        return $this->getBy($query, self::SEMESTER);
+    }
+
+    public function scopeNone(Builder $query)
+    {
+        return $this->getBy($query, self::NONE);
     }
 }

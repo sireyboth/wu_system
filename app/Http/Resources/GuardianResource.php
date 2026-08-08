@@ -1,24 +1,15 @@
 <?php
 namespace App\Http\Resources;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-
-class GuardianResource extends JsonResource
+class GuardianResource extends IResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(Request $request): array
+    public function toList(): array
     {
         return to_list($this, [
-            'job'   => $this->job,
+            'job'          => $this->job,
             'relationship' => $this->relationship,
             'phones'       => $this->phones ?? null,
             'addresses'    => $this->addresses ?? null,
         ]);
     }
 }
-

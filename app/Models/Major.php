@@ -1,8 +1,6 @@
 <?php
 namespace App\Models;
 
-use App\Helpers\IModel;
-
 class Major extends IModel
 {
     public function __construct(array $attributes = [])

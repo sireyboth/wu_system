@@ -15,7 +15,7 @@ class StudentController extends Controller
         $this->name          = 'Student';
         $this->model         = Student::class;
         $this->resource      = StudentResource::class;
-        $this->relationships = [
+        $this->relationships = array_merge([
             'person',
             'batch',
             'major',
@@ -24,15 +24,7 @@ class StudentController extends Controller
             'group',
             'status',
             'guardians',
-            ...array_map(fn($r) => "person.{$r}", [
-                'nationality',
-                'addresses',
-                'addresses.province',
-                'addresses.district',
-                'addresses.commune',
-                'addresses.village',
-            ]),
-        ];
+        ], $this->withPerson());
     }
 
     /**
@@ -40,7 +32,17 @@ class StudentController extends Controller
      */
     public function index(Request $request)
     {
-        return $this->list($request);
+        return $this->list($request, function ($query) use ($request) {
+            if ($request->payment === Student::YEARLY) {
+                return $query->yearly();
+            }
+
+            if ($request->payment === Student::SEMESTER) {
+                return $query->semester();
+            }
+
+            return $query->none();
+        });
     }
 
     /**

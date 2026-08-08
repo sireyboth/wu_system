@@ -1,8 +1,6 @@
 <?php
 namespace App\Models;
 
-use App\Helpers\IModel;
-
 class Faculty extends IModel
 {
 

@@ -1,32 +1,50 @@
 [
     {
-        "name_kh": "ជំនាន់ទី១",
-        "name_en": "Batch 1",
-        "shortcut": "B1",
+        "name_kh": "ជំនាន់ទី១៦",
+        "name_en": "Batch 16",
+        "shortcut": "B16",
+        "academic_year": "2018-19"
+    },
+    {
+        "name_kh": "ជំនាន់ទី១៧",
+        "name_en": "Batch 17",
+        "shortcut": "B17",
+        "academic_year": "2019-20"
+    },
+    {
+        "name_kh": "ជំនាន់ទី១៨",
+        "name_en": "Batch 18",
+        "shortcut": "B18",
+        "academic_year": "2020-21"
+    },
+    {
+        "name_kh": "ជំនាន់ទី១៩",
+        "name_en": "Batch 19",
+        "shortcut": "B19",
         "academic_year": "2021-22"
     },
     {
-        "name_kh": "ជំនាន់ទី២",
-        "name_en": "Batch 2",
-        "shortcut": "B2",
+        "name_kh": "ជំនាន់ទី២០",
+        "name_en": "Batch 20",
+        "shortcut": "B20",
         "academic_year": "2022-23"
     },
     {
-        "name_kh": "ជំនាន់ទី៣",
-        "name_en": "Batch 3",
-        "shortcut": "B3",
-        "academic_year": "20223-24"
+        "name_kh": "ជំនាន់ទី២១",
+        "name_en": "Batch 21",
+        "shortcut": "B21",
+        "academic_year": "2023-24"
     },
     {
-        "name_kh": "ជំនាន់ទី៤",
-        "name_en": "Batch 4",
-        "shortcut": "B4",
+        "name_kh": "ជំនាន់ទី២២",
+        "name_en": "Batch 22",
+        "shortcut": "B22",
         "academic_year": "2024-25"
     },
     {
-        "name_kh": "ជំនាន់ទី៥",
-        "name_en": "Batch 5",
-        "shortcut": "B6",
+        "name_kh": "ជំនាន់ទី២៣",
+        "name_en": "Batch 23",
+        "shortcut": "B23",
         "academic_year": "2025-26"
     }
 ]

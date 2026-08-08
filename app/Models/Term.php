@@ -1,7 +1,6 @@
 <?php
 namespace App\Models;
 
-use App\Helpers\IModel;
 use Illuminate\Database\Eloquent\Builder;
 
 class Term extends IModel

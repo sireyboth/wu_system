@@ -1,32 +1,19 @@
 <?php
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-
-class SubjectRequest extends FormRequest
+class SubjectRequest extends IRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
+    protected function formData(): array
     {
-        return true;
-    }
-
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
-    public function rules(): array
-    {
-        return [
-             ...DEFAULT_VALIDATE,
-            ...check_exist('major_id', 'majors'),
-            ...check_unique('code', 'subjects'),
-            'year_level' => 'nullable|string|max:50',
-            'semester'   => 'nullable|string|max:50',
-            'credit'     => 'nullable|integer',
-        ];
+        return array_merge(
+            DEFAULT_VALIDATE,
+            check_exist('major_id', 'majors'),
+            check_unique('code', 'subjects'),
+            [
+                'year_level' => 'nullable|string|max:50',
+                'semester'   => 'nullable|string|max:50',
+                'credit'     => 'nullable|integer',
+            ]
+        );
     }
 }

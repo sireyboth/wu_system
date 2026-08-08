@@ -1,10 +1,7 @@
 <?php
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-
-class District extends Model
+class District extends IModel
 {
     /**
      * The attributes that are mass assignable.

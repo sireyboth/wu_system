@@ -1,5 +1,5 @@
 <?php
-namespace App\Helpers;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,30 +12,16 @@ abstract class IModel extends Model
     use HasFactory, SoftDeletes;
 
     protected array $searchable = [];
+    protected string $keyName   = 'shortcut';
+    protected string $operator  = '=';
 
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
-
         if (empty($this->searchable) && ! empty($this->fillable)) {
             $this->searchable = $this->fillable;
         }
     }
-
-    // public function scopeSearch(Builder $query, ?string $keyword) : Builder
-    // {
-    //     if (! $keyword || empty($this->searchable)) {
-    //         return $query;
-    //     }
-
-    //     return $query->where(function (Builder $q) use ($keyword) {
-
-    //         foreach ($this->searchable as $column) {
-    //             $q->orWhere($column, 'LIKE', "%{$keyword}%");
-    //         }
-
-    //     });
-    // }
 
     public function scopeSearch(Builder $query, ?string $keyword): Builder
     {
@@ -63,23 +49,13 @@ abstract class IModel extends Model
         });
     }
 
-    // Auto combine when creating/updating
-    public function setNameKhAttribute(string $value)
+    public function getNameAttribute()
     {
-        $this->attributes['name_kh'] = $value;
-        $this->attributes['name']    = $this->combineName($value, $this->name_en ?? request('name_en'));
+        return to_name($this);
     }
 
-    public function setNameEnAttribute(string $value)
+    protected function getBy(Builder $query, mixed $value = null)
     {
-        $this->attributes['name_en'] = $value;
-        $this->attributes['name']    = $this->combineName($this->name_kh ?? request('name_kh'), $value);
-    }
-
-    private function combineName(?string $name_kh, ?string $name_en): string
-    {
-        return "{$name_kh} ({$name_en})";
+        return $query->where($this->keyName, $this->operator, $value);
     }
 }
-
-
