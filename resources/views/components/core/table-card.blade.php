@@ -23,7 +23,7 @@
     sort: {{ $sort ? "'{$sort}'" : 'null' }},
     direction: '{{ $direction }}',
     perPage: {{ $perPage }},
-})" class="bg-white dark:bg-gray-900 relative shadow-md sm:rounded-lg overflow-hidden">
+})" class="bg-white dark:bg-neutral-900 relative shadow-md sm:rounded-lg overflow-hidden">
     {{-- toolbar --}}
     <div class=" flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
         <div class="w-full md:w-1/2">
@@ -45,8 +45,8 @@
 
     {{-- table --}}
     <div class="overflow-x-auto">
-        <table class="min-w-full whitespace-nowrap text-sm text-left text-gray-500 dark:text-gray-400">
-            <thead class="text-sm text-gray-700 capitalize bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <table class="min-w-full whitespace-nowrap text-sm text-left text-neutral-500 dark:text-neutral-400">
+            <thead class="hidden md:table-header-group sticky top-0 z-20 text-xs text-neutral-700 uppercase bg-neutral-50 dark:bg-neutral-800/50 dark:text-neutral-300 backdrop-blur-md border-b border-neutral-200 dark:border-white/5">
                 <tr>
                     @if ($showIndex)
                         <x-core.table-header label="#" />
@@ -55,9 +55,9 @@
                     {{ $head }}
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-neutral-200 dark:divide-white/5">
                 <template x-for="(row, index) in rows" :key="row.id">
-                    <tr class="border-b dark:border-gray-700">
+                    <tr>
                         @if ($showIndex)
                             <x-core.table-data x-text="(meta.current_page - 1) * perPage + index + 1" />
                         @endif
@@ -67,7 +67,7 @@
                 </template>
 
                 <tr x-show="!loading && rows.length === 0" style="display: none;">
-                    <td colspan="100%" class="px-4 py-6 text-center text-gray-500 dark:text-gray-400">
+                    <td colspan="100%" class="px-4 py-6 text-center text-neutral-500 dark:text-neutral-400">
                         {{ $noData }}
                     </td>
                 </tr>
