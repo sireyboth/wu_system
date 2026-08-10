@@ -4,7 +4,7 @@
 
 <div class="text-center mb-14 fade-up">
     <!-- University logo — drop the real file at public/images/logo.png and this fills in automatically -->
-    <div class="mx-auto mb-5 flex items-center justify-center w-20 h-20 rounded-2xl bg-white/80 dark:bg-white/5 backdrop-blur-sm border border-neutral-200/80 dark:border-white/10 shadow-md p-2.5">
+    <div class="mx-auto mb-5 flex items-center justify-center w-40 h-40 rounded-2xl bg-white/80 dark:bg-white/5 backdrop-blur-sm border border-neutral-200/80 dark:border-white/10 shadow-md p-2.5">
         <img src="{{ asset('images/logo.png') }}" alt="Western University logo"
              class="w-full h-full object-contain"
              onerror="this.style.display='none'">
@@ -23,7 +23,7 @@
 
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
     @foreach ($rounds as $i => $label)
-        <a href="{{ route('stateExam.attendance.search', $i + 1) }}"
+        <a href="{{ route('state-exam.attendance.search', $i + 1) }}"
            style="animation-delay: {{ 120 + $i * 130 }}ms"
            class="fade-up group relative overflow-hidden p-8 text-center bg-white/80 dark:bg-neutral-900/70 backdrop-blur-sm border border-neutral-200/80 dark:border-white/10 rounded-3xl shadow-sm hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-indigo-400/60 dark:hover:border-indigo-500/40 hover:-translate-y-1.5 transition-all duration-500">
 

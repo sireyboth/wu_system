@@ -31,4 +31,12 @@ class StateExamController extends Controller
             'roundLabel' => $this->rounds[$round - 1],
         ]);
     }
+
+    /**
+     * Admin-only attendance report page (charts + KPIs). No modal — a full page.
+     */
+    public function report()
+    {
+        return view('stateExam.report.index');
+    }
 }

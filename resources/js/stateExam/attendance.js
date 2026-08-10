@@ -156,8 +156,8 @@ async function fetchRooms(search = '') {
     return Array.isArray(json.data) ? json.data : [];
 }
 
-async function loadRooms(search = '') {
-    els.list.innerHTML = skeletonRows();
+async function loadRooms(search = '', { silent = false } = {}) {
+    if (!silent) els.list.innerHTML = skeletonRows();
     currentRooms = await fetchRooms(search);
     renderList(currentRooms);
 }
@@ -294,3 +294,13 @@ document.addEventListener('keydown', (e) => {
 });
 
 loadRooms();
+
+// ---------- Auto-refresh ----------
+// Keep the list current for whoever's watching the screen, without disrupting
+// anyone actively entering a number in the modal.
+const AUTO_REFRESH_MS = 5 * 60 * 1000;
+
+setInterval(() => {
+    if (!els.modal.classList.contains('hidden')) return; // entry in progress — skip this tick
+    loadRooms(els.search?.value || '', { silent: true });
+}, AUTO_REFRESH_MS);

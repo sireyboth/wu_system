@@ -172,15 +172,142 @@
         </div>
     </header>
 
-    <main class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+    <main id="geoContent" class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-14 hidden">
         @yield('content')
     </main>
 
-    <footer class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 pb-10 text-center">
+    <footer id="geoFooter" class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 pb-10 text-center hidden">
         <p class="text-[11px] tracking-wide text-neutral-400 dark:text-neutral-600">
             &copy; {{ date('Y') }} Western University &middot; Official Exam Attendance Portal &middot; Authorized on-site staff use only
         </p>
     </footer>
+
+    <!-- Location gate — this page only unlocks on campus -->
+    <div id="geoGate" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-50 dark:bg-neutral-950">
+        <div class="w-full max-w-sm text-center">
+            <div id="geoIconChecking" class="mx-auto mb-5 flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                <svg class="w-7 h-7 animate-spin" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
+            </div>
+            <div id="geoIconBlocked" class="hidden mx-auto mb-5 flex items-center justify-center w-16 h-16 rounded-2xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                </svg>
+            </div>
+            <h2 id="geoTitle" class="text-lg font-bold text-neutral-900 dark:text-white">កំពុងផ្ទៀងផ្ទាត់ទីតាំង</h2>
+            <p id="geoMessage" class="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
+                កំពុងពិនិត្យមើលថាតើអ្នកកំពុងនៅលើបរិវេណសាកលវិទ្យាល័យ...<br>
+                <span class="text-xs">Verifying that you're on campus...</span>
+            </p>
+            <button id="geoRetryBtn" type="button" onclick="window.__geoCheck()"
+                class="hidden mt-5 inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-indigo-600 rounded-xl shadow-lg shadow-indigo-500/25 hover:bg-indigo-700 active:scale-95 transition-all">
+                ព្យាយាមម្តងទៀត (Try Again)
+            </button>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            // Western University Main Campus — https://maps.app.goo.gl/RmmQBV3c3v4PcBGZ8
+            var TARGET_LAT = 11.5715553;
+            var TARGET_LNG = 104.8892426;
+            var ALLOWED_RADIUS_METERS = 300;
+
+            var gate = document.getElementById('geoGate');
+            var content = document.getElementById('geoContent');
+            var footer = document.getElementById('geoFooter');
+            var iconChecking = document.getElementById('geoIconChecking');
+            var iconBlocked = document.getElementById('geoIconBlocked');
+            var title = document.getElementById('geoTitle');
+            var message = document.getElementById('geoMessage');
+            var retryBtn = document.getElementById('geoRetryBtn');
+
+            function showChecking() {
+                iconChecking.classList.remove('hidden');
+                iconBlocked.classList.add('hidden');
+                retryBtn.classList.add('hidden');
+                title.textContent = 'កំពុងផ្ទៀងផ្ទាត់ទីតាំង';
+                message.innerHTML = 'កំពុងពិនិត្យមើលថាតើអ្នកកំពុងនៅលើបរិវេណសាកលវិទ្យាល័យ...<br><span class="text-xs">Verifying that you\'re on campus...</span>';
+            }
+
+            function showBlocked(titleText, messageHtml) {
+                iconChecking.classList.add('hidden');
+                iconBlocked.classList.remove('hidden');
+                retryBtn.classList.remove('hidden');
+                title.textContent = titleText;
+                message.innerHTML = messageHtml;
+            }
+
+            function unlock() {
+                gate.classList.add('hidden');
+                content.classList.remove('hidden');
+                footer.classList.remove('hidden');
+            }
+
+            // Haversine distance in meters
+            function distanceMeters(lat1, lng1, lat2, lng2) {
+                var R = 6371000;
+                var dLat = (lat2 - lat1) * Math.PI / 180;
+                var dLng = (lng2 - lng1) * Math.PI / 180;
+                var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+                return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            }
+
+            window.__geoCheck = function () {
+                showChecking();
+
+                if (!('geolocation' in navigator)) {
+                    showBlocked(
+                        'មិនអាចផ្ទៀងផ្ទាត់ទីតាំងបានទេ',
+                        'កម្មវិធីរុករករបស់អ្នកមិនគាំទ្រការកំណត់ទីតាំងទេ។<br><span class="text-xs">Your browser doesn\'t support location services.</span>'
+                    );
+                    return;
+                }
+
+                navigator.geolocation.getCurrentPosition(
+                    function (position) {
+                        var dist = distanceMeters(
+                            position.coords.latitude,
+                            position.coords.longitude,
+                            TARGET_LAT,
+                            TARGET_LNG
+                        );
+
+                        if (dist <= ALLOWED_RADIUS_METERS) {
+                            unlock();
+                        } else {
+                            var km = (dist / 1000).toFixed(1);
+                            showBlocked(
+                                'ទំព័រនេះសម្រាប់តែបុគ្គលិកនៅបរិវេណប៉ុណ្ណោះ',
+                                'អ្នកនៅចម្ងាយប្រហែល ' + km + ' គីឡូម៉ែត្រ ពីសាកលវិទ្យាល័យវេស្ទើន។<br>' +
+                                '<span class="text-xs">This page is only available on the Western University campus. You are about ' + km + ' km away.</span>'
+                            );
+                        }
+                    },
+                    function (error) {
+                        if (error.code === error.PERMISSION_DENIED) {
+                            showBlocked(
+                                'ត្រូវការការអនុញ្ញាតទីតាំង',
+                                'សូមអនុញ្ញាតការចូលប្រើទីតាំង ដើម្បីបន្ត។<br><span class="text-xs">Please allow location access in your browser to continue.</span>'
+                            );
+                        } else {
+                            showBlocked(
+                                'មិនអាចទាញយកទីតាំងបានទេ',
+                                'សូមព្យាយាមម្តងទៀត។<br><span class="text-xs">Could not determine your location. Please try again.</span>'
+                            );
+                        }
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+                );
+            };
+
+            window.__geoCheck();
+        })();
+    </script>
 
     @stack('scripts')
 </body>

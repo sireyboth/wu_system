@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="mb-8 fade-up">
-    <a href="{{ route('stateExam.attendance.index') }}"
+    <a href="{{ route('state-exam.attendance.index') }}"
        class="group inline-flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-neutral-700 dark:text-neutral-200 bg-white/85 dark:bg-neutral-900/70 backdrop-blur-sm border border-neutral-200 dark:border-white/10 rounded-xl shadow-sm hover:shadow-md hover:border-indigo-400/60 dark:hover:border-indigo-500/40 hover:-translate-x-0.5 transition-all duration-300">
         <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
