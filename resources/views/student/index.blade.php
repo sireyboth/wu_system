@@ -63,7 +63,7 @@
             </div>
 
             <div
-                class="md:overflow-x-auto max-h-[600px] scrollbar-thin scrollbar-thumb-neutral-200 dark:scrollbar-thumb-white/10">
+                class="overflow-y-auto md:overflow-x-auto max-h-[600px] scrollbar-thin scrollbar-thumb-neutral-200 dark:scrollbar-thumb-white/10">
                 <table
                     class="w-full text-sm text-left text-neutral-500 dark:text-neutral-400 block md:table md:border-collapse">
                     <thead

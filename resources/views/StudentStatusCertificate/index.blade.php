@@ -90,7 +90,7 @@
             </div>
 
             <div
-                class="md:overflow-x-auto max-h-[600px]
+                class="overflow-y-auto md:overflow-x-auto max-h-[600px]
                         scrollbar-thin scrollbar-thumb-neutral-200 dark:scrollbar-thumb-white/10">
                 <table
                     class="block w-full text-sm text-left text-neutral-500 dark:text-neutral-400 md:table md:border-collapse">

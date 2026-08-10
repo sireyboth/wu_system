@@ -13,6 +13,9 @@ export function renderTable(dom, rooms) {
         return;
     }
 
+    dom.tableBody.className =
+        'grid grid-cols-1 gap-3 p-4 md:p-0 md:table-row-group md:gap-0 md:divide-y md:divide-neutral-200 md:dark:divide-white/5';
+
     dom.tableBody.innerHTML = rooms.map((room, index) => renderRow(room, index)).join('');
 }
 
