@@ -1,4 +1,6 @@
 <?php
+
+use App\Http\Controllers\Admin\ExamScheduleController;
 use App\Http\Controllers\BatchController;
 use App\Http\Controllers\CampusController;
 use App\Http\Controllers\DashboardController;
@@ -30,6 +32,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('student', StudentController::class)->only('index');
     Route::resource('StudentStatusCertificate', StudentStatusController::class)->only('index');
     Route::resource('app-status', StatusController::class)->only('index');
+
+    Route::get('/exam-schedule', ExamScheduleController::class)->name('exam.schedule');
 
     Route::resource('profile', ProfileController::class)->only(['edit', 'update', 'destroy']);
 });

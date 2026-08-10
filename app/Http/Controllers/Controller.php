@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Generic;
+use App\Models\ExamState;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
@@ -17,6 +18,7 @@ abstract class Controller
     protected string $model;
     protected string $resource;
     protected array|string $relationships = [];
+    protected array $rounds                 = ['ម៉ោងទី១', 'ម៉ោងទី២', 'ម៉ោងទី៣'];
 
     protected function not_found(string $id = '', string $message = 'not found'): JsonResponse
     {
@@ -104,5 +106,37 @@ abstract class Controller
                 array_map(fn($a) => "{$otherKey}.$a", ['province', 'district', 'commune', 'village'])
             )
         );
+    }
+
+    public function summarize(?string $from = null, ?string $to = null): array
+    {
+        $rooms = ExamState::query()
+            ->when($from, fn($q) => $q->whereDate('exam_date', '>=', $from))
+            ->when($to, fn($q) => $q->whereDate('exam_date', '<=', $to))
+            ->get(['majors', 'absences']);
+
+        $summary = array_fill(0, count($this->rounds), ['total' => 0, 'absent' => 0]);
+
+        foreach ($rooms as $room) {
+            foreach ($room->absences ?? [] as $index => $absence) {
+                $round = $index % count($this->rounds); // position tells you the round
+
+                $summary[$round]['absent'] += $absence['total'];
+
+                $major                     = collect($room->majors)->firstWhere('major', $absence['major']);
+                $summary[$round]['total'] += $major['total'] ?? 0;
+            }
+        }
+
+        return collect($summary)->map(function ($data, $i) {
+            $present = $data['total'] - $data['absent'];
+            return [
+                'label'   => $this->rounds[$i],
+                'total'   => $data['total'],
+                'present' => $present,
+                'absent'  => $data['absent'],
+                'percent' => $data['total'] > 0 ? round($present / $data['total'] * 100)  : 0,
+            ];
+        })->all();
     }
 }

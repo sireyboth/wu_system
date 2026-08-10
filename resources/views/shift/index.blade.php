@@ -10,7 +10,7 @@
             Overview of your application
         </p>
     </div>
-    
+
     <div class="space-y-4">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="relative w-full md:w-96 group">
@@ -57,7 +57,7 @@
             class="relative overflow-hidden bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-2xl shadow-sm transition-colors duration-300">
 
             <div id="loading-overlay"
-                class="hidden absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-neutral-900/50 backdrop-blur-[2px]">
+                class="absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-neutral-900/50 backdrop-blur-[2px]">
                 <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
             </div>
 
