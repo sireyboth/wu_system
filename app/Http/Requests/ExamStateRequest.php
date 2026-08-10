@@ -6,18 +6,39 @@ class ExamStateRequest extends IRequest
     protected function formData(): array
     {
         return [
-            'no'          => 'nullable|integer',
-            'floor_order' => 'nullable|integer',
-            'floor'       => 'nullable|string|max:50',
-            'room'        => 'required|string|max:50',
-            'shift'       => 'nullable|string|max:50',
-            'major'       => 'required|string|max:50',
-            'students'    => 'required|integer',
-            'degree'      => 'required|string|max:50',
-            'majors'      => 'nullable|array',
-            'sort_order'  => 'nullable|integer',
-            'exam_date'   => 'nullable|date',
-            'remark'      => 'nullable|string',
+            'no'            => 'nullable|integer',
+            'room'          => 'required|string|max:50',
+            'shift'         => 'nullable|string|max:50',
+            'major'         => 'required|string|max:100',
+            'student_total' => 'nullable|integer',
+            'degree'        => 'required|string|max:50',
+
+            'majors'        => 'nullable|array',
+            "majors.*"      => "nullable",
+
+            'absences'      => 'nullable|array',
+            'absences.*'    => 'nullable',
+
+            'exam_date'     => 'nullable|date',
+            'remark'        => 'nullable|string',
         ];
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $studentTotal = (int) $this->input('student_total', 0);
+
+            foreach ((array) $this->input('absences', []) as $index => $absence) {
+                $absentTotal = (int) ($absence['total'] ?? 0);
+
+                if ($absentTotal > $studentTotal) {
+                    $validator->errors()->add(
+                        "absences.$index.total",
+                        'ចំនួនអវត្តមានមិនអាចលើសពីចំនួននិស្សិតសរុបបានទេ។ (Absent count cannot exceed the student total.)'
+                    );
+                }
+            }
+        });
     }
 }

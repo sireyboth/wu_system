@@ -20,9 +20,9 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@system.me',
         ]);
         User::factory()->create([
-            'name'  => 'User Test',
-            'email' => 'test@gmail.com',
-            'password' => Hash::make('12345678')
+            'name'     => 'User Test',
+            'email'    => 'test@gmail.com',
+            'password' => Hash::make('12345678'),
         ]);
 
         $this->call([
@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
             StructureSeeder::class,
             TermSeeder::class,
             StudentSeeder::class,
+            ExamStateSeeder::class,
         ]);
     }
 }

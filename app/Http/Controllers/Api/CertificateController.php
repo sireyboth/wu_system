@@ -17,7 +17,6 @@ class CertificateController extends Controller
         $this->model         = Certificate::class;
         $this->resource      = CertificateResource::class;
         $this->relationships = $this->withStudent();
-
     }
 
     /**
@@ -95,5 +94,19 @@ class CertificateController extends Controller
         );
 
         return response()->json(['certificate_no' => $preview]);
+    }
+
+    public function report()
+    {
+        $counts = Certificate::selectRaw('status, count(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        return response()->json([
+            'total'   => (int) $counts->sum(),
+            'pending' => (int) ($counts['pending'] ?? 0),
+            'printed' => (int) ($counts['printed'] ?? 0),
+            'other'   => (int) $counts->except(['pending', 'printed'])->sum(),
+        ]);
     }
 }

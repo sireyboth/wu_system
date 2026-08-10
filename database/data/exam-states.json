@@ -1,0 +1,944 @@
+[
+    {
+        "no": 1,
+        "room": "104",
+        "major": "Law",
+        "student_total": 24,
+        "degree": "BA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "LAW",
+                "total": 21
+            },
+            {
+                "major": "PA",
+                "total": 1
+            },
+            {
+                "major": "PL",
+                "total": 2
+            }
+        ],
+        "absences": [
+            {
+                "major": "LAW",
+                "time": "08:00 AM",
+                "total": 0
+            },
+            {
+                "major": "PA",
+                "time": "10:00 AM",
+                "total": 0
+            },
+            {
+                "major": "PL",
+                "time": "01:00 PM",
+                "total": 2
+            }
+        ]
+    },
+    {
+        "no": 2,
+        "room": "105",
+        "major": "Law",
+        "student_total": 29,
+        "degree": "BA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "LAW",
+                "total": 23
+            },
+            {
+                "major": "PL",
+                "total": 6
+            }
+        ],
+        "absences": [
+            {
+                "major": "LAW",
+                "time": "08:00 AM",
+                "total": 2
+            },
+            {
+                "major": "PL",
+                "time": "10:00 AM",
+                "total": 1
+            }
+        ]
+    },
+    {
+        "no": 3,
+        "room": "106",
+        "major": "Law",
+        "student_total": 32,
+        "degree": "BA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "LAW",
+                "total": 27
+            },
+            {
+                "major": "PL",
+                "total": 5
+            }
+        ],
+        "absences": [
+            {
+                "major": "LAW",
+                "time": "08:00 AM",
+                "total": 1
+            },
+            {
+                "major": "PL",
+                "time": "10:00 AM",
+                "total": 1
+            }
+        ]
+    },
+    {
+        "no": 4,
+        "room": "201",
+        "major": "CS+CNT+DCA",
+        "student_total": 30,
+        "degree": "BA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "CS",
+                "total": 15
+            },
+            {
+                "major": "CNT",
+                "total": 6
+            },
+            {
+                "major": "DCA",
+                "total": 9
+            }
+        ],
+        "absences": [
+            {
+                "major": "CS",
+                "time": "08:00 AM",
+                "total": 0
+            },
+            {
+                "major": "CNT",
+                "time": "10:00 AM",
+                "total": 0
+            },
+            {
+                "major": "DCA",
+                "time": "01:00 PM",
+                "total": 3
+            }
+        ]
+    },
+    {
+        "no": 5,
+        "room": "202",
+        "major": "CS+CNT+DCA",
+        "student_total": 30,
+        "degree": "BA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "CS",
+                "total": 23
+            },
+            {
+                "major": "CNT",
+                "total": 7
+            }
+        ],
+        "absences": [
+            {
+                "major": "CS",
+                "time": "08:00 AM",
+                "total": 0
+            },
+            {
+                "major": "CNT",
+                "time": "10:00 AM",
+                "total": 0
+            }
+        ]
+    },
+    {
+        "no": 6,
+        "room": "203",
+        "major": "CS+CNT+DCA",
+        "student_total": 25,
+        "degree": "BA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "CS",
+                "total": 15
+            },
+            {
+                "major": "CNT",
+                "total": 5
+            },
+            {
+                "major": "DCA",
+                "total": 5
+            }
+        ],
+        "absences": [
+            {
+                "major": "CS",
+                "time": "08:00 AM",
+                "total": 0
+            },
+            {
+                "major": "CNT",
+                "time": "10:00 AM",
+                "total": 1
+            },
+            {
+                "major": "DCA",
+                "time": "01:00 PM",
+                "total": 1
+            }
+        ],
+        "remark": "Mix"
+    },
+    {
+        "no": 6,
+        "room": "203",
+        "major": "CIVIL",
+        "student_total": 3,
+        "degree": "BA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "CIVIL",
+                "total": 3
+            }
+        ],
+        "absences": [
+            {
+                "major": "CIVIL",
+                "time": "08:00 AM",
+                "total": 0
+            }
+        ],
+        "remark": "Mix"
+    },
+    {
+        "no": 7,
+        "room": "204",
+        "major": "CS+CNT+DCA",
+        "student_total": 32,
+        "degree": "AA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "CS",
+                "total": 12
+            },
+            {
+                "major": "CNT",
+                "total": 3
+            },
+            {
+                "major": "DCA",
+                "total": 15
+            },
+            {
+                "major": "DIM",
+                "total": 2
+            }
+        ],
+        "absences": [
+            {
+                "major": "CS",
+                "time": "08:00 AM",
+                "total": 1
+            },
+            {
+                "major": "CNT",
+                "time": "10:00 AM",
+                "total": 3
+            },
+            {
+                "major": "DCA",
+                "time": "01:00 PM",
+                "total": 1
+            },
+            {
+                "major": "DIM",
+                "time": "08:00 AM",
+                "total": 1
+            }
+        ]
+    },
+    {
+        "no": 8,
+        "room": "205",
+        "major": "CS+CNT+DCA",
+        "student_total": 32,
+        "degree": "AA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "CS",
+                "total": 11
+            },
+            {
+                "major": "CNT",
+                "total": 5
+            },
+            {
+                "major": "DCA",
+                "total": 13
+            },
+            {
+                "major": "DIM",
+                "total": 3
+            }
+        ],
+        "absences": [
+            {
+                "major": "CS",
+                "time": "08:00 AM",
+                "total": 2
+            },
+            {
+                "major": "CNT",
+                "time": "10:00 AM",
+                "total": 0
+            },
+            {
+                "major": "DCA",
+                "time": "01:00 PM",
+                "total": 1
+            },
+            {
+                "major": "DIM",
+                "time": "08:00 AM",
+                "total": 3
+            }
+        ]
+    },
+    {
+        "no": 9,
+        "room": "206",
+        "major": "CS+CNT+DCA",
+        "student_total": 32,
+        "degree": "AA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "CS",
+                "total": 14
+            },
+            {
+                "major": "CNT",
+                "total": 3
+            },
+            {
+                "major": "DCA",
+                "total": 15
+            }
+        ],
+        "absences": [
+            {
+                "major": "CS",
+                "time": "08:00 AM",
+                "total": 2
+            },
+            {
+                "major": "CNT",
+                "time": "10:00 AM",
+                "total": 2
+            },
+            {
+                "major": "DCA",
+                "time": "01:00 PM",
+                "total": 1
+            }
+        ]
+    },
+    {
+        "no": 10,
+        "room": "301",
+        "major": "TESOL, COMM",
+        "student_total": 32,
+        "degree": "BA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "TESOL",
+                "total": 16
+            },
+            {
+                "major": "COMM",
+                "total": 16
+            }
+        ],
+        "absences": [
+            {
+                "major": "TESOL",
+                "time": "08:00 AM",
+                "total": 1
+            },
+            {
+                "major": "COMM",
+                "time": "10:00 AM",
+                "total": 2
+            }
+        ]
+    },
+    {
+        "no": 11,
+        "room": "302",
+        "major": "TESOL, COMM",
+        "student_total": 32,
+        "degree": "BA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "TESOL",
+                "total": 15
+            },
+            {
+                "major": "COMM",
+                "total": 17
+            }
+        ],
+        "absences": [
+            {
+                "major": "TESOL",
+                "time": "08:00 AM",
+                "total": 0
+            },
+            {
+                "major": "COMM",
+                "time": "10:00 AM",
+                "total": 0
+            }
+        ]
+    },
+    {
+        "no": 12,
+        "room": "303",
+        "major": "TESOL, COMM",
+        "student_total": 32,
+        "degree": "BA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "TESOL",
+                "total": 16
+            },
+            {
+                "major": "COMM",
+                "total": 16
+            }
+        ],
+        "absences": [
+            {
+                "major": "TESOL",
+                "time": "08:00 AM",
+                "total": 3
+            },
+            {
+                "major": "COMM",
+                "time": "10:00 AM",
+                "total": 0
+            }
+        ]
+    },
+    {
+        "no": 13,
+        "room": "305",
+        "major": "TESOL, COMM",
+        "student_total": 32,
+        "degree": "BA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "TESOL",
+                "total": 15
+            },
+            {
+                "major": "COMM",
+                "total": 17
+            }
+        ],
+        "absences": [
+            {
+                "major": "TESOL",
+                "time": "08:00 AM",
+                "total": 2
+            },
+            {
+                "major": "COMM",
+                "time": "10:00 AM",
+                "total": 2
+            }
+        ]
+    },
+    {
+        "no": 14,
+        "room": "306",
+        "major": "TESOL, COMM",
+        "student_total": 32,
+        "degree": "BA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "TESOL",
+                "total": 18
+            },
+            {
+                "major": "COMM",
+                "total": 14
+            }
+        ],
+        "absences": [
+            {
+                "major": "TESOL",
+                "time": "08:00 AM",
+                "total": 2
+            },
+            {
+                "major": "COMM",
+                "time": "10:00 AM",
+                "total": 0
+            }
+        ]
+    },
+    {
+        "no": 15,
+        "room": "401",
+        "major": "MGT+MKT",
+        "student_total": 30,
+        "degree": "BA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "MGT",
+                "total": 19
+            },
+            {
+                "major": "MKT",
+                "total": 11
+            }
+        ],
+        "absences": [
+            {
+                "major": "MGT",
+                "time": "08:00 AM",
+                "total": 3
+            },
+            {
+                "major": "MKT",
+                "time": "10:00 AM",
+                "total": 0
+            }
+        ]
+    },
+    {
+        "no": 16,
+        "room": "402",
+        "major": "TESOL, COMM",
+        "student_total": 19,
+        "degree": "BA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "TESOL",
+                "total": 15
+            },
+            {
+                "major": "COMM",
+                "total": 4
+            }
+        ],
+        "absences": [
+            {
+                "major": "TESOL",
+                "time": "08:00 AM",
+                "total": 3
+            },
+            {
+                "major": "COMM",
+                "time": "10:00 AM",
+                "total": 0
+            }
+        ]
+    },
+    {
+        "no": 17,
+        "room": "403",
+        "major": "MGT+MKT",
+        "student_total": 19,
+        "degree": "BA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "MGT",
+                "total": 12
+            },
+            {
+                "major": "MKT",
+                "total": 7
+            }
+        ],
+        "absences": [
+            {
+                "major": "MGT",
+                "time": "08:00 AM",
+                "total": 2
+            },
+            {
+                "major": "MKT",
+                "time": "10:00 AM",
+                "total": 2
+            }
+        ]
+    },
+    {
+        "no": 18,
+        "room": "404",
+        "major": "MGT+MKT",
+        "student_total": 19,
+        "degree": "BA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "MGT",
+                "total": 13
+            },
+            {
+                "major": "MKT",
+                "total": 6
+            }
+        ],
+        "absences": [
+            {
+                "major": "MGT",
+                "time": "08:00 AM",
+                "total": 1
+            },
+            {
+                "major": "MKT",
+                "time": "10:00 AM",
+                "total": 0
+            }
+        ]
+    },
+    {
+        "no": 19,
+        "room": "405",
+        "major": "MGT+MKT",
+        "student_total": 35,
+        "degree": "BA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "MGT",
+                "total": 24
+            },
+            {
+                "major": "MKT",
+                "total": 11
+            }
+        ],
+        "absences": [
+            {
+                "major": "MGT",
+                "time": "08:00 AM",
+                "total": 0
+            },
+            {
+                "major": "MKT",
+                "time": "10:00 AM",
+                "total": 1
+            }
+        ]
+    },
+    {
+        "no": 20,
+        "room": "406",
+        "major": "MGT+MKT",
+        "student_total": 20,
+        "degree": "BA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "MGT",
+                "total": 13
+            },
+            {
+                "major": "MKT",
+                "total": 7
+            }
+        ],
+        "absences": [
+            {
+                "major": "MGT",
+                "time": "08:00 AM",
+                "total": 2
+            },
+            {
+                "major": "MKT",
+                "time": "10:00 AM",
+                "total": 0
+            }
+        ]
+    },
+    {
+        "no": 21,
+        "room": "407",
+        "major": "MGT+MKT",
+        "student_total": 20,
+        "degree": "BA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "MGT",
+                "total": 15
+            },
+            {
+                "major": "MKT",
+                "total": 5
+            }
+        ],
+        "absences": [
+            {
+                "major": "MGT",
+                "time": "08:00 AM",
+                "total": 1
+            },
+            {
+                "major": "MKT",
+                "time": "10:00 AM",
+                "total": 0
+            }
+        ]
+    },
+    {
+        "no": 22,
+        "room": "501",
+        "major": "Accounting",
+        "student_total": 37,
+        "degree": "AA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "ACC",
+                "total": 37
+            }
+        ],
+        "absences": [
+            {
+                "major": "ACC",
+                "time": "08:00 AM",
+                "total": 3
+            }
+        ],
+        "remark": "Mix"
+    },
+    {
+        "no": 22,
+        "room": "501",
+        "major": "CIVIL",
+        "student_total": 5,
+        "degree": "AA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "CIVIL",
+                "total": 5
+            }
+        ],
+        "absences": [
+            {
+                "major": "CIVIL",
+                "time": "08:00 AM",
+                "total": 2
+            }
+        ],
+        "remark": "Mix"
+    },
+    {
+        "no": 23,
+        "room": "502",
+        "major": "Banking",
+        "student_total": 17,
+        "degree": "AA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "BANK",
+                "total": 17
+            }
+        ],
+        "absences": [
+            {
+                "major": "BANK",
+                "time": "08:00 AM",
+                "total": 3
+            }
+        ]
+    },
+    {
+        "no": 24,
+        "room": "503",
+        "major": "CS+CNT+DCA",
+        "student_total": 15,
+        "degree": "AA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "CS",
+                "total": 7
+            },
+            {
+                "major": "CNT",
+                "total": 1
+            },
+            {
+                "major": "DCA",
+                "total": 7
+            }
+        ],
+        "absences": [
+            {
+                "major": "CS",
+                "time": "08:00 AM",
+                "total": 2
+            },
+            {
+                "major": "CNT",
+                "time": "10:00 AM",
+                "total": 0
+            },
+            {
+                "major": "DCA",
+                "time": "01:00 PM",
+                "total": 2
+            }
+        ],
+        "remark": "Mix"
+    },
+    {
+        "no": 24,
+        "room": "503",
+        "major": "Arch",
+        "student_total": 6,
+        "degree": "AA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "ARC",
+                "total": 6
+            }
+        ],
+        "absences": [
+            {
+                "major": "ARC",
+                "time": "08:00 AM",
+                "total": 2
+            }
+        ],
+        "remark": "Mix"
+    },
+    {
+        "no": 25,
+        "room": "504",
+        "major": "TESOL, COMM",
+        "student_total": 25,
+        "degree": "AA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "TESOL",
+                "total": 12
+            },
+            {
+                "major": "COMM",
+                "total": 13
+            }
+        ],
+        "absences": [
+            {
+                "major": "TESOL",
+                "time": "08:00 AM",
+                "total": 1
+            },
+            {
+                "major": "COMM",
+                "time": "10:00 AM",
+                "total": 2
+            }
+        ]
+    },
+    {
+        "no": 26,
+        "room": "Hall 505",
+        "major": "MGT+MKT",
+        "student_total": 46,
+        "degree": "AA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "MGT",
+                "total": 22
+            },
+            {
+                "major": "MKT",
+                "total": 24
+            }
+        ],
+        "absences": [
+            {
+                "major": "MGT",
+                "time": "08:00 AM",
+                "total": 0
+            },
+            {
+                "major": "MKT",
+                "time": "10:00 AM",
+                "total": 1
+            }
+        ]
+    },
+    {
+        "no": 27,
+        "room": "506",
+        "major": "MGT+MKT",
+        "student_total": 24,
+        "degree": "AA",
+        "shift": "Morning",
+        "majors": [
+            {
+                "major": "MGT",
+                "total": 12
+            },
+            {
+                "major": "MKT",
+                "total": 12
+            }
+        ],
+        "absences": [
+            {
+                "major": "MGT",
+                "time": "08:00 AM",
+                "total": 1
+            },
+            {
+                "major": "MKT",
+                "time": "10:00 AM",
+                "total": 1
+            }
+        ]
+    }
+]
