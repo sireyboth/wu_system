@@ -33,7 +33,10 @@ export function buildDom() {
         modal: document.getElementById('stateExamModal'),
         modalCard: document.getElementById('modalCard'),
         modalTitle: document.getElementById('modalTitle'),
-        submitBtn: document.getElementById('stateExamForm')?.querySelector('button[type="submit"]'),
+        // Submit button lives outside <form id="stateExamForm"> now (in the fixed
+        // footer) and is wired to it via the HTML `form` attribute, so the form
+        // body can scroll independently while the footer stays pinned.
+        submitBtn: document.querySelector('button[type="submit"][form="stateExamForm"]'),
     };
 }
 

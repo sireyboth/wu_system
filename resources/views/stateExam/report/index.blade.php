@@ -1,4 +1,5 @@
 @extends('layouts.dashboard')
+@section('title', 'Attendance Report')
 @section('content')
 
 <div class="mb-8 flex items-center justify-between flex-wrap gap-4">

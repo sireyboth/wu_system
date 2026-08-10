@@ -24,6 +24,43 @@
             padding-left: 2rem;
         }
     }
+
+    /* Sidebar scrollbar — thin, rounded, brand-tinted, fades into the sidebar
+       background so it feels native to the UI instead of an OS-default bar. */
+    .custom-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(99, 102, 241, 0.3) transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: rgba(99, 102, 241, 0.3);
+        border-radius: 9999px;
+        transition: background-color 0.2s ease;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(99, 102, 241, 0.6);
+    }
+
+    html.dark .custom-scrollbar {
+        scrollbar-color: rgba(165, 180, 252, 0.25) transparent;
+    }
+
+    html.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: rgba(165, 180, 252, 0.25);
+    }
+
+    html.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(165, 180, 252, 0.5);
+    }
 </style>
 
 <header id="mobile-top-bar"

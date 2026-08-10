@@ -1,15 +1,8 @@
 @extends('layouts.dashboard')
+@section('title', 'Provisional Certificates')
 
 @section('content')
-    {{-- Page Header --}}
-    <div class="mb-8">
-        <h1 class="text-2xl font-bold text-neutral-900 dark:text-white">
-            សូមស្វាគមន៍មកកាន់ទំព័រ <span class="text-indigo-700">គ្រប់គ្រងសញ្ញាបត្របណ្ដោះអាសន្ន</span>
-        </h1>
-        <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-            Overview of your application
-        </p>
-    </div>
+    <x-core.page-header title="គ្រប់គ្រងសញ្ញាបត្របណ្ដោះអាសន្ន" />
 
     <div class="space-y-4">
 
