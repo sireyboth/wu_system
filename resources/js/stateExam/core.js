@@ -14,6 +14,7 @@ export const state = {
     editingId: null,
     debounceTimer: null,
     searchAbortController: null, // used by api-service to cancel stale searches
+    showingTrash: false,
 };
 
 /**

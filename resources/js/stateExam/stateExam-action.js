@@ -64,6 +64,22 @@ export async function handleDeleteAction(dom, ApiService, id) {
 }
 
 /**
+ * Restores a soft-deleted exam room (Trash view).
+ */
+export async function handleRestoreAction(dom, ApiService, id) {
+    const { error } = await ApiService.request(`${CONFIG.API_BASE}/${id}/restore`, {
+        method: 'PATCH',
+    });
+
+    if (!error) {
+        Toast.fire({ icon: 'success', title: 'ស្ដារទិន្នន័យបានជោគជ័យ! (Restored!)' });
+        loadStateExam(dom, ApiService, dom.searchInput?.value || '');
+    } else {
+        Toast.fire({ icon: 'error', title: 'មិនអាចស្ដារទិន្នន័យបានទេ' });
+    }
+}
+
+/**
  * Validates and submits the create/edit form.
  */
 export async function handleFormSubmit(dom, ApiService, e) {

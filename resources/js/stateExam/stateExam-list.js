@@ -1,16 +1,20 @@
 import { CONFIG } from './config.js';
 import { state, Toast } from './core.js';
 import { renderTable } from './table-render.js';
+import { resetBulkSelection } from './stateExam-bulk.js';
+import { renderPagination } from './stateExam-pagination.js';
 
 /**
  * Loads the exam-state (exam room) list, optionally filtered by search,
- * and renders it into the table.
+ * and renders it into the table. Pass state.showingTrash = true to list
+ * soft-deleted rooms instead (rendered with a Restore button).
  */
-export async function loadStateExam(dom, ApiService, searchQuery = '') {
+export async function loadStateExam(dom, ApiService, searchQuery = '', page = 1) {
     state.searchAbortController?.abort();
     state.searchAbortController = new AbortController();
 
-    const url = `${CONFIG.API_BASE}?search=${encodeURIComponent(searchQuery)}`;
+    const trashedParam = state.showingTrash ? '&trashed=1' : '';
+    const url = `${CONFIG.API_BASE}?search=${encodeURIComponent(searchQuery)}${trashedParam}&page=${page}`;
     const { error, aborted, data } = await ApiService.request(url, {
         signal: state.searchAbortController.signal,
     });
@@ -27,5 +31,7 @@ export async function loadStateExam(dom, ApiService, searchQuery = '') {
             ? data
             : [];
 
-    renderTable(dom, records);
+    renderTable(dom, records, state.showingTrash);
+    resetBulkSelection(dom);
+    renderPagination(data?.meta);
 }

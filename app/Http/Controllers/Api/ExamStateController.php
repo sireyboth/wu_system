@@ -21,7 +21,7 @@ class ExamStateController extends Controller
      */
     public function index(Request $request)
     {
-        return $this->list($request);
+        return $this->list($request, fn($query) => $request->boolean('trashed') ? $query->onlyTrashed() : $query);
     }
 
     /**
@@ -70,6 +70,22 @@ class ExamStateController extends Controller
     public function force_destroy(ExamState $examState)
     {
         return $this->clear($examState);
+    }
+
+    /**
+     * Move multiple resources to trash in one request.
+     */
+    public function bulkDestroy(Request $request)
+    {
+        $validated = $request->validate([
+            'ids'   => 'required|array|min:1',
+            'ids.*' => 'integer|exists:exam_states,id',
+        ]);
+
+        $count = ExamState::whereIn('id', $validated['ids'])->count();
+        ExamState::whereIn('id', $validated['ids'])->delete();
+
+        return has_data(null, "{$count} room(s) moved to trash.");
     }
 
     public function report(Request $request)
