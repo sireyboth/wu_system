@@ -210,10 +210,17 @@
 
     <script>
         (function () {
-            // Western University Main Campus — https://maps.app.goo.gl/RmmQBV3c3v4PcBGZ8
-            var TARGET_LAT = 11.5715553;
-            var TARGET_LNG = 104.8892426;
-            var ALLOWED_RADIUS_METERS = 300;
+
+
+            // // Western University Main Campus — https://maps.app.goo.gl/RmmQBV3c3v4PcBGZ8
+            // var TARGET_LAT = 11.5715553;
+            // var TARGET_LNG = 104.8892426;
+            // var ALLOWED_RADIUS_METERS = 300;
+
+            // Cambodia (approx. country center) — allow access from anywhere in the country
+            var TARGET_LAT = 12.5657;
+            var TARGET_LNG = 104.9910;
+            var ALLOWED_RADIUS_METERS = 350000;
 
             var gate = document.getElementById('geoGate');
             var content = document.getElementById('geoContent');
@@ -282,9 +289,12 @@
                         } else {
                             var km = (dist / 1000).toFixed(1);
                             showBlocked(
-                                'ទំព័រនេះសម្រាប់តែបុគ្គលិកនៅបរិវេណប៉ុណ្ណោះ',
-                                'អ្នកនៅចម្ងាយប្រហែល ' + km + ' គីឡូម៉ែត្រ ពីសាកលវិទ្យាល័យវេស្ទើន។<br>' +
-                                '<span class="text-xs">This page is only available on the Western University campus. You are about ' + km + ' km away.</span>'
+                                // 'ទំព័រនេះសម្រាប់តែបុគ្គលិកនៅបរិវេណប៉ុណ្ណោះ',
+                                // 'អ្នកនៅចម្ងាយប្រហែល ' + km + ' គីឡូម៉ែត្រ ពីសាកលវិទ្យាល័យវេស្ទើន។<br>' +
+                                // '<span class="text-xs">This page is only available on the Western University campus. You are about ' + km + ' km away.</span>'
+                                'ទំព័រនេះសម្រាប់តែអ្នកប្រើប្រាស់នៅកម្ពុជាប៉ុណ្ណោះ',
+                                'អ្នកនៅចម្ងាយប្រហែល ' + km + ' គីឡូម៉ែត្រ ពីកម្ពុជា។<br>' +
+                                '<span class="text-xs">This page is only available within Cambodia. You are about ' + km + ' km away.</span>'
                             );
                         }
                     },
