@@ -2,7 +2,7 @@
 @section('title', 'Exam Schedule')
 @section('content')
     <!-- {{-- Page Header --}} -->
-    <x-ui.page-header title="Exam Schedule" />
+    <x-core.page-header welcome="Welcome to" title="Exam Schedule" />
 
     <x-ui.action-group>
         <x-btn size="sm"> Add Room </x-btn>
