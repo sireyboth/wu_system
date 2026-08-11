@@ -32,9 +32,16 @@ abstract class Controller
         if ($fn) {
             $response = $fn($response);
         }
+
+        if ($sort = $request->input('sort')) {
+            $direction = str_starts_with($sort, '-') ? 'desc' : 'asc';
+            $column    = ltrim($sort, '-');
+            $response  = $response->orderBy($column, $direction);
+        }
+
         $response = $response->search($request->search)->with($this->relationships);
 
-        return $this->resource::collection($response->latest()->paginate($limit));
+        return $this->resource::collection($response->latest()->paginate($limit)->onEachSide(1));
     }
 
     protected function save(FormRequest $request, ?array $columns = [])
@@ -132,7 +139,7 @@ abstract class Controller
                 'total'   => $data['total'],
                 'present' => $present,
                 'absent'  => $data['absent'],
-                'percent' => $data['total'] > 0 ? round($present / $data['total'] * 100)  : 0,
+                'percent' => $data['total'] > 0 ? round($present / $data['total'] * 100) : 0,
             ];
         })->all();
     }

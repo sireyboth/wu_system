@@ -16,7 +16,7 @@ class StateExamController extends Controller
      */
     public function attendance()
     {
-        return view('exam-attendance.index', ['rounds' => $this->rounds]);
+        return view('stateExam.attendance.index', ['rounds' => $this->rounds]);
     }
 
     /**
@@ -26,9 +26,17 @@ class StateExamController extends Controller
     {
         abort_unless($round >= 1 && $round <= count($this->rounds), 404);
 
-        return view('exam-attendance.search', [
+        return view('stateExam.attendance.search', [
             'round'      => $round,
             'roundLabel' => $this->rounds[$round - 1],
         ]);
+    }
+
+    /**
+     * Admin-only attendance report page (charts + KPIs). No modal — a full page.
+     */
+    public function report()
+    {
+        return view('stateExam.report.index');
     }
 }

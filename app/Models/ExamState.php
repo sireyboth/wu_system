@@ -4,17 +4,18 @@ namespace App\Models;
 class ExamState extends IModel
 {
     protected $fillable = [
-        'no', 'room', 'major', 'student_total', 'shift',
+        'no', 'room', 'major', 'student_total', 'shift', 'invigilators',
         'degree', 'majors', 'remark', 'absences', 'exam_date',
     ];
 
     protected $casts = [
-        'majors'    => 'array',
-        'absences'  => 'array',
-        'exam_date' => 'date:Y-m-d',
+        'majors'       => 'array',
+        'absences'     => 'array',
+        'invigilators' => 'array',
+        'exam_date'    => 'date:Y-m-d',
     ];
 
-     protected $appends = ['floor'];
+    protected $appends = ['floor'];
 
     public function getFloorAttribute(): ?int
     {

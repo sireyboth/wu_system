@@ -1,4 +1,16 @@
-import axios from 'axios';
+import axios from "axios";
+
 window.axios = axios;
 
-window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+const { headers } = window.axios.defaults;
+export const type = "application/json";
+headers.common["X-Requested-With"] = "XMLHttpRequest";
+headers.common["Accept"] = type;
+headers.common["Content-Type"] = type;
+
+const token = document.head.querySelector('meta[name="csrf-token"]');
+token
+    ? (headers.common["X-CSRF-TOKEN"] = token.content)
+    : console.error(
+          'CSRF token not found: add <meta name="csrf-token" content="{{ csrf_token() }}"> to your layout <head>.',
+      );

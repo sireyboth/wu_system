@@ -1,15 +1,8 @@
 @extends('layouts.dashboard')
+@section('title', 'Majors')
 @section('content')
 
-    <!-- {{-- Page Header --}} -->
-    <div class="mb-8">
-        <h1 class="text-2xl font-bold text-neutral-900 dark:text-white">
-            សូមស្វាគមន៍មកកាន់ទំព័រ <span class="text-indigo-700">គ្រប់គ្រងជំនាញ</span>
-        </h1>
-        <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-            Overview of your application
-        </p>
-    </div>
+    <x-core.page-header title="គ្រប់គ្រងជំនាញ" />
     <div class="space-y-4">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="relative w-full md:w-96 group">
@@ -56,7 +49,7 @@
             class="relative overflow-hidden bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-2xl shadow-sm transition-colors duration-300">
 
             <div id="loading-overlay"
-                class="hidden absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-neutral-900/50 backdrop-blur-[2px]">
+                class="hidden absolute inset-0 z-10 items-center justify-center bg-white/50 dark:bg-neutral-900/50 backdrop-blur-[2px]">
                 <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
             </div>
 
