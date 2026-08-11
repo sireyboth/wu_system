@@ -1,6 +1,8 @@
 <?php
 namespace App\Http\Requests;
 
+use Illuminate\Validation\Validator;
+
 class ExamStateRequest extends IRequest
 {
     protected function formData(): array
@@ -27,7 +29,7 @@ class ExamStateRequest extends IRequest
         ];
     }
 
-    public function withValidator($validator)
+    public function withValidator(Validator $validator)
     {
         $validator->after(function ($validator) {
             $studentTotal = (int) $this->input('student_total', 0);
