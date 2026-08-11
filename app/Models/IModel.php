@@ -5,7 +5,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Str;
 
 abstract class IModel extends Model
 {
@@ -29,24 +28,7 @@ abstract class IModel extends Model
             return $query;
         }
 
-        return $query->where(function (Builder $q) use ($keyword) {
-            foreach ($this->searchable as $field) {
-                if (! Str::contains($field, '.')) {
-                    $q->orWhere($field, 'like', "%{$keyword}%");
-
-                    continue;
-                }
-
-                $parts    = explode('.', $field);
-                $column   = array_pop($parts);
-                $relation = implode('.', $parts);
-
-                $q->orWhereHas($relation, function (Builder $query) use ($column, $keyword) {
-                    $query->where($column, 'like', "%{$keyword}%");
-                });
-
-            }
-        });
+        return $query->whereLike($this->searchable, $keyword);
     }
 
     public function getNameAttribute()

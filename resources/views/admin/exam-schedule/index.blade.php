@@ -1,175 +1,34 @@
 @extends('layouts.dashboard')
 @section('content')
     <!-- {{-- Page Header --}} -->
-    <x-core.page-header title="Exam Schedule" />
-    {{--
-    <div class="space-y-4">
-        <div class="flex flex-col justify-between gap-4 md:flex-row md:items-center">
-            <div class="relative w-full md:w-96 group">
-                <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none ps-3">
-                    <svg class="w-4 h-4 transition-colors text-neutral-500 group-focus-within:text-indigo-500" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="m21 21-4.35-4.35M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" />
-                    </svg>
-                </div>
+    <x-ui.page-header title="Exam Schedule" />
 
-                <form id="statusSearchForm" method="GET" action="{{ route('app-status.index') }}"
-                    class="relative w-full md:w-96 group">
-                    <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none ps-3">
-                        <svg class="w-4 h-4 transition-colors text-neutral-500 group-focus-within:text-indigo-500"
-                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="m21 21-4.35-4.35M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" />
-                        </svg>
-                    </div>
+    <x-ui.action-group>
+        <x-btn size="sm"> Add Room </x-btn>
+        <x-btn size="sm"> Add Room </x-btn>
+    </x-ui.action-group>
 
-                    <input id="statusSearchInput" type="text" name="search" value="{{ request('search') }}"
-                        class="block w-full p-2.5 ps-10 text-sm text-neutral-900 border border-neutral-200 rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-neutral-900 dark:border-white/10 dark:placeholder-neutral-400 dark:text-white transition-all"
-                        placeholder="Search Invoice number, type, status..." autocomplete="off" />
-                </form>
 
-            </div>
-            <!-- Button -->
-            <div class="flex items-center gap-2">
-                <!-- <button type="button" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-neutral-700 bg-white border border-neutral-200 rounded-xl hover:bg-neutral-50 dark:bg-neutral-900 dark:text-neutral-300 dark:border-white/10 dark:hover:bg-white/5 transition-all">
-                                            <svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2.586a1 1 0 0 1-.293.707l-6.414 6.414a1 1 0 0 0-.293.707V17l-4 4v-6.586a1 1 0 0 0-.293-.707L3.293 7.293A1 1 0 0 1 3 6.586V4Z"/></svg>
-                                            Filters
-                                        </button> -->
-                <button type="button" onclick="AppModal.toggle(true)"
-                    class="inline-flex items-center px-4 py-2.5 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition-all active:scale-95">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    Create New status
-                </button>
+    <x-core.table endpoint="/users" sort="name">
+        <x-slot:header>
+            <x-ui.sortable field="name" label="Full Name" />
+            <x-table-head>Email Address</x-table-head>
+            <x-table-head>Created At</x-table-head>
+            <x-table-head>Updated At</x-table-head>
+            <x-table-head>Actions</x-table-head>
+        </x-slot:header>
 
-            </div>
-        </div>
-
-        <div
-            class="relative overflow-hidden transition-colors duration-300 bg-white border shadow-sm dark:bg-neutral-900 border-neutral-200 dark:border-white/10 rounded-2xl">
-
-            <div id="loading-overlay"
-                class="hidden absolute inset-0 z-10 items-center justify-center bg-white/50 dark:bg-neutral-900/50 backdrop-blur-[2px]">
-                <div class="w-10 h-10 border-b-2 border-indigo-600 rounded-full animate-spin"></div>
-            </div>
-
-            <div
-                class="overflow-x-auto max-h-[600px] scrollbar-thin scrollbar-thumb-neutral-200 dark:scrollbar-thumb-white/10">
-                <table class="w-full text-sm text-left border-collapse text-neutral-500 dark:text-neutral-400">
-                    <thead
-                        class="sticky top-0 z-20 text-xs uppercase text-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 dark:text-neutral-300 backdrop-blur-md">
-                        <tr>
-                            <th scope="col" class="px-6 py-4 font-bold tracking-wider">
-                                <div class="flex items-center transition-colors cursor-pointer group hover:text-indigo-600">
-                                    N.O
-                                    <svg class="w-3 h-3 ms-1.5 opacity-0 group-hover:opacity-100 transition-opacity"
-                                        fill="currentColor" viewBox="0 0 24 24">
-                                        <path
-                                            d="M8.574 11.024h6.852a2.075 2.075 0 0 0 1.847-1.086 1.9 1.9 0 0 0-.11-1.986L13.736 2.9a2.122 2.122 0 0 0-3.472 0L6.837 7.952a1.9 1.9 0 0 0-.11 1.986 2.074 2.074 0 0 0 1.847 1.086Z" />
-                                    </svg>
-                                </div>
-                            </th>
-                            <th scope="col" class="px-6 py-4">Name Khmer</th>
-                            <th scope="col" class="px-6 py-4">Name English</th>
-                            <th scope="col" class="px-6 py-4">Shortcut</th>
-                            <th scope="col" class="px-6 py-4">Remark</th>
-                            <th scope="col" class="px-6 py-4">Create At</th>
-                            <th scope="col" class="px-6 py-4 text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="status-table-body" class="divide-y divide-neutral-200 dark:divide-white/5">
-                        <tr>
-                            <td colspan="7" class="px-6 py-10 text-center">
-                                <span class="text-neutral-500">Loading data...</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div id="pagination-container" class="px-6 py-4 border-t border-neutral-200 dark:border-white">
-            </div>
-
-        </div>
-    </div>
-    </div> --}}
-
-    @php
-        $invoices = [
-            ['Paid', 'Credit card', 10.0, '27ed00e0-a383-4483-b864-67e65cbb033d'],
-            ['Paid', 'Bank Transfer', 15.0, 'b33256e6-a35d-4670-8b78-908f0035a827'],
-            ['Paid', 'PayPal', 5.0, 'df3caae2-f945-4317-9db4-68fc605345b4'],
-            ['Refunded', 'Credit card', 20.0, '36f19e85-6841-456c-9ddb-1ecdaa47dafd'],
-            ['Pending', 'Credit card', 50.0, '22f60166-819e-4216-9d34-08e5cf3906f9'],
-        ];
-    @endphp
-
-    <x-core.table-card>
-        <x-slot:title>Schedules</x-slot:title>
-        <x-slot:action>
-            <x-btn size="sm"> Add Room </x-btn>
-        </x-slot:action>
-
-        <x-slot:toolbar>
-            <div x-data="{ perPage: {{ request('per_page', 10) }} }" class="w-32">
-                <x-form-select x-model="perPage" @change="window.location = updateQueryParam('per_page', perPage)"
-                    class="rounded-lg">
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                </x-form-select>
-            </div>
-
-            {{-- <form method="GET" x-data="{ q: '{{ request('q') }}' }" x-init="$watch('q', debounce(() => $el.submit(), 400))" class="w-64">
-            </form> --}}
-            {{-- <x-form-input type="search" name="q" placeholder="Search invoice..." x-model="q" /> --}}
-            <x-form-input name="search" placeholder="Search..." class="rounded-lg">
-                <x-slot:icon-prefix>
-                    <x-form-icon icon="heroicon-o-magnifying-glass" />
-                </x-slot:icon-prefix>
-            </x-form-input>
-        </x-slot:toolbar>
-
-        {{-- Body --}}
-        <x-table container:class="max-h-80" hover>
-            <x-table-header sticky>
-                <x-table-row>
-                    <x-table-head>Invoice</x-table-head>
-                    <x-table-head>Status</x-table-head>
-                    <x-table-head>Method</x-table-head>
-                    <x-table-head align="end">Amount</x-table-head>
-                    <x-table-head>Payment reference</x-table-head>
-                </x-table-row>
-            </x-table-header>
-            <x-table-body highlight="even">
-                @foreach ($invoices as $i => $invoice)
-                    <x-table-row>
-                        <x-table-head>
-                            INV{{ str_pad($i + 1, 3, 0, STR_PAD_LEFT) }}
-                        </x-table-head>
-                        <x-table-cell>{{ $invoice[0] }}</x-table-cell>
-                        <x-table-cell>{{ $invoice[1] }}</x-table-cell>
-                        <x-table-cell align="end">
-                            <x-currency :value="$invoice[2]" />
-                        </x-table-cell>
-                        <x-table-cell>{{ $invoice[3] }}</x-table-cell>
-                    </x-table-row>
-                @endforeach
-            </x-table-body>
-        </x-table>
-
-        {{-- Footer --}}
-        {{-- <x-slot:footer>
-            <span class="text-sm text-gray-500">
-                Showing {{ $invoices->firstItem() }}–{{ $invoices->lastItem() }} of {{ $invoices->total() }}
-            </span>
-            {{ $invoices->links() }}
-        </x-slot:footer> --}}
-    </x-core.table-card>
-
+        <x-slot:content>
+            <x-table-cell x-text="row.name" />
+            <x-table-cell x-text="row.email" />
+            <x-table-cell x-text="$formatDate(row.created_at, 'datetime')" />
+            <x-table-cell x-text="$formatDate(row.updated_at, 'relative')" />
+            <x-table-cell>
+                <x-btn size="sm"> Add Room </x-btn>
+                <x-btn size="sm"> Add Room </x-btn>
+            </x-table-cell>
+        </x-slot:content>
+    </x-core.table>
 
     @include('admin.exam-schedule._form')
 @endsection

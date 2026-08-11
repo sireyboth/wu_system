@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\ShiftController;
 use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\SubjectController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -38,6 +39,7 @@ Route::prefix('v1')->group(function () {
         'statuses'     => StatusController::class,
         'certificates' => CertificateController::class,
         'exam-states'  => ExamStateController::class,
+        'users'        => UserController::class,
     ]);
 
     Route::get('/provinces', [AddressController::class, 'provinces'])->name('provinces.all');
