@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Generic;
+use App\Models\ExamState;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
@@ -17,6 +18,7 @@ abstract class Controller
     protected string $model;
     protected string $resource;
     protected array|string $relationships = [];
+    protected array $rounds                 = ['ម៉ោងទី១', 'ម៉ោងទី២', 'ម៉ោងទី៣'];
 
     protected function not_found(string $id = '', string $message = 'not found'): JsonResponse
     {
@@ -104,5 +106,34 @@ abstract class Controller
                 array_map(fn($a) => "{$otherKey}.$a", ['province', 'district', 'commune', 'village'])
             )
         );
+    }
+
+    public function summarize(?string $from = null, ?string $to = null): array
+    {
+        $rooms = ExamState::query()
+            ->when($from, fn($q) => $q->whereDate('exam_date', '>=', $from))
+            ->when($to, fn($q) => $q->whereDate('exam_date', '<=', $to))
+            ->get(['student_total', 'absences']);
+
+        $summary = array_fill(0, count($this->rounds), ['total' => 0, 'absent' => 0]);
+
+        // absences is one entry per session/round, positionally: absences[0] = round 1, etc.
+        foreach ($rooms as $room) {
+            foreach ($this->rounds as $round => $label) {
+                $summary[$round]['total']  += $room->student_total ?? 0;
+                $summary[$round]['absent'] += $room->absences[$round]['total'] ?? 0;
+            }
+        }
+
+        return collect($summary)->map(function ($data, $i) {
+            $present = $data['total'] - $data['absent'];
+            return [
+                'label'   => $this->rounds[$i],
+                'total'   => $data['total'],
+                'present' => $present,
+                'absent'  => $data['absent'],
+                'percent' => $data['total'] > 0 ? round($present / $data['total'] * 100)  : 0,
+            ];
+        })->all();
     }
 }

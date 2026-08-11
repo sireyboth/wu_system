@@ -23,6 +23,7 @@ Route::prefix('v1')->group(function () {
         Route::get('preview-number', [CertificateController::class, 'preview'])->name('certificates.preview');
         Route::get('report', [CertificateController::class, 'report'])->name('certificates.report');
     });
+    Route::get('/exam-states/report', [ExamStateController::class, 'report'])->name('exam-states.report');
 
     api_routes([
         'faculties'    => FacultyController::class,
@@ -39,11 +40,11 @@ Route::prefix('v1')->group(function () {
         'exam-states'  => ExamStateController::class,
     ]);
 
-    Route::get('/provinces', [AddressController::class, 'provinces']);
-    Route::get('/nationalities', [AddressController::class, 'nationalities']);
+    Route::get('/provinces', [AddressController::class, 'provinces'])->name('provinces.all');
+    Route::get('/nationalities', [AddressController::class, 'nationalities'])->name('nationalities.all');
 
     // Using Model Binding
-    Route::get('/districts/{province}', [AddressController::class, 'districts']);
-    Route::get('/communes/{district}', [AddressController::class, 'communes']);
-    Route::get('/villages/{commune}', [AddressController::class, 'villages']);
+    Route::get('/districts/{province}', [AddressController::class, 'districts'])->name('districts.by-province');
+    Route::get('/communes/{district}', [AddressController::class, 'communes'])->name('communes.by-district');
+    Route::get('/villages/{commune}', [AddressController::class, 'villages'])->name('villages.by-commune');
 });

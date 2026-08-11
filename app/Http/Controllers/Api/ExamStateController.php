@@ -71,4 +71,14 @@ class ExamStateController extends Controller
     {
         return $this->clear($examState);
     }
+
+    public function report(Request $request)
+    {
+        $validated = $request->validate([
+            'from' => 'nullable|date',
+            'to'   => 'nullable|date|after_or_equal:from',
+        ]);
+
+        return $this->summarize($validated['from'] ?? null, $validated['to'] ?? null);
+    }
 }
