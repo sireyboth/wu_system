@@ -86,7 +86,7 @@
                 <label
                     class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">ស្ថានភាពការសិក្សា
                     (Enrollment Status)</label>
-                <select name="status_id" id="student-status"
+                <select required name="status_id" id="student-status"
                     class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
                     <option value="" disabled selected>-- ជ្រើសរើសស្ថានភាពសិក្សា--</option>
                 </select>

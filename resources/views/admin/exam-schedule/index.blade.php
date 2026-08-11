@@ -1,4 +1,5 @@
 @extends('layouts.dashboard')
+@section('title', 'Exam Schedule')
 @section('content')
     <!-- {{-- Page Header --}} -->
     <x-ui.page-header title="Exam Schedule" />

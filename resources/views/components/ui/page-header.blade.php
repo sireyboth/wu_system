@@ -1,4 +1,4 @@
-@props(['welcome' => 'Welcome to', 'title' => 'Home', 'subtitle' => 'Overview of your application'])
+@props(['welcome' => 'សូមស្វាគមន៍មកកាន់ទំព័រ', 'title' => 'Home', 'subtitle' => 'Overview of your application'])
 
 <div class="mb-6">
     <h1 class="text-2xl font-bold text-neutral-900 dark:text-white">

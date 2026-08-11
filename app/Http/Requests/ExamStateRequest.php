@@ -26,4 +26,22 @@ class ExamStateRequest extends IRequest
             'remark'         => 'nullable|string',
         ];
     }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $studentTotal = (int) $this->input('student_total', 0);
+
+            foreach ((array) $this->input('absences', []) as $index => $absence) {
+                $absentTotal = (int) ($absence['total'] ?? 0);
+
+                if ($absentTotal > $studentTotal) {
+                    $validator->errors()->add(
+                        "absences.$index.total",
+                        'ចំនួនអវត្តមានមិនអាចលើសពីចំនួននិស្សិតសរុបបានទេ។ (Absent count cannot exceed the student total.)'
+                    );
+                }
+            }
+        });
+    }
 }

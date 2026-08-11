@@ -25,6 +25,7 @@ Route::prefix('v1')->group(function () {
         Route::get('report', [CertificateController::class, 'report'])->name('certificates.report');
     });
     Route::get('/exam-states/report', [ExamStateController::class, 'report'])->name('exam-states.report');
+    Route::delete('/exam-states/bulk', [ExamStateController::class, 'bulkDestroy'])->name('exam-states.bulk-destroy');
 
     api_routes([
         'faculties'    => FacultyController::class,

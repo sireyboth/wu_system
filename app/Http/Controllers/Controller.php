@@ -120,18 +120,15 @@ abstract class Controller
         $rooms = ExamState::query()
             ->when($from, fn($q) => $q->whereDate('exam_date', '>=', $from))
             ->when($to, fn($q) => $q->whereDate('exam_date', '<=', $to))
-            ->get(['majors', 'absences']);
+            ->get(['student_total', 'absences']);
 
         $summary = array_fill(0, count($this->rounds), ['total' => 0, 'absent' => 0]);
 
+        // absences is one entry per session/round, positionally: absences[0] = round 1, etc.
         foreach ($rooms as $room) {
-            foreach ($room->absences ?? [] as $index => $absence) {
-                $round = $index % count($this->rounds); // position tells you the round
-
-                $summary[$round]['absent'] += $absence['total'];
-
-                $major                     = collect($room->majors)->firstWhere('major', $absence['major']);
-                $summary[$round]['total'] += $major['total'] ?? 0;
+            foreach ($this->rounds as $round => $label) {
+                $summary[$round]['total']  += $room->student_total ?? 0;
+                $summary[$round]['absent'] += $room->absences[$round]['total'] ?? 0;
             }
         }
 

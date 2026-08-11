@@ -41,7 +41,7 @@ class StudentController extends Controller
                 return $query->semester();
             }
 
-            return $query->none();
+            return $query;
         });
     }
 

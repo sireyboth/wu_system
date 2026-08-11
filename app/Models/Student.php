@@ -111,9 +111,4 @@ class Student extends IModel
     {
         return $this->getBy($query, self::SEMESTER);
     }
-
-    public function scopeNone(Builder $query)
-    {
-        return $this->getBy($query, self::NONE);
-    }
 }

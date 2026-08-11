@@ -77,7 +77,7 @@ export async function handlePreviewAction(ApiService, id) {
                 <h4 class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider border-b border-neutral-200 dark:border-white/10 pb-2">២. ព័ត៌មានសិក្សា (Academic Records)</h4>
                 <div class="grid grid-cols-2 gap-x-4 gap-y-2.5 text-xs">
                     <div><span class="text-neutral-400 block">អត្តសញ្ញាណប័ណ្ណនិស្សិត (ID Code):</span> <span class="font-mono font-bold text-indigo-600 dark:text-indigo-400">${escapeHtml(student.code ?? 'N/A')}</span></div>
-                    <div><span class="text-neutral-400 block">ស្ថានភាពនិស្សិត (Status):</span> <span class="uppercase font-bold text-emerald-500">${escapeHtml(student.status ?? 'Active')}</span></div>
+                    <div><span class="text-neutral-400 block">ស្ថានភាពនិស្សិត (Status):</span> <span class="uppercase font-bold text-emerald-500">${escapeHtml(student.status?.name_kh || student.status?.name || 'Active')}</span></div>
                     <div><span class="text-neutral-400 block">ជំនាញឯកទេស (Major):</span> <span class="font-semibold">${escapeHtml(major.name ?? 'N/A')}</span></div>
                     <div><span class="text-neutral-400 block">ជំនាន់សិក្សា (Batch):</span> <span class="font-mono">${escapeHtml(batch.name ?? 'N/A')}</span></div>
                     <div><span class="text-neutral-400 block">កាលបរិច្ឆេទចូលរៀន (Admission Date):</span> <span class="font-mono">${admissionFormatted}</span></div>
@@ -106,10 +106,10 @@ export async function handlePreviewAction(ApiService, id) {
             <h4 class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider border-b border-neutral-200 dark:border-white/10 pb-2">៤. ព័ត៌មានអាណាព្យាបាល (Primary Guardian Relations)</h4>
             ${guardian ? `
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
-                    <div><span class="text-neutral-400 block">ឈ្មោះខ្មែរ (Name KH):</span> <span class="font-bold text-neutral-900 dark:text-white">${escapeHtml(guardian.person?.last_name_kh ?? '')} ${escapeHtml(guardian.person?.first_name_kh ?? '')}</span></div>
-                    <div><span class="text-neutral-400 block">Name EN:</span> <span class="font-semibold text-neutral-900 dark:text-white">${escapeHtml(guardian.person?.last_name ?? '')} ${escapeHtml(guardian.person?.first_name ?? '')}</span></div>
-                    <div><span class="text-neutral-400 block">ត្រូវជា (Relationship):</span> <span class="font-medium text-indigo-600 dark:text-indigo-400">${escapeHtml(guardian.pivot?.relationship ?? 'N/A')}</span></div>
-                    <div><span class="text-neutral-400 block">លេខទូរស័ព្ទ (Phone):</span> <span class="font-mono font-medium">${escapeHtml(guardian.person?.phone ?? 'N/A')}</span></div>
+                    <div><span class="text-neutral-400 block">ឈ្មោះខ្មែរ (Name KH):</span> <span class="font-bold text-neutral-900 dark:text-white">${escapeHtml(guardian.name_kh ?? 'N/A')}</span></div>
+                    <div><span class="text-neutral-400 block">Name EN:</span> <span class="font-semibold text-neutral-900 dark:text-white">${escapeHtml(guardian.name_en ?? 'N/A')}</span></div>
+                    <div><span class="text-neutral-400 block">ត្រូវជា (Relationship):</span> <span class="font-medium text-indigo-600 dark:text-indigo-400">${escapeHtml(guardian.relationship ?? 'N/A')}</span></div>
+                    <div><span class="text-neutral-400 block">លេខទូរស័ព្ទ (Phone):</span> <span class="font-mono font-medium">${escapeHtml(guardian.phones?.[0] ?? 'N/A')}</span></div>
                 </div>
             ` : `<p class="text-xs text-neutral-400 italic">គ្មានទិន្នន័យអាណាព្យាបាលភ្ជាប់ជាមួយឡើយ</p>`}
         </div>`;

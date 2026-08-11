@@ -50,7 +50,7 @@
         <div>
             <label
                 class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">អាសយដ្ឋានអាណាព្យាបាល​ (មិនតម្រូវ)</label>
-            <input required type="tel" name="guardians[0][addresses][0]" placeholder="e.g., Phnom Penh"
+            <input type="tel" name="guardians[0][addresses][0]" placeholder="e.g., Phnom Penh"
                 class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
         </div>
     </div>

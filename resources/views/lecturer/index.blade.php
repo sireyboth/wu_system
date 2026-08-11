@@ -1,15 +1,8 @@
 @extends('layouts.dashboard')
+@section('title', 'Lecturers')
 @section('content')
 
-    <!-- {{-- Page Header --}} -->
-    <div class="mb-8">
-        <h1 class="text-2xl font-bold text-neutral-900 dark:text-white">
-            សូមស្វាគមន៍មកកាន់ទំព័រ <span class="text-indigo-700">គ្រប់គ្រងសាស្ដ្រាចារ្យ</span>
-        </h1>
-        <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-            Overview of your application
-        </p>
-    </div>
+    <x-core.page-header title="គ្រប់គ្រងសាស្ដ្រាចារ្យ" />
     <div class="space-y-4">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="relative w-full md:w-96 group">

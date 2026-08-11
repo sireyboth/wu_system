@@ -24,6 +24,43 @@
             padding-left: 2rem;
         }
     }
+
+    /* Sidebar scrollbar — thin, rounded, brand-tinted, fades into the sidebar
+       background so it feels native to the UI instead of an OS-default bar. */
+    .custom-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(99, 102, 241, 0.3) transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: rgba(99, 102, 241, 0.3);
+        border-radius: 9999px;
+        transition: background-color 0.2s ease;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(99, 102, 241, 0.6);
+    }
+
+    html.dark .custom-scrollbar {
+        scrollbar-color: rgba(165, 180, 252, 0.25) transparent;
+    }
+
+    html.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: rgba(165, 180, 252, 0.25);
+    }
+
+    html.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(165, 180, 252, 0.5);
+    }
 </style>
 
 <header id="mobile-top-bar"
@@ -107,8 +144,23 @@
                     </x-sidebar-link>
 
                     <li class="pt-4 pb-1">
-                        <span
-                            class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Certificate</span>
+
+                        <span class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Exam</span>
+                    </li>
+                    <x-sidebar-link route="stateExam.index">
+                        <x-slot name="icon">
+                            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l9-5 9 5-9 5-9-5z"/>
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10v5c0 1.5 3.1 3 7 3s7-1.5 7-3v-5"/>
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 10v6"/>
+                            </svg>
+                        </x-slot>
+                        ប្រឡងបញ្ចប់ការសិក្សា (StateExam)
+                    </x-sidebar-link>
+
+                    <li class="pt-4 pb-1">
+                        <span class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Certificate</span>
+
                     </li>
                     <x-sidebar-link route="StudentStatusCertificate.index">
                         <x-slot name="icon">
