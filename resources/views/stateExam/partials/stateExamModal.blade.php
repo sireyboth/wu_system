@@ -1,4 +1,4 @@
-<x-ui.modal id="stateExamModal" title="បន្ថែមបន្ទប់ប្រឡងថ្មី (Add Exam Room)" form-id="stateExamForm">
+<x-ui.modal id="stateExamModal" title="បន្ថែមបន្ទប់ប្រឡងថ្មី (Add Exam Room)" form-id="stateExamForm" max-width="max-w-3xl">
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="relative group">
@@ -29,7 +29,7 @@
     <!-- Majors Breakdown (dynamic, clonable) -->
     <div>
         <div class="flex items-center justify-between mb-1.5">
-            <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">ការបំបែកតាមជំនាញ (Majors Breakdown)</label>
+            <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">ការបំបែកតាមជំនាញ និងអនុរក្ស (Majors Breakdown & Invigilators)</label>
             <button type="button" id="addMajorRowBtn"
                     class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors">
                 + បន្ថែមជំនាញ (Add Major)

@@ -24,7 +24,7 @@ export async function handleEditAction(dom, ApiService, id) {
         const el = dom.form?.querySelector(`[name="${field}"]`);
         if (el) el.value = room[field] ?? '';
     });
-    loadMajorsRows(dom, room.majors);
+    loadMajorsRows(dom, room.majors, room.invigilators);
 
     dom.modal?.classList.remove('invisible', 'opacity-0');
     dom.modal?.classList.add('flex');
@@ -101,6 +101,7 @@ export async function handleFormSubmit(dom, ApiService, e) {
     const majors = collectMajorsRows(dom);
     payload.majors = majors;
     payload.student_total = majors.reduce((sum, m) => sum + m.total, 0);
+    payload.invigilators = majors.map((m) => m.invigilator).filter((name) => name);
 
     const url = state.isEditMode
         ? `${CONFIG.API_BASE}/${state.editingId}`

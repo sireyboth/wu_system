@@ -39,4 +39,14 @@ class StateExamController extends Controller
     {
         return view('stateExam.report.index');
     }
+
+    /**
+     * Public invigilator duty-card lookup. No auth, no geofence — meant to be
+     * shared with invigilators ahead of time so they can look up their own
+     * room / floor / shift before arriving on campus.
+     */
+    public function invigilators()
+    {
+        return view('stateExam.invigilators.index');
+    }
 }
