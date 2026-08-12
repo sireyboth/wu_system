@@ -153,15 +153,15 @@
     <header class="no-print relative z-10 border-b border-neutral-200/70 dark:border-white/10 bg-white/70 dark:bg-neutral-950/60 backdrop-blur-xl">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-800 text-white shadow-lg shadow-indigo-500/30 shrink-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.42A12.083 12.083 0 0121 15.5V19a1 1 0 01-1 1H4a1 1 0 01-1-1v-3.5a12.083 12.083 0 012.84-4.92L12 14z" />
-                    </svg>
+                <!-- University logo — drop the real file at public/images/logo.png and this fills in automatically -->
+                <div class="shrink-0 flex items-center justify-center w-10 h-10 rounded-xl bg-white/80 dark:bg-white/5 backdrop-blur-sm border border-neutral-200/80 dark:border-white/10 shadow-sm overflow-hidden p-1">
+                    <img src="{{ asset('images/logo.png') }}" alt="Western University logo"
+                         class="w-full h-full object-contain"
+                         onerror="this.style.display='none'">
                 </div>
                 <div class="leading-tight">
                     <div class="text-sm font-bold tracking-wide">សាកលវិទ្យាល័យវេស្ទើន</div>
-                    <div class="text-[11px] font-medium uppercase tracking-[0.14em] text-amber-600 dark:text-amber-400">Western University &middot; Official Exam Portal</div>
+                    <div class="text-[11px] font-medium uppercase tracking-[0.14em] text-amber-600 dark:text-amber-400">Western University &middot;<br> Official Exam Portal</div>
                 </div>
             </div>
 

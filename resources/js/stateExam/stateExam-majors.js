@@ -4,7 +4,7 @@
  * is read-only and always recomputed as the sum of these rows.
  */
 
-const TIME_SLOTS = ['7:30-9:00', '9:15-10:48', '10:45-12:15'];
+const TIME_SLOTS = ['7:30-9:00', '9:15-10:48', '10:45-12:15', '07:30-12:15'];
 
 function recalcStudentTotal(dom) {
     const totals = dom.form.querySelectorAll('.major-total-input');
@@ -31,7 +31,7 @@ export function addMajorRow(dom, major = '', total = '', time = '', invigilator 
         <select class="major-time-input w-28 shrink-0 px-2 py-2 text-xs sm:text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-lg text-neutral-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/40">
             ${timeOptionsHtml(time || TIME_SLOTS[0])}
         </select>
-        <input type="number" min="0" placeholder="ចំនួន" value="${total}"
+        <input type="number" min="0" placeholder="ចំនួន" value="${total}" required
                class="major-total-input w-16 shrink-0 px-2 py-2 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-lg text-neutral-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/40">
         <input type="text" placeholder="អនុរក្ស (Invigilator)" value="${invigilator}"
                class="major-invigilator-input flex-1 min-w-0 basis-24 px-3 py-2 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-lg text-neutral-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/40">

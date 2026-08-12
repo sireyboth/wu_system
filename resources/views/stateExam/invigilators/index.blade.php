@@ -2,14 +2,22 @@
 @section('title', 'កាតកាតព្វកិច្ចអ្នកឃ្លាំមើល (Invigilator Duty Card)')
 @section('content')
 
+
+  <!-- University logo — drop the real file at public/images/logo.png and this fills in automatically -->
+    <div class="mx-auto mb-5 flex items-center justify-center w-40 h-40 rounded-2xl bg-white/80 dark:bg-white/5 backdrop-blur-sm border border-neutral-200/80 dark:border-white/10 shadow-md p-2.5">
+        <img src="{{ asset('images/logo.png') }}" alt="Western University logo"
+             class="w-full h-full object-contain"
+             onerror="this.style.display='none'">
+    </div>
+
 <div class="text-center mb-12 fade-up">
     <div class="inline-flex items-center gap-2 px-3 py-1 mb-5 text-[11px] font-bold tracking-widest uppercase rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-500/20">
         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
         Official Duty Roster
     </div>
-    <h1 class="font-display text-3xl sm:text-4xl font-bold tracking-tight">កាតកាតព្វកិច្ចអ្នកឃ្លាំមើលប្រឡង</h1>
+    <h1 class="font-display text-3xl sm:text-4xl font-bold tracking-tight">កាតបញ្ចាក់អនុរក្សក្នុងការប្រឡង</h1>
     <p class="mt-3 text-sm text-neutral-500 dark:text-neutral-400 max-w-lg mx-auto">
-        ស្វែងរកឈ្មោះ ឬបន្ទប់ ដើម្បីមើលកាលវិភាគនៃការឃ្លាំមើលរបស់អ្នក
+        ស្វែងរកឈ្មោះ ឬបន្ទប់ ដើម្បីមើលកាលវិភាគអនុរក្សនីមួយៗ
         <span class="block text-xs text-neutral-400 dark:text-neutral-500 mt-0.5">Search your name or a room number to find your invigilation duty — room, floor, and shift.</span>
     </p>
 </div>
