@@ -21,10 +21,28 @@ export function renderTable(dom, rooms, trashed = false) {
     dom.tableBody.innerHTML = rooms.map((room, index) => renderRow(room, index, trashed)).join('');
 }
 
-function sumAbsences(absences) {
-    return Array.isArray(absences)
-        ? absences.reduce((sum, a) => sum + (Number(a?.total) || 0), 0)
-        : 0;
+/**
+ * Renders one small pill per session (3 total), each showing absent/total
+ * for that session — instead of a single aggregate "N absent" count.
+ * A session with nothing recorded yet shows "—/total" in a neutral color.
+ */
+function attendanceBadges(room) {
+    const total = Number(room.student_total) || 0;
+    const absences = Array.isArray(room.absences) ? room.absences : [];
+
+    return [0, 1, 2].map((i) => {
+        const recorded = absences[i]?.total;
+        const hasData = recorded !== undefined && recorded !== null && recorded !== '' && !Number.isNaN(Number(recorded));
+        const absent = hasData ? Number(recorded) : null;
+
+        const color = !hasData
+            ? 'bg-neutral-100 text-neutral-400 dark:bg-white/5 dark:text-neutral-500'
+            : absent > 0
+                ? 'bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400'
+                : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400';
+
+        return `<span class="inline-flex items-center px-2 py-0.5 text-[11px] font-bold rounded-full ${color}" title="Session ${i + 1}">S${i + 1} ${hasData ? absent : '—'}/${total}</span>`;
+    }).join('');
 }
 
 function renderRow(room, index, trashed = false) {
@@ -32,10 +50,7 @@ function renderRow(room, index, trashed = false) {
         ? new Date(room.exam_date).toLocaleDateString(CONFIG.LOCALE, { day: '2-digit', month: 'short', year: 'numeric' })
         : '<span class="text-neutral-400 italic">Not set</span>';
 
-    const absentTotal = sumAbsences(room.absences);
-    const absentBadge = absentTotal > 0
-        ? `<span class="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400">${absentTotal} absent</span>`
-        : `<span class="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">All present</span>`;
+    const attendanceHtml = `<div class="flex flex-wrap items-center gap-1">${attendanceBadges(room)}</div>`;
 
     const room_no = escapeHtml(room.room ?? 'N/A');
     const floorLabel = escapeHtml(room.floor_label ?? '');
@@ -62,8 +77,9 @@ function renderRow(room, index, trashed = false) {
                             <div class="text-xs text-neutral-400 truncate">${floorLabel} · ${shift}</div>
                         </div>
                     </div>
-                    ${absentBadge}
                 </div>
+
+                <div class="px-4 pb-3">${attendanceHtml}</div>
 
                 <div class="grid grid-cols-2 gap-x-3 gap-y-2.5 px-4 py-3 text-xs">
                     <div>
@@ -119,7 +135,7 @@ function renderRow(room, index, trashed = false) {
             <td class="hidden md:table-cell px-6 py-4 text-sm">${shift}</td>
             <td class="hidden md:table-cell px-6 py-4 font-mono text-sm text-neutral-800 dark:text-neutral-200 font-bold">${studentTotal}</td>
             <td class="hidden md:table-cell px-6 py-4 text-xs font-mono text-neutral-500">${examDateFormatted}</td>
-            <td class="hidden md:table-cell px-6 py-4">${absentBadge}</td>
+            <td class="hidden md:table-cell px-6 py-4">${attendanceHtml}</td>
             <td class="hidden md:table-cell p-6 text-right">
                 <div class="flex justify-end gap-1.5">
                     ${trashed ? `

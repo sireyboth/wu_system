@@ -184,6 +184,11 @@
         </p>
     </footer>
 
+    {{-- Page-level modals render here — a direct child of <body>, outside
+         <main>'s stacking context, so `position: fixed` + z-index on a modal
+         actually paints above the footer instead of being trapped under it. --}}
+    @stack('modals')
+
     <!-- Location gate — this page only unlocks on campus -->
     <div id="geoGate" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-50 dark:bg-neutral-950">
         <div class="w-full max-w-sm text-center">
