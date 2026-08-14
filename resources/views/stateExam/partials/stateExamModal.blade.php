@@ -52,6 +52,13 @@
         </div>
     </div>
 
+    <!-- Attendance per Session (super admin manual override — mirrors the public attendance page) -->
+    <div>
+        <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">អវត្តមានតាមវគ្គ (Attendance per Session)</label>
+        <div id="absencesContainer" class="grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
+        <p class="mt-1.5 text-[11px] text-neutral-400">ទុកចន្លោះទទេប្រសិនបើវគ្គនោះមិនទាន់បញ្ចូលទិន្នន័យ (Leave a session blank if it hasn't been recorded yet)</p>
+    </div>
+
     <!-- Input Row: Remark -->
     <div class="relative group">
         <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">សម្គាល់ (Remarks)</label>

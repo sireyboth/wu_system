@@ -2,6 +2,7 @@ import { CONFIG } from './config.js';
 import { state, Toast } from './core.js';
 import { loadStateExam } from './stateExam-list.js';
 import { loadMajorsRows, resetMajorsRows, collectMajorsRows } from './stateExam-majors.js';
+import { loadAbsenceInputs, resetAbsenceInputs, collectAbsences } from './stateExam-absences.js';
 
 /**
  * Opens the modal pre-filled for editing an existing exam room.
@@ -25,6 +26,7 @@ export async function handleEditAction(dom, ApiService, id) {
         if (el) el.value = room[field] ?? '';
     });
     loadMajorsRows(dom, room.majors, room.invigilators);
+    loadAbsenceInputs(dom, room.absences);
 
     dom.modal?.classList.remove('invisible', 'opacity-0');
     dom.modal?.classList.add('flex');
@@ -102,6 +104,7 @@ export async function handleFormSubmit(dom, ApiService, e) {
     payload.majors = majors;
     payload.student_total = majors.reduce((sum, m) => sum + m.total, 0);
     payload.invigilators = majors.map((m) => m.invigilator).filter((name) => name);
+    payload.absences = collectAbsences(dom, payload.major);
 
     const url = state.isEditMode
         ? `${CONFIG.API_BASE}/${state.editingId}`
@@ -139,6 +142,7 @@ export function closeStateExamModal(dom) {
         dom.modal?.classList.remove('flex');
         dom.form?.reset();
         resetMajorsRows(dom);
+        resetAbsenceInputs(dom);
         state.isEditMode = false;
         state.editingId = null;
         if (dom.modalTitle) dom.modalTitle.textContent = 'បន្ថែមបន្ទប់ប្រឡងថ្មី (Add Exam Room)';

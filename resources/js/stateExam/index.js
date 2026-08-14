@@ -4,6 +4,7 @@ import { createApiService } from './api-service.js';
 import { loadStateExam } from './stateExam-list.js';
 import { handleEditAction, handleDeleteAction, handleRestoreAction, handleFormSubmit, openStateExamModal, closeStateExamModal } from './stateExam-action.js';
 import { bindMajorsEvents, resetMajorsRows } from './stateExam-majors.js';
+import { resetAbsenceInputs } from './stateExam-absences.js';
 import { bindBulkSelect } from './stateExam-bulk.js';
 import { bindPagination } from './stateExam-pagination.js';
 
@@ -17,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     bindMajorsEvents(dom);
     resetMajorsRows(dom);
+    resetAbsenceInputs(dom);
     bindBulkSelect(dom, ApiService, () => loadStateExam(dom, ApiService, dom.searchInput?.value || ''));
     bindPagination((page) => loadStateExam(dom, ApiService, dom.searchInput?.value || '', page));
     initEvents(dom, ApiService);
