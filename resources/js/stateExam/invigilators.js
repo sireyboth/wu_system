@@ -1,8 +1,9 @@
 /**
  * Public invigilator duty-card lookup — no auth, no geofence.
- * Reuses the existing /api/v1/exam-states endpoint (already unauthenticated)
- * and flattens each room's `majors` rows (major, time, invigilator) into
- * one duty card per invigilator assignment.
+ * Reuses the existing /api/v1/exam-states endpoint (already unauthenticated).
+ * One card per ROOM, listing every major/invigilator assigned to it — so
+ * an invigilator searching their own name still sees the full room roster,
+ * not just their own row.
  */
 
 const API_BASE = '/api/v1/exam-states';
@@ -31,59 +32,35 @@ function formatDate(value) {
 
 const NOT_ASSIGNED = 'មិនទាន់មានអ្នកឃ្លាំមើល (Not yet assigned)';
 
-// ---------- Flatten rooms -> per-invigilator duty assignments ----------
+// ---------- Normalize a room's majors/invigilators into one roster ----------
 
-function assignmentsFromRoom(room) {
+function rosterFromRoom(room) {
     if (Array.isArray(room.majors) && room.majors.length > 0) {
         return room.majors.map((m) => ({
             invigilator: (m.invigilator || '').trim() || NOT_ASSIGNED,
-            room: room.room,
-            floorLabel: room.floor_label,
             major: m.major || room.major,
             time: m.time || '',
-            shift: room.shift,
-            examDate: room.exam_date,
-            degree: room.degree,
         }));
     }
 
     // Legacy rows: a flat invigilators[] list with no per-major pairing.
     const names = Array.isArray(room.invigilators) ? room.invigilators.filter((n) => (n || '').trim()) : [];
     if (names.length > 0) {
-        return names.map((name) => ({
-            invigilator: name.trim(),
-            room: room.room,
-            floorLabel: room.floor_label,
-            major: room.major,
-            time: '',
-            shift: room.shift,
-            examDate: room.exam_date,
-            degree: room.degree,
-        }));
+        return names.map((name) => ({ invigilator: name.trim(), major: room.major, time: '' }));
     }
 
-    // No majors rows and no invigilators at all — still show the room itself.
-    return [{
-        invigilator: NOT_ASSIGNED,
-        room: room.room,
-        floorLabel: room.floor_label,
-        major: room.major,
-        time: '',
-        shift: room.shift,
-        examDate: room.exam_date,
-        degree: room.degree,
-    }];
+    return [{ invigilator: NOT_ASSIGNED, major: room.major, time: '' }];
 }
 
-function matchesSearch(assignment, keyword) {
+function matchesSearch(room, roster, keyword) {
     if (!keyword) return true;
     const haystack = [
-        assignment.invigilator,
-        assignment.room,
-        assignment.floorLabel,
-        assignment.major,
-        assignment.degree,
-        assignment.shift,
+        room.room,
+        room.floor_label,
+        room.major,
+        room.degree,
+        room.shift,
+        ...roster.map((r) => `${r.invigilator} ${r.major}`),
     ].join(' ').toLowerCase();
     return haystack.includes(keyword.toLowerCase());
 }
@@ -118,22 +95,36 @@ function promptState() {
 
 function skeletonCards(n = 2) {
     return Array.from({ length: n }).map((_, i) => `
-        <div class="rounded-3xl border border-neutral-200/70 dark:border-white/5 bg-white/60 dark:bg-neutral-900/50 h-52 animate-pulse" style="animation-delay:${i * 80}ms"></div>`
+        <div class="rounded-3xl border border-neutral-200/70 dark:border-white/5 bg-white/60 dark:bg-neutral-900/50 h-64 animate-pulse" style="animation-delay:${i * 80}ms"></div>`
     ).join('');
 }
 
-function dutyCard(a, i) {
+function rosterRow(entry, highlight) {
+    const isUnassigned = entry.invigilator === NOT_ASSIGNED;
+    return `
+        <div class="flex items-center justify-between gap-3 px-4 py-3 ${highlight ? 'bg-indigo-50 dark:bg-indigo-500/10' : ''}">
+            <div class="min-w-0">
+                <div class="text-sm font-bold truncate ${isUnassigned ? 'italic text-neutral-400 dark:text-neutral-500' : 'text-neutral-900 dark:text-white'}">${escapeHtml(entry.invigilator)}</div>
+                <div class="text-[11px] text-neutral-400 dark:text-neutral-500 truncate">${escapeHtml(entry.major || '')}</div>
+            </div>
+            <div class="shrink-0 text-xs font-semibold text-neutral-500 dark:text-neutral-400">${escapeHtml(entry.time || '—')}</div>
+        </div>`;
+}
+
+function roomCard(room, roster, i, keyword) {
+    const kw = keyword.toLowerCase();
+
     return `
         <div class="fade-up group relative overflow-hidden bg-white/90 dark:bg-neutral-900/80 backdrop-blur-sm border border-neutral-200/80 dark:border-white/10 rounded-3xl shadow-sm hover:shadow-xl hover:border-indigo-300/70 dark:hover:border-indigo-500/30 transition-all duration-500" style="animation-delay:${Math.min(i, 8) * 70}ms">
 
             <!-- Card header -->
             <div class="relative px-6 pt-6 pb-5 bg-gradient-to-br from-indigo-600 to-indigo-800 text-white">
                 <span class="pointer-events-none absolute -top-4 -right-3 font-display text-6xl font-bold text-white/[0.08] select-none">
-                    ${escapeHtml(a.room ?? '?')}
+                    ${escapeHtml(room.room ?? '?')}
                 </span>
                 <div class="relative">
-                    <div class="text-[10px] font-bold uppercase tracking-[0.16em] text-indigo-200">Invigilator Duty Card</div>
-                    <div class="mt-1 text-lg font-bold leading-tight truncate ${a.invigilator === NOT_ASSIGNED ? 'italic text-indigo-200' : ''}">${escapeHtml(a.invigilator)}</div>
+                    <div class="text-[10px] font-bold uppercase tracking-[0.16em] text-indigo-200">Room Duty Card</div>
+                    <div class="mt-1 text-lg font-bold leading-tight">បន្ទប់ ${escapeHtml(room.room ?? 'N/A')} &middot; ${escapeHtml(room.floor_label ?? 'N/A')}</div>
                 </div>
             </div>
 
@@ -141,29 +132,20 @@ function dutyCard(a, i) {
             <div class="px-6 py-5 space-y-4">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <div class="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">បន្ទប់ (Room)</div>
-                        <div class="mt-1 text-xl font-black text-neutral-900 dark:text-white">${escapeHtml(a.room ?? 'N/A')}</div>
-                    </div>
-                    <div>
-                        <div class="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">ជាន់ (Floor)</div>
-                        <div class="mt-1 text-xl font-black text-neutral-900 dark:text-white">${escapeHtml(a.floorLabel ?? 'N/A')}</div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4 pt-4 border-t border-neutral-100 dark:border-white/5">
-                    <div>
-                        <div class="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">ម៉ោង (Time)</div>
-                        <div class="mt-1 text-sm font-bold text-neutral-700 dark:text-neutral-200">${escapeHtml(a.time || a.shift || 'TBD')}</div>
-                    </div>
-                    <div>
                         <div class="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">ថ្ងៃប្រឡង (Date)</div>
-                        <div class="mt-1 text-sm font-bold text-neutral-700 dark:text-neutral-200">${escapeHtml(formatDate(a.examDate))}</div>
+                        <div class="mt-1 text-sm font-bold text-neutral-700 dark:text-neutral-200">${escapeHtml(formatDate(room.exam_date))}</div>
+                    </div>
+                    <div>
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">សញ្ញាបត្រ (Degree)</div>
+                        <div class="mt-1 text-sm font-bold text-neutral-700 dark:text-neutral-200">${escapeHtml(room.degree ?? 'N/A')}</div>
                     </div>
                 </div>
 
-                <div class="pt-4 border-t border-neutral-100 dark:border-white/5">
-                    <div class="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">ជំនាញ / សញ្ញាបត្រ (Major / Degree)</div>
-                    <div class="mt-1 text-sm font-semibold text-neutral-700 dark:text-neutral-200">${escapeHtml(a.major ?? '')}${a.degree ? ' &middot; ' + escapeHtml(a.degree) : ''}</div>
+                <div class="pt-1">
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 mb-2">អ្នកឃ្លាំមើលទាំងអស់ (All Invigilators)</div>
+                    <div class="rounded-2xl border border-neutral-100 dark:border-white/5 divide-y divide-neutral-100 dark:divide-white/5 overflow-hidden">
+                        ${roster.map((entry) => rosterRow(entry, kw && entry.invigilator.toLowerCase().includes(kw))).join('')}
+                    </div>
                 </div>
             </div>
 
@@ -180,12 +162,12 @@ function dutyCard(a, i) {
         </div>`;
 }
 
-function renderCards(assignments) {
-    if (!assignments.length) {
+function renderCards(rooms, keyword) {
+    if (!rooms.length) {
         els.list.innerHTML = emptyState();
         return;
     }
-    els.list.innerHTML = assignments.map(dutyCard).join('');
+    els.list.innerHTML = rooms.map(({ room, roster }, i) => roomCard(room, roster, i, keyword)).join('');
 }
 
 // ---------- Data flow ----------
@@ -208,11 +190,11 @@ async function runSearch(keyword) {
     els.list.innerHTML = skeletonCards();
 
     const rooms = await fetchRooms(trimmed);
-    const assignments = rooms
-        .flatMap(assignmentsFromRoom)
-        .filter((a) => matchesSearch(a, trimmed));
+    const matches = rooms
+        .map((room) => ({ room, roster: rosterFromRoom(room) }))
+        .filter(({ room, roster }) => matchesSearch(room, roster, trimmed));
 
-    renderCards(assignments);
+    renderCards(matches, trimmed);
 }
 
 els.search?.addEventListener('input', (e) => {
