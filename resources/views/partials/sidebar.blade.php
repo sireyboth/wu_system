@@ -1,5 +1,7 @@
 {{-- Sidebar --}}
 <style>
+    [x-cloak] { display: none !important; }
+
     #main-content {
         transition: margin-left 300ms ease-in-out, padding 300ms ease-in-out;
         margin-left: 0;
@@ -147,16 +149,74 @@
 
                         <span class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Exam</span>
                     </li>
-                    <x-sidebar-link route="stateExam.index">
-                        <x-slot name="icon">
-                            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l9-5 9 5-9 5-9-5z"/>
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10v5c0 1.5 3.1 3 7 3s7-1.5 7-3v-5"/>
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 10v6"/>
+                    <li x-data="{ open: {{ request()->routeIs('stateExam.*') || request()->routeIs('state-exam.*') ? 'true' : 'false' }} }">
+                        <button type="button" @click="open = !open"
+                            class="flex items-center justify-between w-full px-3 py-2.5 rounded-xl transition-all duration-200 group
+                                {{ request()->routeIs('stateExam.*') || request()->routeIs('state-exam.*')
+                                    ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 shadow-sm'
+                                    : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-white/5 hover:text-neutral-900 dark:hover:text-white border border-transparent' }}">
+                            <span class="flex items-center">
+                                <span class="transition-transform duration-200 group-hover:scale-110">
+                                    <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l9-5 9 5-9 5-9-5z"/>
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10v5c0 1.5 3.1 3 7 3s7-1.5 7-3v-5"/>
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 10v6"/>
+                                    </svg>
+                                </span>
+                                <span class="ms-3 font-semibold">ប្រឡងបញ្ចប់ការសិក្សា (StateExam)</span>
+                            </span>
+                            <svg class="w-4 h-4 shrink-0 transition-transform duration-200" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                             </svg>
-                        </x-slot>
-                        ប្រឡងបញ្ចប់ការសិក្សា (StateExam)
-                    </x-sidebar-link>
+                        </button>
+
+                        <ul x-show="open" x-cloak
+                            x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 -translate-y-1"
+                            x-transition:enter-end="opacity-100 translate-y-0"
+                            x-transition:leave="transition ease-in duration-150"
+                            x-transition:leave-start="opacity-100"
+                            x-transition:leave-end="opacity-0"
+                            class="mt-1 ms-5 ps-4 border-l border-neutral-200 dark:border-white/10 space-y-1">
+
+                            <x-sidebar-link route="stateExam.index" :exact="true">
+                                <x-slot name="icon">
+                                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l9-5 9 5-9 5-9-5z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 10v5c0 1.5 3.1 3 7 3s7-1.5 7-3v-5"/>
+                                    </svg>
+                                </x-slot>
+                                បន្ទប់ប្រឡង (Exam Rooms)
+                            </x-sidebar-link>
+
+                            <x-sidebar-link route="stateExam.report" :exact="true">
+                                <x-slot name="icon">
+                                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/>
+                                    </svg>
+                                </x-slot>
+                                របាយការណ៍ (Report)
+                            </x-sidebar-link>
+
+                            <x-sidebar-link route="state-exam.attendance.index" :exact="true">
+                                <x-slot name="icon">
+                                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </x-slot>
+                                អវត្តមានប្រឡង (Attendance)
+                            </x-sidebar-link>
+
+                            <x-sidebar-link route="state-exam.invigilators.index" :exact="true">
+                                <x-slot name="icon">
+                                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                    </svg>
+                                </x-slot>
+                                កាតអ្នកឃ្លាំមើល (Duty Cards)
+                            </x-sidebar-link>
+                        </ul>
+                    </li>
 
                     <li class="pt-4 pb-1">
                         <span class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Certificate</span>

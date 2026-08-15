@@ -150,7 +150,7 @@ function boardingPass(room, roster, i, keyword) {
                 <!-- Glass panel -->
                 <div class="relative flex flex-col sm:flex-row rounded-[27px] overflow-hidden bg-white/45 dark:bg-neutral-900/45 backdrop-blur-2xl">
 
-                    <!-- Material layers: grain for texture, moving specular highlight, static top sheen -->
+                    <!-- Material layers: grain for textures, moving specular highlight, static top sheen -->
                     <div class="glass-noise pointer-events-none absolute inset-0" aria-hidden="true"></div>
                     <div class="glass-specular pointer-events-none absolute inset-0" aria-hidden="true"></div>
                     <div class="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/45 dark:from-white/10 via-transparent to-transparent opacity-60" aria-hidden="true"></div>

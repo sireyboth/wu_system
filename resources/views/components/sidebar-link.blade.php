@@ -1,4 +1,4 @@
-@props(['route', 'icon' => null])
+@props(['route', 'icon' => null, 'exact' => false])
 
 @php
     use Illuminate\Support\Facades\Route as RouteFacade;
@@ -6,8 +6,12 @@
 
     $href = $route && RouteFacade::has($route) ? route($route) : '#';
 
-    $base = $route ? Str::before($route, '.') : '';
-    $isActive = $base ? request()->routeIs($base . '.*') : false;
+    if ($exact) {
+        $isActive = $route ? request()->routeIs($route) : false;
+    } else {
+        $base = $route ? Str::before($route, '.') : '';
+        $isActive = $base ? request()->routeIs($base . '.*') : false;
+    }
 
     $activeClasses = 'text-indigo-600 dark:text-indigo-400
                       bg-indigo-50 dark:bg-indigo-500/10
