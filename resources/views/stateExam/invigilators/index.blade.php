@@ -30,7 +30,7 @@
         </svg>
     </div>
     <input id="invigilatorSearchInput" type="text" placeholder="ស្វែងរកឈ្មោះ, បន្ទប់, ជាន់..." autocomplete="off"
-        class="relative block w-full p-4 ps-11 text-sm bg-white/40 dark:bg-white/5 backdrop-blur-2xl border border-white/50 dark:border-white/10 rounded-2xl shadow-lg shadow-indigo-500/5 focus:ring-4 focus:ring-indigo-400/30 focus:border-indigo-400/70 dark:focus:border-indigo-500/50 dark:placeholder-neutral-500 outline-none transition-all" />
+        class="relative block w-full p-4 ps-11 text-base sm:text-sm bg-white/40 dark:bg-white/5 backdrop-blur-2xl border border-white/50 dark:border-white/10 rounded-2xl shadow-lg shadow-indigo-500/5 focus:ring-4 focus:ring-indigo-400/30 focus:border-indigo-400/70 dark:focus:border-indigo-500/50 dark:placeholder-neutral-500 outline-none transition-all" />
 </div>
 
 <!-- Color-blob canvas the glass cards refract via backdrop-blur -->

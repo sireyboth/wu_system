@@ -136,6 +136,43 @@
             .state-bg { display: none !important; }
             body { background: #fff !important; }
         }
+
+        /* ---------- Premium glass: pointer-tracked tilt + moving specular highlight ---------- */
+        .glass-tilt {
+            transform: perspective(1200px) rotateX(0deg) rotateY(0deg);
+            transition: transform .5s cubic-bezier(.16,1,.3,1), box-shadow .5s cubic-bezier(.16,1,.3,1);
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+
+        /* JS sets --tiltX/--tiltY/--specX/--specY on mousemove; this is the resting state. */
+        .glass-tilt {
+            --specX: 30%;
+            --specY: 20%;
+        }
+
+        .glass-specular {
+            background: radial-gradient(circle at var(--specX, 30%) var(--specY, 20%), rgba(255,255,255,.55), transparent 42%);
+            mix-blend-mode: overlay;
+            opacity: .9;
+        }
+
+        html.dark .glass-specular {
+            background: radial-gradient(circle at var(--specX, 30%) var(--specY, 20%), rgba(255,255,255,.22), transparent 42%);
+        }
+
+        /* Subtle material grain so the glass reads as a surface, not a flat gradient. */
+        .glass-noise {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            opacity: .05;
+            mix-blend-mode: overlay;
+        }
+
+        html.dark .glass-noise { opacity: .08; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .glass-tilt { transition: none; }
+        }
     </style>
 </head>
 

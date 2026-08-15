@@ -32,7 +32,7 @@
         </svg>
     </div>
     <input id="roomSearchInput" type="text" placeholder="ស្វែងរកបន្ទប់, ជំនាញ, សញ្ញាបត្រ..." autocomplete="off"
-        class="block w-full p-4 ps-11 text-sm bg-white/80 dark:bg-neutral-900/70 backdrop-blur-sm border border-neutral-200 dark:border-white/10 rounded-2xl shadow-sm focus:ring-4 focus:ring-indigo-500/15 focus:border-indigo-400 dark:focus:border-indigo-500/50 dark:placeholder-neutral-500 outline-none transition-all" />
+        class="block w-full p-4 ps-11 text-base sm:text-sm bg-white/80 dark:bg-neutral-900/70 backdrop-blur-sm border border-neutral-200 dark:border-white/10 rounded-2xl shadow-sm focus:ring-4 focus:ring-indigo-500/15 focus:border-indigo-400 dark:focus:border-indigo-500/50 dark:placeholder-neutral-500 outline-none transition-all" />
 </div>
 
 <div id="roomList" class="space-y-3 fade-up" style="animation-delay:200ms"></div>
