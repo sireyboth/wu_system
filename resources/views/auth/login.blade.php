@@ -263,7 +263,7 @@
                     <button class="rp-submit" type="submit">Enter Records System &rarr;</button>
 
                     <div class="rp-foot">
-                        New staff member? <a href="{{ route('register') }}">Request registrar access</a>
+                        New staff accounts are created by an administrator — contact your registrar admin for access.
                     </div>
                 </form>
             </div>
