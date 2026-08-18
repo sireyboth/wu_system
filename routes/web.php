@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ExamScheduleController;
+use App\Http\Controllers\AlertController;
 use App\Http\Controllers\BatchController;
 use App\Http\Controllers\CampusController;
 use App\Http\Controllers\DashboardController;
@@ -40,6 +41,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('campus', CampusController::class)->only('index');
     Route::resource('stateExam', StateExamController::class)->only('index');
     Route::get('stateExam/report', [StateExamController::class, 'report'])->name('stateExam.report');
+
+    Route::resource('alert', AlertController::class)->only('index');
 
     Route::resource('student', StudentController::class)->only('index');
     Route::resource('StudentStatusCertificate', StudentStatusController::class)->only('index');

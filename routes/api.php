@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AddressController;
+use App\Http\Controllers\Api\AlertController;
 use App\Http\Controllers\Api\BatchController;
 use App\Http\Controllers\Api\CampusController;
 use App\Http\Controllers\Api\CertificateController;
@@ -31,6 +32,14 @@ Route::prefix('v1')->group(function () {
         Route::delete('/bulk', [ExamStateController::class, 'bulkDestroy'])->name('bulk-destroy');
     });
 
+    Route::prefix('alerts')->name('alerts.')->group(function () {
+        Route::get('/dashboard', [AlertController::class, 'dashboard'])->name('dashboard');
+        Route::delete('/bulk', [AlertController::class, 'bulkDestroy'])->name('bulk-destroy');
+        Route::post('/{alert}/complete', [AlertController::class, 'complete'])->name('complete');
+        Route::post('/{alert}/snooze', [AlertController::class, 'snooze'])->name('snooze');
+        Route::get('/{alert}/logs', [AlertController::class, 'logs'])->name('logs');
+    });
+
     // Register API resource routes for various controllers
     api_routes([
         'faculties'    => FacultyController::class,
@@ -45,6 +54,7 @@ Route::prefix('v1')->group(function () {
         'statuses'     => StatusController::class,
         'certificates' => CertificateController::class,
         'exam-states'  => ExamStateController::class,
+        'alerts'       => AlertController::class,
         'users'        => UserController::class,
     ]);
 
