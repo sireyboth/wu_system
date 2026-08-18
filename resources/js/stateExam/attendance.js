@@ -148,12 +148,18 @@ function renderList(rooms) {
     }).join('');
 }
 
+function byRoomAscending(a, b) {
+    // Numeric-aware compare so "104" < "105" < "Hall 505", not alphabetical ("104" < "2xx").
+    return String(a.room ?? '').localeCompare(String(b.room ?? ''), undefined, { numeric: true, sensitivity: 'base' });
+}
+
 async function fetchRooms(search = '') {
     const res = await fetch(`${API_BASE}?search=${encodeURIComponent(search)}`, {
         headers: { Accept: 'application/json' },
     });
     const json = await res.json();
-    return Array.isArray(json.data) ? json.data : [];
+    const rooms = Array.isArray(json.data) ? json.data : [];
+    return rooms.sort(byRoomAscending);
 }
 
 async function loadRooms(search = '', { silent = false } = {}) {
