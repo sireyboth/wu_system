@@ -21,9 +21,47 @@ document.addEventListener('DOMContentLoaded', () => {
     resetAbsenceInputs(dom);
     bindBulkSelect(dom, ApiService, () => loadStateExam(dom, ApiService, dom.searchInput?.value || ''));
     bindPagination((page) => loadStateExam(dom, ApiService, dom.searchInput?.value || '', page));
+    bindSortableHeaders(dom, ApiService);
     initEvents(dom, ApiService);
     loadStateExam(dom, ApiService);
 });
+
+/**
+ * Wires up the <x-ui.data-table> sortable-header buttons (currently just
+ * "Room"). Clicking the active column flips asc/desc; clicking a different
+ * one switches to it starting at asc. Icon rotation/color reflects state.
+ */
+function bindSortableHeaders(dom, ApiService) {
+    const buttons = document.querySelectorAll('.sortable-th[data-sort-table="state-exam-table-body"]');
+
+    function syncIcons() {
+        buttons.forEach((btn) => {
+            const icon = btn.querySelector('.sort-icon');
+            const isActive = btn.dataset.sortKey === state.sortKey;
+            btn.classList.toggle('text-indigo-600', isActive);
+            btn.classList.toggle('dark:text-indigo-400', isActive);
+            if (icon) {
+                icon.classList.toggle('text-indigo-500', isActive);
+                icon.classList.toggle('dark:text-indigo-400', isActive);
+                icon.classList.toggle('text-neutral-300', !isActive);
+                icon.classList.toggle('dark:text-neutral-600', !isActive);
+                icon.style.transform = isActive && state.sortDir === 'desc' ? 'rotate(180deg)' : '';
+            }
+        });
+    }
+
+    buttons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const key = btn.dataset.sortKey;
+            state.sortDir = state.sortKey === key && state.sortDir === 'asc' ? 'desc' : 'asc';
+            state.sortKey = key;
+            syncIcons();
+            loadStateExam(dom, ApiService, dom.searchInput?.value || '');
+        });
+    });
+
+    syncIcons();
+}
 
 function initEvents(dom, ApiService) {
     dom.form?.addEventListener('submit', (e) => handleFormSubmit(dom, ApiService, e));

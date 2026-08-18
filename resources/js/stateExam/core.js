@@ -15,6 +15,8 @@ export const state = {
     debounceTimer: null,
     searchAbortController: null, // used by api-service to cancel stale searches
     showingTrash: false,
+    sortKey: 'room',
+    sortDir: 'asc', // 'asc' | 'desc'
 };
 
 /**

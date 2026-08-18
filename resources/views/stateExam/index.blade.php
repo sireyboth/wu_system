@@ -63,7 +63,7 @@
         </div>
 
         <x-ui.data-table
-            :headers="['N.O', 'Room', 'Major', 'Degree', 'Shift', 'Students', 'Exam Date', 'Attendance', ['label' => 'Actions', 'align' => 'right']]"
+            :headers="['N.O', ['label' => 'Room', 'sort' => 'room'], 'Major', 'Degree', 'Shift', 'Students', 'Exam Date', 'Attendance', ['label' => 'Actions', 'align' => 'right']]"
             body-id="state-exam-table-body" selectable />
     </div>
 
