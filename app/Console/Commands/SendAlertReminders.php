@@ -32,26 +32,22 @@ class SendAlertReminders extends Command
 
             // Heads-up pings are automatic now — no per-alert opt-in.
             if ($alert->start_date->isTomorrow() && ! $this->alreadySentForOccurrence($alert, 'before_start')) {
-                $sent += (int) $this->send($alert, 'before_start',
-                    "🔔 *{$alert->title}*\nStarts tomorrow — " . $alert->start_date->format('D, d M Y h:i A'));
+                $sent += (int) $this->send($alert, 'before_start', $alert->telegramMessage('before_start'));
             }
 
             if ($alert->end_date->isTomorrow() && ! $this->alreadySentForOccurrence($alert, 'before_end')) {
-                $sent += (int) $this->send($alert, 'before_end',
-                    "⏰ *{$alert->title}*\nEnds tomorrow — " . $alert->end_date->format('D, d M Y h:i A'));
+                $sent += (int) $this->send($alert, 'before_end', $alert->telegramMessage('before_end'));
             }
 
             // One-shot pings the instant start/end actually arrive — independent of
             // the optional repeating nag, so even a short, non-repeating alert
             // still tells you when it begins and when it's due.
             if (now()->gte($alert->start_date) && ! $this->alreadySentForOccurrence($alert, 'on_start')) {
-                $sent += (int) $this->send($alert, 'on_start',
-                    "🔔 *{$alert->title}*\nStarting now — " . $alert->start_date->format('D, d M Y h:i A'));
+                $sent += (int) $this->send($alert, 'on_start', $alert->telegramMessage('on_start'));
             }
 
             if (now()->gte($alert->end_date) && ! $this->alreadySentForOccurrence($alert, 'on_end')) {
-                $sent += (int) $this->send($alert, 'on_end',
-                    "⏳ *{$alert->title}*\nDue now — " . $alert->end_date->format('D, d M Y h:i A'));
+                $sent += (int) $this->send($alert, 'on_end', $alert->telegramMessage('on_end'));
             }
 
             if ($alert->remind_enabled && $alert->remind_interval_minutes && now()->gte($alert->start_date)) {
@@ -59,9 +55,8 @@ class SendAlertReminders extends Command
                 $due  = ! $last || $last->diffInMinutes(now()) >= $alert->remind_interval_minutes;
 
                 if ($due) {
-                    $overdueTag = $alert->isOverdue() ? "\n🚨 *OVERDUE*" : '';
                     $sent += (int) $this->send($alert, 'reminder',
-                        "🔁 *{$alert->title}*\n{$alert->content}{$overdueTag}");
+                        $alert->telegramMessage('reminder', ['overdue' => $alert->isOverdue()]));
                 }
             }
         }

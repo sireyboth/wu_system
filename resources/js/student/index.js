@@ -54,6 +54,16 @@ function initEvents(dom, ApiService) {
     // Create/update form submit
     dom.form?.addEventListener('submit', (e) => handleFormSubmit(dom, ApiService, e));
 
+    // payment_as is either yearly or semester, never both — checking one unchecks the other
+    const yearlyCheckbox = dom.form?.querySelector('#payment_as_yearly');
+    const semesterCheckbox = dom.form?.querySelector('#payment_as_semester');
+    yearlyCheckbox?.addEventListener('change', () => {
+        if (yearlyCheckbox.checked) semesterCheckbox.checked = false;
+    });
+    semesterCheckbox?.addEventListener('change', () => {
+        if (semesterCheckbox.checked) yearlyCheckbox.checked = false;
+    });
+
     // Table row actions (preview / edit / delete) via event delegation
     dom.tableBody?.addEventListener('click', (e) => {
         const targetBtn = e.target.closest('button[data-action]');

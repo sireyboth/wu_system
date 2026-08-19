@@ -87,12 +87,10 @@ class AlertController extends Controller
     public function complete(Alert $alert)
     {
         $wasRepeating = $alert->repeat_type !== 'none';
-        $title = $alert->title;
         $alert->completeOrAdvance();
+        $alert->refresh();
 
-        $message = $wasRepeating
-            ? "✅ *{$title}*\nCompleted — advanced to next occurrence: " . $alert->fresh()->start_date->format('D, d M Y h:i A')
-            : "✅ *{$title}*\nCompleted";
+        $message = $alert->telegramMessage('completed', $wasRepeating ? ['next_start' => $alert->start_date] : []);
 
         $ok = TelegramNotifier::send($message);
         $alert->log('completed', $message, $ok);

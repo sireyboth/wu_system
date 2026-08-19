@@ -79,6 +79,11 @@ export async function handleEditAction(dom, ApiService, id) {
     };
     toList(scalarFields, dom);
 
+    const yearlyCheckbox = dom.form.querySelector("#payment_as_yearly");
+    const semesterCheckbox = dom.form.querySelector("#payment_as_semester");
+    if (yearlyCheckbox) yearlyCheckbox.checked = payload.payment_as === "yearly";
+    if (semesterCheckbox) semesterCheckbox.checked = payload.payment_as === "semester";
+
     const relationalFields = {
         status_id: payload.status,
         batch_id: payload.batch,
@@ -211,6 +216,13 @@ export async function handleFormSubmit(dom, ApiService, e) {
 
     dom.submitBtn.disabled = true;
     const payload = parseNestedFormData(dom.form);
+    if (dom.form.querySelector("#payment_as_yearly")?.checked) {
+        payload.payment_as = "yearly";
+    } else if (dom.form.querySelector("#payment_as_semester")?.checked) {
+        payload.payment_as = "semester";
+    } else {
+        payload.payment_as = "none";
+    }
 
     const url = state.isEditMode
         ? `${CONFIG.API_BASE}/${state.editingStudentId}`

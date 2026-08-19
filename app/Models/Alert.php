@@ -119,4 +119,70 @@ class Alert extends IModel
     {
         return $this->logs()->where('type', $type)->first()?->sent_at;
     }
+
+    /**
+     * Builds the Telegram message for one notification type — single source
+     * of truth so the reminder command and the "Done" action stay visually
+     * consistent instead of hand-rolling their own strings. $context carries
+     * type-specific extras: ['overdue' => bool] for 'reminder',
+     * ['next_start' => Carbon] for 'completed' on a repeating alert.
+     */
+    public function telegramMessage(string $type, array $context = []): string
+    {
+        [$icon, $label] = match ($type) {
+            'before_start' => ['🔔', 'ជូនដំណឹងជាមុន — Starts Tomorrow'],
+            'before_end'   => ['⏰', 'ជូនដំណឹងជាមុន — Due Tomorrow'],
+            'on_start'     => ['🚀', 'ចាប់ផ្តើមឥឡូវនេះ — Starting Now'],
+            'on_end'       => ['⏳', 'ដល់ពេលកំណត់ — Due Now'],
+            'reminder'     => ($context['overdue'] ?? false)
+                ? ['🚨', 'ហួសកំណត់ — Overdue Reminder']
+                : ['🔁', 'ការរំលឹក — Reminder'],
+            'completed'    => ['✅', 'បានបញ្ចប់ — Completed'],
+            default        => ['📌', 'ការជូនដំណឹង — Notice'],
+        };
+
+        $lines = ["{$icon} *{$label}*", '', '*' . self::escapeTelegramMarkdown($this->title) . '*'];
+
+        if ($this->sub_title) {
+            $lines[] = '_' . self::escapeTelegramMarkdown($this->sub_title) . '_';
+        }
+
+        if ($type !== 'completed' && $this->content) {
+            $lines[] = '';
+            $lines[] = self::escapeTelegramMarkdown($this->content);
+        }
+
+        $meta = [];
+        if ($this->category) {
+            $meta[] = "📁 " . self::escapeTelegramMarkdown($this->category);
+        }
+
+        $meta[] = match ($type) {
+            'before_start', 'on_start' => '🗓 ចាប់ផ្តើម (Start): ' . $this->start_date->format('D, d M Y · h:i A'),
+            'before_end', 'on_end', 'reminder' => '🗓 កំណត់ (Due): ' . $this->end_date->format('D, d M Y · h:i A'),
+            'completed' => isset($context['next_start'])
+                ? '🔁 លើកក្រោយ (Next occurrence): ' . $context['next_start']->format('D, d M Y · h:i A')
+                : '🗓 ' . $this->start_date->format('D, d M Y · h:i A') . ' → ' . $this->end_date->format('D, d M Y · h:i A'),
+            default => null,
+        };
+
+        $lines[] = '';
+        $lines = [...$lines, ...array_filter($meta)];
+
+        $lines[] = '';
+        $lines[] = '🏫 Western University · Registrar Alerts';
+
+        return implode("\n", $lines);
+    }
+
+    /**
+     * Telegram's legacy "Markdown" parse mode 400s the whole request if
+     * user-typed text happens to contain an unescaped _, *, `, or [ — so any
+     * free-text field (title/sub_title/content/category) must be escaped
+     * before being wrapped in our own bold/italic markers.
+     */
+    protected static function escapeTelegramMarkdown(string $text): string
+    {
+        return preg_replace('/([_*`\[])/', '\\\\$1', $text);
+    }
 }

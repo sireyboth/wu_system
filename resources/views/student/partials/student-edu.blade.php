@@ -74,6 +74,25 @@
                 <input type="text" name="from_school" placeholder="e.g., វិទ្យាល័យ ជា ស៊ីម សាមគ្គី"
                     class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
             </div>
+            <div class="flex flex-col justify-end gap-1.5 pb-2.5">
+                <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1">
+                    របៀបទូទាត់ថ្លៃសិក្សា (Payment As)
+                </label>
+                <div class="flex items-center gap-4">
+                    <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                        <input type="checkbox" id="payment_as_semester"
+                            class="w-4 h-4 rounded border-neutral-300 dark:border-white/20 text-indigo-600 focus:ring-4 focus:ring-indigo-500/10 focus:ring-offset-0 cursor-pointer">
+                        <span class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">ឆមាស
+                            (Semesterly)</span>
+                    </label>
+                    <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                        <input type="checkbox" id="payment_as_yearly"
+                            class="w-4 h-4 rounded border-neutral-300 dark:border-white/20 text-indigo-600 focus:ring-4 focus:ring-indigo-500/10 focus:ring-offset-0 cursor-pointer">
+                        <span class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">ឆ្នាំ
+                            (Yearly)</span>
+                    </label>
+                </div>
+            </div>
         </div>
     </div>
 
