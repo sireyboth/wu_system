@@ -10,7 +10,7 @@ class SendAlertReminders extends Command
 {
     protected $signature = 'alerts:send-reminders';
 
-    protected $description = 'Send Telegram reminders for alerts: 1-day-before pings, and the repeating nag while an alert is active or overdue';
+    protected $description = 'Send Telegram reminders for alerts: 1-day-before pings, a one-shot ping when it starts and when it\'s due, and the repeating nag while an alert is active or overdue';
 
     public function handle(): int
     {
@@ -41,6 +41,19 @@ class SendAlertReminders extends Command
                     "⏰ *{$alert->title}*\nEnds tomorrow — " . $alert->end_date->format('D, d M Y h:i A'));
             }
 
+            // One-shot pings the instant start/end actually arrive — independent of
+            // the optional repeating nag, so even a short, non-repeating alert
+            // still tells you when it begins and when it's due.
+            if (now()->gte($alert->start_date) && ! $this->alreadySentForOccurrence($alert, 'on_start')) {
+                $sent += (int) $this->send($alert, 'on_start',
+                    "🔔 *{$alert->title}*\nStarting now — " . $alert->start_date->format('D, d M Y h:i A'));
+            }
+
+            if (now()->gte($alert->end_date) && ! $this->alreadySentForOccurrence($alert, 'on_end')) {
+                $sent += (int) $this->send($alert, 'on_end',
+                    "⏳ *{$alert->title}*\nDue now — " . $alert->end_date->format('D, d M Y h:i A'));
+            }
+
             if ($alert->remind_enabled && $alert->remind_interval_minutes && now()->gte($alert->start_date)) {
                 $last = $alert->lastLogAt('reminder');
                 $due  = ! $last || $last->diffInMinutes(now()) >= $alert->remind_interval_minutes;
@@ -58,15 +71,15 @@ class SendAlertReminders extends Command
     }
 
     /**
-     * A "before_start"/"before_end" ping should fire once per occurrence, not
-     * once per calendar day — after a repeating alert advances, start_date
-     * moves forward, so scoping the dedup check to "since 2 days before the
-     * current start_date" naturally re-arms it for the next occurrence
-     * without needing to track occurrence numbers separately.
+     * Each one-shot ping type should fire once per occurrence, not once per
+     * calendar day — after a repeating alert advances, start_date/end_date
+     * move forward, so scoping the dedup check to "since 2 days before the
+     * anchor date" naturally re-arms it for the next occurrence without
+     * needing to track occurrence numbers separately.
      */
     protected function alreadySentForOccurrence(Alert $alert, string $type): bool
     {
-        $anchor = $type === 'before_end' ? $alert->end_date : $alert->start_date;
+        $anchor = in_array($type, ['before_end', 'on_end'], true) ? $alert->end_date : $alert->start_date;
 
         return $alert->logs()
             ->where('type', $type)
