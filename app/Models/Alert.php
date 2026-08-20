@@ -141,33 +141,28 @@ class Alert extends IModel
             default        => ['📌', 'ការជូនដំណឹង — Notice'],
         };
 
-        $lines = ["{$icon} *{$label}*", '', '*' . self::escapeTelegramMarkdown($this->title) . '*'];
+        $lines = ["{$icon} *{$label}*", ''];
+
+        if ($this->category) {
+            $lines[] = '📁 *Category:* ' . self::escapeTelegramMarkdown($this->category);
+        }
+
+        $lines[] = '📝 *Title:* ' . self::escapeTelegramMarkdown($this->title);
 
         if ($this->sub_title) {
-            $lines[] = '_' . self::escapeTelegramMarkdown($this->sub_title) . '_';
+            $lines[] = '🏷 *Subtitle:* ' . self::escapeTelegramMarkdown($this->sub_title);
         }
 
         if ($type !== 'completed' && $this->content) {
-            $lines[] = '';
-            $lines[] = self::escapeTelegramMarkdown($this->content);
+            $lines[] = '🗒 *Content:* ' . self::escapeTelegramMarkdown($this->content);
         }
 
-        $meta = [];
-        if ($this->category) {
-            $meta[] = "📁 " . self::escapeTelegramMarkdown($this->category);
+        $lines[] = '🟢 *Start Date:* ' . $this->start_date->format('D, d M Y · h:i A');
+        $lines[] = '🔴 *End Date:* ' . $this->end_date->format('D, d M Y · h:i A');
+
+        if ($type === 'completed' && isset($context['next_start'])) {
+            $lines[] = '🔁 *Next Occurrence:* ' . $context['next_start']->format('D, d M Y · h:i A');
         }
-
-        $meta[] = match ($type) {
-            'before_start', 'on_start' => '🗓 ចាប់ផ្តើម (Start): ' . $this->start_date->format('D, d M Y · h:i A'),
-            'before_end', 'on_end', 'reminder' => '🗓 កំណត់ (Due): ' . $this->end_date->format('D, d M Y · h:i A'),
-            'completed' => isset($context['next_start'])
-                ? '🔁 លើកក្រោយ (Next occurrence): ' . $context['next_start']->format('D, d M Y · h:i A')
-                : '🗓 ' . $this->start_date->format('D, d M Y · h:i A') . ' → ' . $this->end_date->format('D, d M Y · h:i A'),
-            default => null,
-        };
-
-        $lines[] = '';
-        $lines = [...$lines, ...array_filter($meta)];
 
         $lines[] = '';
         $lines[] = '🏫 Western University · Registrar Alerts';
