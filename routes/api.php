@@ -21,16 +21,28 @@ use Illuminate\Support\Facades\Route;
 /**
  * Route Api for application
  */
+// These two are admin-only actions and must be registered — and matched —
+// before the public exam-states resource below, or its {exam_state}
+// wildcard show route would swallow "/report" and "/bulk" as an id first.
+Route::prefix('v1')->middleware('auth')->group(function () {
+    Route::prefix('exam-states')->name('exam-states.')->group(function () {
+        Route::get('/report', [ExamStateController::class, 'report'])->name('report');
+        Route::delete('/bulk', [ExamStateController::class, 'bulkDestroy'])->name('bulk-destroy');
+    });
+});
+
+// Exam-states stays fully public and unauthenticated — the on-site
+// attendance/invigilator pages (routes/web.php's public state-exam.*
+// group) have no login and PUT here directly to mark absences.
+Route::prefix('v1')->group(function () {
+    api_routes(['exam-states' => ExamStateController::class]);
+});
+
 Route::prefix('v1')->middleware('auth')->group(function () {
     // Custom API routes for specific controllers
     Route::prefix('certificates')->name('certificates.')->group(function () {
         Route::get('/preview-number', [CertificateController::class, 'preview'])->name('preview');
         Route::get('/report', [CertificateController::class, 'report'])->name('report');
-    });
-
-    Route::prefix('exam-states')->name('exam-states.')->group(function () {
-        Route::get('/report', [ExamStateController::class, 'report'])->name('report');
-        Route::delete('/bulk', [ExamStateController::class, 'bulkDestroy'])->name('bulk-destroy');
     });
 
     Route::prefix('alerts')->name('alerts.')->group(function () {
@@ -64,7 +76,6 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         'students'     => StudentController::class,
         'statuses'     => StatusController::class,
         'certificates' => CertificateController::class,
-        'exam-states'  => ExamStateController::class,
         'alerts'       => AlertController::class,
         'users'        => UserController::class,
     ], [
@@ -79,8 +90,8 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         'students'     => 'student',
         'statuses'     => 'app-status',
         'certificates' => 'certificate',
-        'exam-states'  => 'state-exam',
         // 'alerts' intentionally ungated — every logged-in user manages alerts.
+        // 'exam-states' registered separately above, fully public.
         'users'        => 'role',
     ]);
 
