@@ -46,7 +46,7 @@
             this.toggleLoader(true);
             try {
                 const response = await fetch(url, {
-                    credentials: 'omit',
+                    credentials: 'same-origin',
                     headers: { 'Accept': 'application/json', ...options.headers },
                     ...options
                 });

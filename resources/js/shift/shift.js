@@ -50,7 +50,7 @@ const ApiService = {
 
             const response = await fetch(url, {
                 method: method, // Explicitly enforce the target HTTP verb
-                credentials: 'omit',
+                credentials: 'same-origin',
                 headers: {
                     'Accept': 'application/json',
                     ...headers

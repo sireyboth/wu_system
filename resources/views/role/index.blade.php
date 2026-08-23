@@ -5,11 +5,21 @@
     <x-core.page-header title="តួនាទី និងសិទ្ធិចូលប្រើ (Roles & Permissions)"
         subtitle="គ្រប់គ្រងអ្វីដែលបុគ្គលិកនីមួយៗអាចមើល ឬកែប្រែបាន (Control what each staff member can see and edit)" />
 
-    <div class="space-y-8">
+    <div class="space-y-10">
         {{-- Roles --}}
         <div>
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-sm font-bold text-neutral-800 dark:text-white">តួនាទី (Roles)</h3>
+            <div class="flex items-center justify-between mb-5">
+                <div class="flex items-center gap-2.5">
+                    <span class="flex items-center justify-center w-8 h-8 rounded-xl bg-indigo-600/10 text-indigo-600 dark:text-indigo-400">
+                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12a3 3 0 100-6 3 3 0 000 6zM17.804 21c.512-.75.79-1.638.79-2.556C18.594 15.36 15.964 13 12.75 13H12a4.5 4.5 0 00-4.5 4.5c0 .918.278 1.806.79 2.556M15 6a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </span>
+                    <div>
+                        <h3 class="text-sm font-bold text-neutral-800 dark:text-white leading-tight">តួនាទី (Roles)</h3>
+                        <p class="text-[11px] text-neutral-400">Reusable permission bundles you assign to staff</p>
+                    </div>
+                </div>
                 <button type="button" onclick="RolesModule.openCreate()"
                     class="inline-flex items-center px-4 py-2.5 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition-all active:scale-95">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -19,35 +29,44 @@
                 </button>
             </div>
 
-            <div id="roles-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            <div id="roles-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
         </div>
 
-        {{-- Users --}}
+        {{-- Staff Accounts --}}
         <div>
-            <h3 class="text-sm font-bold text-neutral-800 dark:text-white mb-4">បុគ្គលិក (Staff Accounts)</h3>
-            <div
-                class="relative overflow-hidden bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-2xl shadow-sm">
-                <div id="loading-overlay"
-                    class="hidden absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-neutral-900/50 backdrop-blur-[2px]">
-                    <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
+            <div class="flex items-center justify-between mb-5">
+                <div class="flex items-center gap-2.5">
+                    <span class="flex items-center justify-center w-8 h-8 rounded-xl bg-emerald-600/10 text-emerald-600 dark:text-emerald-400">
+                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </span>
+                    <div>
+                        <h3 class="text-sm font-bold text-neutral-800 dark:text-white leading-tight">បុគ្គលិក (Staff Accounts)</h3>
+                        <p id="staff-count-label" class="text-[11px] text-neutral-400">&nbsp;</p>
+                    </div>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left text-neutral-500 dark:text-neutral-400 border-collapse">
-                        <thead class="text-xs text-neutral-700 uppercase bg-neutral-50 dark:bg-neutral-800/50 dark:text-neutral-300">
-                            <tr>
-                                <th class="px-6 py-3">Name</th>
-                                <th class="px-6 py-3">Email</th>
-                                <th class="px-6 py-3">Role</th>
-                            </tr>
-                        </thead>
-                        <tbody id="users-table-body" class="divide-y divide-neutral-100 dark:divide-white/5"></tbody>
-                    </table>
+                <div class="relative w-full max-w-xs">
+                    <div class="absolute inset-y-0 left-0 flex items-center ps-3 pointer-events-none">
+                        <svg class="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" />
+                        </svg>
+                    </div>
+                    <input id="staffSearchInput" type="text" placeholder="ស្វែងរកបុគ្គលិក (Search staff)..."
+                        class="block w-full p-2.5 ps-9 text-sm text-neutral-900 border border-neutral-200 rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-neutral-900 dark:border-white/10 dark:placeholder-neutral-500 dark:text-white transition-all">
                 </div>
             </div>
+
+            <div id="loading-overlay"
+                class="hidden py-10 items-center justify-center">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+            </div>
+
+            <div id="users-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
         </div>
     </div>
 
-    <x-ui.modal id="roleModal" title="បង្កើតតួនាទីថ្មី (Create Role)" formId="roleForm" maxWidth="max-w-2xl">
+    <x-ui.modal id="roleModal" title="បង្កើតតួនាទីថ្មី (Create Role)" formId="roleForm" maxWidth="max-w-3xl">
         <input type="hidden" name="id">
         <div>
             <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">
@@ -57,9 +76,28 @@
         </div>
 
         <div>
-            <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-2">
-                សិទ្ធិចូលប្រើម៉ូឌុល (Module Permissions)</label>
-            <div id="permission-grid" class="space-y-2 border border-neutral-200 dark:border-white/10 rounded-xl p-3 max-h-[45vh] overflow-y-auto"></div>
+            <div class="flex items-center justify-between mb-2">
+                <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+                    សិទ្ធិចូលប្រើម៉ូឌុល (Module Permissions)</label>
+                <button type="button" id="toggleAllPermissions"
+                    class="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
+                    ជ្រើសរើសទាំងអស់ (Select All)
+                </button>
+            </div>
+
+            <div class="grid grid-cols-4 gap-2 px-4 pb-2 text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+                <div class="col-span-1"></div>
+                <div class="col-span-3 grid grid-cols-4 text-center">
+                    <span>View</span>
+                    <span>Create</span>
+                    <span>Edit</span>
+                    <span>Delete</span>
+                </div>
+            </div>
+
+            <div id="permission-grid"
+                class="divide-y divide-neutral-100 dark:divide-white/5 border border-neutral-200 dark:border-white/10 rounded-xl max-h-[42vh] overflow-y-auto scrollbar-thin scrollbar-thumb-neutral-200 dark:scrollbar-thumb-white/10">
+            </div>
         </div>
 
         <x-slot:footer>

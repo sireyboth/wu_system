@@ -77,7 +77,7 @@
                 const { headers, method = 'GET', body, ...restOptions } = options;
                 const response = await fetch(url, {
                     method: method,
-                    credentials: 'omit',
+                    credentials: 'same-origin',
                     headers: {
                         'Accept': 'application/json',
                         ...headers
