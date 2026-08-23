@@ -3,7 +3,7 @@ import { state, Toast } from "./core.js";
 import { parseNestedFormData } from "./form-utils.js";
 import { renderTable } from "./table-render.js";
 import { toggleModal, switchTab } from "./ui.js";
-import { populateAddressCascade } from "./address-cascade.js";
+import { populateAddressCascade, initFormLookups } from "./address-cascade.js";
 import { getById, toList } from "../app.js";
 
 /**
@@ -64,6 +64,10 @@ export async function handleEditAction(dom, ApiService, id) {
         dom.submitBtn.textContent = "ធ្វើបច្ចុប្បន្នភាពទិន្នន័យ (Update)";
 
     if (!dom.form) return;
+
+    // Ensure dropdown option lists exist before we set their selected values below
+    // (memoized — a no-op if the modal was already opened once this page load).
+    await initFormLookups(ApiService);
 
     // 1. Academic details
     const scalarFields = {

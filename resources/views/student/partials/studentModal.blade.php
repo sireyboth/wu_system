@@ -13,19 +13,36 @@
                     ដើម្បីបញ្ចូលទៅក្នុងប្រព័ន្ធទិន្នន័យ</p>
             </div>
 
-            <div
-                class="flex flex-wrap bg-neutral-100 dark:bg-neutral-950 p-1 rounded-xl border border-neutral-200/50 dark:border-white/5">
-                <button type="button" onclick="switchTab('identity')" id="tab-identity"
-                    class="px-4 py-2 text-xs font-bold rounded-lg transition-all bg-white dark:bg-neutral-900 text-indigo-600 dark:text-white shadow-sm">
-                    ១. អត្តសញ្ញាណផ្ទាល់ខ្លួន
-                </button>
-                <button type="button" onclick="switchTab('academic')" id="tab-academic"
-                    class="px-4 py-2 text-xs font-medium text-neutral-500 dark:text-neutral-400 rounded-lg transition-all hover:text-neutral-900 dark:hover:text-white">
-                    ២. ព័ត៌មានសិក្សា
-                </button>
-                <button type="button" onclick="switchTab('guardian')" id="tab-guardian"
-                    class="px-4 py-2 text-xs font-medium text-neutral-500 dark:text-neutral-400 rounded-lg transition-all hover:text-neutral-900 dark:hover:text-white">
-                    ៣. ព័ត៌មានអាណាព្យាបាល
+            <div class="flex items-center gap-3">
+                <div
+                    class="flex flex-wrap bg-neutral-100 dark:bg-neutral-950 p-1 rounded-xl border border-neutral-200/50 dark:border-white/5">
+                    <button type="button" onclick="switchTab('identity')" id="tab-identity"
+                        class="flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg transition-all bg-white dark:bg-neutral-900 text-indigo-600 dark:text-white shadow-sm">
+                        <span
+                            class="flex items-center justify-center w-4 h-4 rounded-full bg-indigo-600 text-white text-[10px] font-bold">1</span>
+                        អត្តសញ្ញាណផ្ទាល់ខ្លួន
+                    </button>
+                    <button type="button" onclick="switchTab('academic')" id="tab-academic"
+                        class="flex items-center gap-2 px-4 py-2 text-xs font-medium text-neutral-500 dark:text-neutral-400 rounded-lg transition-all hover:text-neutral-900 dark:hover:text-white">
+                        <span
+                            class="flex items-center justify-center w-4 h-4 rounded-full bg-neutral-300 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 text-[10px] font-bold">2</span>
+                        ព័ត៌មានសិក្សា
+                    </button>
+                    <button type="button" onclick="switchTab('guardian')" id="tab-guardian"
+                        class="flex items-center gap-2 px-4 py-2 text-xs font-medium text-neutral-500 dark:text-neutral-400 rounded-lg transition-all hover:text-neutral-900 dark:hover:text-white">
+                        <span
+                            class="flex items-center justify-center w-4 h-4 rounded-full bg-neutral-300 dark:bg-white/10 text-neutral-600 dark:text-neutral-300 text-[10px] font-bold">3</span>
+                        ព័ត៌មានអាណាព្យាបាល
+                    </button>
+                </div>
+
+                <button type="button" data-close-modal="student" aria-label="Close"
+                    class="shrink-0 flex items-center justify-center w-9 h-9 rounded-xl text-neutral-400 hover:text-neutral-700 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-white/5 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
                 </button>
             </div>
         </div>

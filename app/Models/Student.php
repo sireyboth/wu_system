@@ -36,15 +36,24 @@ class Student extends IModel
             'remark',
         ];
 
-        $this->searchable = array_map(fn($p) => "person.{$p}", [
-            'first_name',
-            'last_name',
-            'first_name_kh',
-            'last_name_kh',
-            'dob',
-            'sex',
-            'email',
-        ]);
+        $this->searchable = [
+            'code',
+            ...array_map(fn($p) => "person.{$p}", [
+                'first_name',
+                'last_name',
+                'first_name_kh',
+                'last_name_kh',
+                'dob',
+                'sex',
+                'email',
+            ]),
+            'status.name_kh',
+            'status.name_en',
+            'batch.name_kh',
+            'batch.name_en',
+            'major.name_kh',
+            'major.name_en',
+        ];
     }
 
     protected function casts(): array

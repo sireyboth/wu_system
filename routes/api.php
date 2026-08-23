@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\FacultyController;
 use App\Http\Controllers\Api\GroupController;
 use App\Http\Controllers\Api\LecturerController;
 use App\Http\Controllers\Api\MajorController;
+use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\ShiftController;
 use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\StudentController;
@@ -20,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 /**
  * Route Api for application
  */
-Route::prefix('v1')->group(function () {
+Route::prefix('v1')->middleware('auth')->group(function () {
     // Custom API routes for specific controllers
     Route::prefix('certificates')->name('certificates.')->group(function () {
         Route::get('/preview-number', [CertificateController::class, 'preview'])->name('preview');
@@ -40,6 +41,16 @@ Route::prefix('v1')->group(function () {
         Route::get('/{alert}/logs', [AlertController::class, 'logs'])->name('logs');
     });
 
+    Route::middleware('permission:role.view')->prefix('roles')->name('roles.')->group(function () {
+        Route::get('/', [RoleController::class, 'index'])->name('index');
+        Route::get('/permission-catalog', [RoleController::class, 'permissionCatalog'])->name('permission-catalog');
+    });
+    Route::middleware('permission:role.create')->post('/roles', [RoleController::class, 'store'])->name('roles.store');
+    Route::middleware('permission:role.edit')->put('/roles/{role}', [RoleController::class, 'update'])->name('roles.update');
+    Route::middleware('permission:role.delete')->delete('/roles/{role}', [RoleController::class, 'destroy'])->name('roles.destroy');
+
+    Route::middleware('permission:role.edit')->put('/users/{user}/roles', [UserController::class, 'updateRoles'])->name('users.roles.update');
+
     // Register API resource routes for various controllers
     api_routes([
         'faculties'    => FacultyController::class,
@@ -56,6 +67,21 @@ Route::prefix('v1')->group(function () {
         'exam-states'  => ExamStateController::class,
         'alerts'       => AlertController::class,
         'users'        => UserController::class,
+    ], [
+        'faculties'    => 'faculty',
+        'majors'       => 'major',
+        'shifts'       => 'shift',
+        'campuses'     => 'campus',
+        'lecturers'    => 'lecturer',
+        'subjects'     => 'subject',
+        'batches'      => 'batch',
+        'groups'       => 'group',
+        'students'     => 'student',
+        'statuses'     => 'app-status',
+        'certificates' => 'certificate',
+        'exam-states'  => 'state-exam',
+        // 'alerts' intentionally ungated — every logged-in user manages alerts.
+        'users'        => 'role',
     ]);
 
     // Address API routes

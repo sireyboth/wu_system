@@ -61,8 +61,20 @@ export function setupCascadeListener(
 /**
  * Pre-loads static reference lists (batches, majors, provinces) and wires
  * up the student + guardian cascading address selectors.
+ *
+ * Memoized: only fires the 7 lookup requests once no matter how many times
+ * (or from where) it's called — callers await the same in-flight/resolved
+ * promise instead of re-fetching. Called lazily on first modal open rather
+ * than on every page load, since most page visits never open the form.
  */
-export async function initFormLookups(ApiService) {
+let lookupsPromise = null;
+
+export function initFormLookups(ApiService) {
+    if (!lookupsPromise) lookupsPromise = loadFormLookups(ApiService);
+    return lookupsPromise;
+}
+
+async function loadFormLookups(ApiService) {
     const [
         batchesRes,
         majorsRes,

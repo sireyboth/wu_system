@@ -157,6 +157,7 @@
                         ការជូនដំណឹង (Alerts)
                     </x-sidebar-link>
 
+                    @can('state-exam.view')
                     <li class="pt-4 pb-1">
 
                         <span class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Exam</span>
@@ -229,7 +230,9 @@
                             </x-sidebar-link>
                         </ul>
                     </li>
+                    @endcan
 
+                    @can('certificate.view')
                     <li class="pt-4 pb-1">
                         <span class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Certificate</span>
 
@@ -246,7 +249,9 @@
                         </x-slot>
                         បណ្ដោះអាសន្ន (Probisional)
                     </x-sidebar-link>
+                    @endcan
 
+                    @can('student.view')
                     <li class="pt-4 pb-1">
                         <span
                             class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Statistic</span>
@@ -261,12 +266,16 @@
                         </x-slot>
                         និស្សិត (Student)
                     </x-sidebar-link>
+                    @endcan
 
+                    @canany(['faculty.view', 'major.view', 'batch.view', 'shift.view', 'group.view', 'app-status.view'])
                     <li class="pt-4 pb-1">
                         <span
                             class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Academics</span>
                     </li>
+                    @endcanany
 
+                    @can('faculty.view')
                     <x-sidebar-link route="faculty.index">
                         <x-slot name="icon">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -277,7 +286,9 @@
                         </x-slot>
                         មហាវិទ្យាល័យ (Faculty)
                     </x-sidebar-link>
+                    @endcan
 
+                    @can('major.view')
                     <x-sidebar-link route="major.index">
                         <x-slot name="icon">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -288,7 +299,9 @@
                         </x-slot>
                         ជំនាញ (Major)
                     </x-sidebar-link>
+                    @endcan
 
+                    @can('batch.view')
                     <x-sidebar-link route="batch.index">
                         <x-slot name="icon">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -300,7 +313,9 @@
                         </x-slot>
                         ជំនាន់ (Batch)
                     </x-sidebar-link>
+                    @endcan
 
+                    @can('shift.view')
                     <x-sidebar-link route="shift.index">
                         <x-slot name="icon">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -311,7 +326,9 @@
                         </x-slot>
                         វេន (Shift)
                     </x-sidebar-link>
+                    @endcan
 
+                    @can('group.view')
                     <x-sidebar-link route="group.index">
                         <x-slot name="icon">
                             <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
@@ -323,7 +340,9 @@
                         </x-slot>
                         ក្រុមសិក្សា (Group)
                     </x-sidebar-link>
+                    @endcan
 
+                    @can('app-status.view')
                     <x-sidebar-link route="app-status.index">
                         <x-slot name="icon">
                             <svg class="w-[19px] h-[19px] text-gray-800 dark:text-white" aria-hidden="true"
@@ -337,15 +356,27 @@
                         </x-slot>
                         ស្ថានភាព (Status)
                     </x-sidebar-link>
+                    @endcan
 
+                    @can('state-exam.view')
                     <x-ui.side-link title="Sample" :options="[
                         ['text' => 'Exam Schedule', 'icon' => 'calendar-check', 'route' => 'exam.schedule'],
                         // ['text' => 'Student', 'icon' => 'user', 'route' => 'student.index'],
                     ]" />
+                    @endcan
 
+                    @can('role.view')
                     <li class="pt-4 pb-1">
                         <span class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Administration</span>
                     </li>
+                    <x-sidebar-link route="role.index">
+                        <x-slot name="icon">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12a3 3 0 100-6 3 3 0 000 6zM17.804 21c.512-.75.79-1.638.79-2.556C18.594 15.36 15.964 13 12.75 13H12a4.5 4.5 0 00-4.5 4.5c0 .918.278 1.806.79 2.556M15 6a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </x-slot>
+                        តួនាទី និងសិទ្ធិ (Roles & Permissions)
+                    </x-sidebar-link>
                     <x-sidebar-link route="register">
                         <x-slot name="icon">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -354,6 +385,7 @@
                         </x-slot>
                         បង្កើតគណនីថ្មី (Create Account)
                     </x-sidebar-link>
+                    @endcan
 
                 </ul>
             </div>

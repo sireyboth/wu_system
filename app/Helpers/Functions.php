@@ -129,29 +129,42 @@ if (! function_exists('no_data')) {
 }
 
 /**
- * Register API resources with soft delete routes (restore + force delete)
+ * Register API resources with soft delete routes (restore + force delete).
+ *
+ * $modules optionally maps a resource slug to its permission-catalog module
+ * (e.g. 'statuses' => 'app-status') so reads require "{module}.view",
+ * creates "{module}.create", and every mutation (update/trash/restore/
+ * destroy/clear) requires "{module}.edit" or "{module}.delete" as
+ * appropriate. A slug left out of $modules stays ungated (e.g. 'alerts',
+ * which every logged-in user can manage regardless of role).
  */
 if (! function_exists('api_routes')) {
-    function api_routes(array $resources): void
+    function api_routes(array $resources, array $modules = []): void
     {
-        Route::apiResources($resources);
-
         foreach ($resources as $slug => $controller) {
+            $module    = $modules[$slug] ?? null;
             $parameter = str_replace('-', '_', Str::singular($slug));
 
-            // Trash
-            Route::patch("{$slug}/{{$parameter}}/trash", [$controller, 'trash'])
-                ->withTrashed()
-                ->name("{$slug}.trash");
+            $gate = fn (?string $ability) => $module && $ability ? ["permission:{$module}.{$ability}"] : [];
 
-            // Restore
-            Route::patch("{$slug}/{{$parameter}}/restore", [$controller, 'restore'])
-                ->withTrashed()
-                ->name("{$slug}.restore");
+            Route::middleware($gate('view'))->group(function () use ($slug, $parameter, $controller) {
+                Route::get($slug, [$controller, 'index'])->name("{$slug}.index");
+                Route::get("{$slug}/{{$parameter}}", [$controller, 'show'])->name("{$slug}.show");
+            });
 
-            // Force Delete
-            Route::delete("{$slug}/{{$parameter}}/clear", [$controller, 'force_destroy'])
-                ->name("{$slug}.remove");
+            Route::middleware($gate('create'))
+                ->post($slug, [$controller, 'store'])->name("{$slug}.store");
+
+            Route::middleware($gate('edit'))->group(function () use ($slug, $parameter, $controller) {
+                Route::match(['put', 'patch'], "{$slug}/{{$parameter}}", [$controller, 'update'])->name("{$slug}.update");
+                Route::patch("{$slug}/{{$parameter}}/trash", [$controller, 'trash'])->withTrashed()->name("{$slug}.trash");
+                Route::patch("{$slug}/{{$parameter}}/restore", [$controller, 'restore'])->withTrashed()->name("{$slug}.restore");
+            });
+
+            Route::middleware($gate('delete'))->group(function () use ($slug, $parameter, $controller) {
+                Route::delete("{$slug}/{{$parameter}}", [$controller, 'destroy'])->name("{$slug}.destroy");
+                Route::delete("{$slug}/{{$parameter}}/clear", [$controller, 'force_destroy'])->name("{$slug}.remove");
+            });
         }
     }
 }

@@ -24,13 +24,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Kept for old inline onclick="" markup that hasn't been migrated yet
     // (see Blade snippet below). New buttons should use data-close-modal instead.
-    window.AppModal = { toggle: (open) => toggleModal(dom, open) };
+    window.AppModal = {
+        toggle: (open) => {
+            if (open) initFormLookups(ApiService);
+            toggleModal(dom, open);
+        },
+    };
     window.toggleModal = (open) => toggleModal(dom, open);
     window.togglePreviewModal = togglePreviewModal;
     window.switchTab = switchTab;
 
     initEvents(dom, ApiService);
-    initFormLookups(ApiService);
     loadStudents(dom, ApiService);
 });
 

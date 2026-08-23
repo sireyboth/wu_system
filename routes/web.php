@@ -10,6 +10,7 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\LecturerController;
 use App\Http\Controllers\MajorController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\StudentController;
@@ -31,24 +32,28 @@ Route::middleware(['auth'])->group(function () {
     // This is the missing piece that connects to your Controller
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Additional routes based on your Controller methods
-    Route::resource('lecturer', LecturerController::class)->only('index');
-    Route::resource('shift', ShiftController::class)->only('index');
-    Route::resource('faculty', FacultyController::class)->only('index');
-    Route::resource('major', MajorController::class)->only('index');
-    Route::resource('batch', BatchController::class)->only('index');
-    Route::resource('group', GroupController::class)->only('index');
-    Route::resource('campus', CampusController::class)->only('index');
-    Route::resource('stateExam', StateExamController::class)->only('index');
-    Route::get('stateExam/report', [StateExamController::class, 'report'])->name('stateExam.report');
+    Route::resource('lecturer', LecturerController::class)->only('index')->middleware('can:lecturer.view');
+    Route::resource('shift', ShiftController::class)->only('index')->middleware('can:shift.view');
+    Route::resource('faculty', FacultyController::class)->only('index')->middleware('can:faculty.view');
+    Route::resource('major', MajorController::class)->only('index')->middleware('can:major.view');
+    Route::resource('batch', BatchController::class)->only('index')->middleware('can:batch.view');
+    Route::resource('group', GroupController::class)->only('index')->middleware('can:group.view');
+    Route::resource('campus', CampusController::class)->only('index')->middleware('can:campus.view');
 
+    Route::middleware('can:state-exam.view')->group(function () {
+        Route::resource('stateExam', StateExamController::class)->only('index');
+        Route::get('stateExam/report', [StateExamController::class, 'report'])->name('stateExam.report');
+        Route::get('/exam-schedule', ExamScheduleController::class)->name('exam.schedule');
+    });
+
+    // Alerts stay open to any logged-in user regardless of role.
     Route::resource('alert', AlertController::class)->only('index');
 
-    Route::resource('student', StudentController::class)->only('index');
-    Route::resource('StudentStatusCertificate', StudentStatusController::class)->only('index');
-    Route::resource('app-status', StatusController::class)->only('index');
+    Route::resource('student', StudentController::class)->only('index')->middleware('can:student.view');
+    Route::resource('StudentStatusCertificate', StudentStatusController::class)->only('index')->middleware('can:certificate.view');
+    Route::resource('app-status', StatusController::class)->only('index')->middleware('can:app-status.view');
 
-    Route::get('/exam-schedule', ExamScheduleController::class)->name('exam.schedule');
+    Route::resource('role', RoleController::class)->only('index')->middleware('can:role.view');
 
     Route::resource('profile', ProfileController::class)->only(['edit', 'update', 'destroy']);
 });
