@@ -172,7 +172,7 @@ function handleSubmit(e) {
 
 function bindEvents() {
     El.dateEng()?.addEventListener('change', handleDateChange);
-    El.form()?.addEventListener('submit', handleSubmit);
+    // El.form()?.addEventListener('submit', handleSubmit);
 
     document.getElementById('closeStudentStatusModalBtn')
         ?.addEventListener('click', close);
@@ -186,6 +186,7 @@ if (document.readyState === 'loading') {
 
 // Global Export
 window.StudentStatusModal = { open, close };
+
 
 // Compat shim for the modal's inline onclick="closeStudentStatusModal()" markup.
 window.closeStudentStatusModal = close;

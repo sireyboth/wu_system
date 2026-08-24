@@ -2,6 +2,7 @@
 namespace App\Http\Resources;
 
 class CertificateResource extends IResource
+class CertificateResource extends IResource
 {
     public function toList(): array
     {

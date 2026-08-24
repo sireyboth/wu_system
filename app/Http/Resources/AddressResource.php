@@ -15,4 +15,5 @@ class AddressResource extends IResource
             'village'  => new VillageResource($this->whenLoaded('village')),
         ];
     }
+
 }

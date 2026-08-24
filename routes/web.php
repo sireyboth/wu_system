@@ -26,7 +26,6 @@ Route::prefix('state-exam/attendance')->name('state-exam.attendance.')->group(fu
 });
 
 Route::middleware(['auth'])->group(function () {
-    // This is the missing piece that connects to your Controller
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Additional routes based on your Controller methods

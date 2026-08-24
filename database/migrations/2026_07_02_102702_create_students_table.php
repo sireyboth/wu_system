@@ -12,9 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         make_fields('students', function (Blueprint $table) {
-            $status_exam = ['none', 'passed', 'failed'];
-            $degree      = ['associate', 'bachelor', 'master', 'phd'];
-
             $table->foreignId('person_id')->constrained('people')->cascadeOnDelete();
             $table->foreignId('batch_id')->constrained()->cascadeOnDelete();
             $table->foreignId('major_id')->constrained()->cascadeOnDelete();

@@ -23,4 +23,15 @@ class Guardian extends IModel
     {
         return $this->belongsTo(Student::class);
     }
+
+    public function getFullGuardianAttribute(): string
+    {
+        return collect([
+            $this->name,
+            $this->job,
+            $this->relationship,
+            imploded($this->phones),
+            imploded($this->addresses),
+        ])->filter()->implode(', ');
+    }
 }

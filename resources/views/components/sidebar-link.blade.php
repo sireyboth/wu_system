@@ -1,4 +1,4 @@
-@props(['route', 'icon' => null])
+@props(['route', 'icon' => null, 'active' => null])
 
 @php
     use Illuminate\Support\Facades\Route as RouteFacade;
@@ -26,7 +26,16 @@
             'class' =>
                 'flex items-center px-3 py-2.5 rounded-xl transition-all duration-200 group ' .
                 ($isActive ? $activeClasses : $inactiveClasses),
+    <a href="{{ $href }}"
+        {{ $attributes->merge([
+            'class' =>
+                'flex items-center px-3 py-2.5 rounded-xl transition-all duration-200 group ' .
+                ($isActive ? $activeClasses : $inactiveClasses),
         ]) }}>
+        @if ($icon)
+            <div class="transition-transform duration-200 group-hover:scale-110">
+                {{ $icon }}
+            </div>
         @if ($icon)
             <div class="transition-transform duration-200 group-hover:scale-110">
                 {{ $icon }}

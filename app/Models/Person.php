@@ -3,6 +3,7 @@ namespace App\Models;
 
 class Person extends IModel
 {
+
     /**
      * The attributes that are mass assignable.
      *
@@ -48,5 +49,15 @@ class Person extends IModel
     public function nationality()
     {
         return $this->belongsTo(Nationality::class);
+    }
+
+    public function getFullNameKhAttribute()
+    {
+        return implode(' ', [$this->first_name_kh, $this->last_name_kh]);
+    }
+
+    public function getFullNameAttribute()
+    {
+        return implode(' ', [$this->first_name, $this->last_name]);
     }
 }

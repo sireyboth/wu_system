@@ -2,6 +2,7 @@
 namespace App\Http\Resources;
 
 class ProvinceResource extends IResource
+class ProvinceResource extends IResource
 {
     public function toList(): array
     {

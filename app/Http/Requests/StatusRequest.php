@@ -2,6 +2,7 @@
 namespace App\Http\Requests;
 
 class StatusRequest extends IRequest
+class StatusRequest extends IRequest
 {
     protected function formData(): array
     {

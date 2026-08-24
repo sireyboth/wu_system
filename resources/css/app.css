@@ -4,12 +4,17 @@
 
 body {
     font-family: theme("fontFamily.sans");
+    font-family: theme("fontFamily.sans");
 }
 @layer utilities {
     .dark input[type="date"]::-webkit-calendar-picker-indicator {
         filter: invert(1);
     }
+    .dark input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+    }
 }
+
 
 
 @custom-variant dark (&:where(.dark, .dark *));

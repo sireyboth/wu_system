@@ -2,6 +2,7 @@
 namespace App\Http\Requests;
 
 class BatchRequest extends IRequest
+class BatchRequest extends IRequest
 {
     protected function formData(): array
     {

@@ -2,6 +2,7 @@
 namespace App\Http\Resources;
 
 class BatchResource extends IResource
+class BatchResource extends IResource
 {
     public function toList(): array
     {

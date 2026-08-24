@@ -2,6 +2,7 @@
 namespace App\Http\Resources;
 
 class DistrictResource extends IResource
+class DistrictResource extends IResource
 {
     public function toList(): array
     {

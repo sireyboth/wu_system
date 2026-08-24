@@ -7,6 +7,6 @@ class Shift extends IModel
 
     public function students()
     {
-        return $this->hasMany(Student::class);
+        return $this->hasMany(StudentSnapshot::class);
     }
 }

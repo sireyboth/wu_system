@@ -56,34 +56,9 @@ class Student extends IModel
         return $this->belongsTo(Person::class);
     }
 
-    public function batch()
-    {
-        return $this->belongsTo(Batch::class);
-    }
-
-    public function shift()
-    {
-        return $this->belongsTo(Shift::class);
-    }
-
-    public function major()
-    {
-        return $this->belongsTo(Major::class);
-    }
-
     public function guardians()
     {
         return $this->hasMany(Guardian::class);
-    }
-
-    public function status()
-    {
-        return $this->belongsTo(Status::class);
-    }
-
-    public function group()
-    {
-        return $this->belongsTo(Group::class);
     }
 
     public function certificates()

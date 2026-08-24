@@ -2,6 +2,7 @@
 namespace App\Http\Resources;
 
 class SubjectResource extends IResource
+class SubjectResource extends IResource
 {
     /**
      * Transform the resource into an array.

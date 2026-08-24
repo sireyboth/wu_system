@@ -1,5 +1,7 @@
 import axios from "axios";
 
+import axios from "axios";
+
 window.axios = axios;
 
 const { headers } = axios.defaults;

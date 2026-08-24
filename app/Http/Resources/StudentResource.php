@@ -2,6 +2,7 @@
 namespace App\Http\Resources;
 
 class StudentResource extends IResource
+class StudentResource extends IResource
 {
     public function toList(): array
     {

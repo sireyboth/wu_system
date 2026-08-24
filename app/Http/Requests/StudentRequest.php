@@ -2,12 +2,13 @@
 namespace App\Http\Requests;
 
 class StudentRequest extends IRequest
+class StudentRequest extends IRequest
 {
+    protected function formData(): array
     protected function formData(): array
     {
         // Prepare base rules and prefixed guardian rules
         $rules = [];
-
         if (is_array(PERSON_VALIDATE)) {
             foreach (PERSON_VALIDATE as $k => $v) {
                 $rules[$k] = $v;
@@ -54,7 +55,7 @@ class StudentRequest extends IRequest
 
         if (is_array(DEFAULT_VALIDATE)) {
             foreach (DEFAULT_VALIDATE as $k => $v) {
-                $rules['guardians.*.' . $k] = $v;
+                $rules["guardians.*.{$k}"] = $v;
             }
         }
 

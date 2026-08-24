@@ -2,6 +2,7 @@
 namespace App\Http\Requests;
 
 class FacultyRequest extends IRequest
+class FacultyRequest extends IRequest
 {
     protected function formData(): array
     {

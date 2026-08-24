@@ -2,6 +2,7 @@
 namespace App\Http\Requests;
 
 class GroupRequest extends IRequest
+class GroupRequest extends IRequest
 {
     protected function formData(): array
     {

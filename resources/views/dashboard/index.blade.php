@@ -61,5 +61,5 @@
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    @vite(['resources/js/dashboard/dashboard.js'])
+    {{-- @vite(['resources/js/dashboard/dashboard.js']) --}}
 @endpush

@@ -42,6 +42,6 @@ class Term extends IModel
 
     public function getFormatedNameAttribute(): string
     {
-        return "{$this->name} - Semester {$this->semester}";
+        return "{$this->display_name} - Semester {$this->semester}";
     }
 }

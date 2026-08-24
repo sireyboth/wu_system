@@ -13,4 +13,17 @@ class IImport implements ToCollection
     {
         //
     }
+
+    protected function transform_data(array $data): array
+    {
+        $kh = split_full_name($data['khmer_name'] ?? null);
+        $en = split_full_name($data['english_name'] ?? null);
+
+        return array_merge($data, [
+            'first_name_kh' => $kh['first_name'],
+            'last_name_kh'  => $kh['last_name'],
+            'first_name'    => $en['first_name'],
+            'last_name'     => $en['last_name'],
+        ]);
+    }
 }

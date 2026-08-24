@@ -2,6 +2,7 @@
 namespace App\Http\Resources;
 
 class NationalityResource extends IResource
+class NationalityResource extends IResource
 {
     public function toList(): array
     {

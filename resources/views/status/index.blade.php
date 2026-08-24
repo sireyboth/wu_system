@@ -15,6 +15,7 @@
                 </div>
 
                 <form id="statusSearchForm" method="GET" action="{{ route('app-status.index') }}"
+                <form id="statusSearchForm" method="GET" action="{{ route('app-status.index') }}"
                     class="relative w-full md:w-96 group">
                     <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none ps-3">
                         <svg class="w-4 h-4 transition-colors text-neutral-500 group-focus-within:text-indigo-500"
