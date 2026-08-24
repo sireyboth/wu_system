@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         make_fields('statuses', function (Blueprint $table) {
-            $table->string('shortcut', 50)->nullable();
+            $table->string('shortcut')->nullable();
             $table->index('shortcut');
         });
     }

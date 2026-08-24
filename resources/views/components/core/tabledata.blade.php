@@ -1,13 +1,19 @@
 {{--
-    Root of any resource index page. Owns the listTable() Alpine instance,
-    so every child (search input, sortable-th, row-actions, pagination)
-    just reaches up into this scope — no props passed between them.
+    <x-core.table endpoint="/users">
+        <x-slot:header>
+            <x-table-head>Name</x-table-head>
+            <x-table-head>Email</x-table-head>
+        </x-slot:header>
 
-    Slots:
-      toolbar  - buttons/dropdowns shown right of the search box (Add, Filter...)
-      head     - <tr> contents for the <thead>
-      default  - <td> contents per row (x-text="row.field" etc.), rendered
-                 once and cloned per row by the x-for below
+        <x-slot:content>
+            <x-table-cell x-text="row.name" />
+            <x-table-cell x-text="row.email" />
+        </x-slot:content>
+    </x-core.table>
+
+    Same tabledata() controller as x-core.table-card — this is just a
+    cleaner-to-read slot naming, writing vendor <x-table-head>/<x-table-cell>
+    directly instead of going through wrapper components.
 --}}
 @props([
     'endpoint',
@@ -17,26 +23,31 @@
     'noData' => 'No records found.',
     'showIndex' => true,
     'filterable' => true,
+    'searchField' => null, // fixed field to always search, e.g. 'name'
+    'searchFields' => null, // array to render a picker dropdown instead, e.g. ['name' => 'Name', 'email' => 'Email']
+    'searchHint' => 'Search...',
 ])
-<div x-data="table({
+
+<div x-data="tabledata({
     endpoint: '{{ $endpoint }}',
     sort: {{ $sort ? "'{$sort}'" : 'null' }},
     direction: '{{ $direction }}',
     perPage: {{ $perPage }},
-})" class="bg-white dark:bg-neutral-900 relative shadow-md sm:rounded-lg overflow-hidden">
+    searchField: {{ $searchField ? "'{$searchField}'" : 'null' }},
+})" class="bg-white dark:bg-neutral-900 relative shadow-xl sm:rounded-lg overflow-hidden">
 
     {{-- toolbar --}}
     @if ($filterable)
-        <x-ui.toolbar />
+        <x-ui.toolbar :fields="$searchFields" :hint="$searchHint" />
     @endif
 
     {{-- table --}}
     <div class="overflow-x-auto">
-        <x-table hover>
-            <x-table-header class="uppercase font-semibold">
+        <x-table container:class="max-h-80" hover>
+            <x-table-header class="uppercase font-semibold" sticky>
                 <x-table-row>
                     @if ($showIndex)
-                        <x-table-head>#</x-table-head>
+                        <x-table-head sticky>#</x-table-head>
                     @endif
 
                     {{ $header }}
@@ -44,12 +55,12 @@
             </x-table-header>
 
             <x-table-body highlight="even">
-                {{-- Skeleton rows — colspan="100%" means this works regardless of how
+                {{-- Skeleton items — colspan="100%" means this works regardless of how
                      many <x-table-head> columns were actually passed in the header slot;
                      no column count needed. --}}
                 <template x-if="loading">
                     <template x-for="i in 6" :key="i">
-                        <x-table-row class="animate-pulse" >
+                        <x-table-row class="animate-pulse">
                             <x-table-cell colspan="100%" class="py-5">
                                 <x-ui.skeleton />
                             </x-table-cell>
@@ -59,12 +70,12 @@
 
                 {{-- Rows --}}
                 <template x-if="!loading && !error">
-                    <template x-for="(row, index) in rows" :key="row.id">
+                    <template x-for="(item, index) in items" :key="item?.id ?? index">
                         <x-table-row x-transition:enter="transition ease-out duration-200"
                             x-transition:enter-start="opacity-0 -translate-y-1"
                             x-transition:enter-end="opacity-100 translate-y-0">
                             @if ($showIndex)
-                                <x-table-head x-text="(meta.current_page - 1) * perPage + index + 1" />
+                                <x-table-head sticky x-text="(meta.current_page - 1) * perPage + index + 1" />
                             @endif
 
                             {{ $content }}
@@ -72,7 +83,7 @@
                     </template>
                 </template>
 
-                <x-table-row x-show="!loading && !error && rows.length === 0" style="display: none;">
+                <x-table-row x-show="!loading && !error && items.length === 0" style="display: none;">
                     <x-table-cell colspan="100%" align="center">{{ $noData }}</x-table-cell>
                 </x-table-row>
 

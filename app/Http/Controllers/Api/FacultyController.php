@@ -11,7 +11,6 @@ class FacultyController extends Controller
 {
     public function __construct()
     {
-        $this->name          = 'Faculty';
         $this->model         = Faculty::class;
         $this->resource      = FacultyResource::class;
         $this->relationships = 'majors';
@@ -46,7 +45,7 @@ class FacultyController extends Controller
      */
     public function update(FacultyRequest $request, Faculty $faculty)
     {
-        return $this->release($request, $faculty);
+        return $this->save($request, $faculty);
     }
 
     /**
@@ -68,7 +67,7 @@ class FacultyController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function force_destroy(Faculty $faculty)
+    public function empty(Faculty $faculty)
     {
         return $this->clear($faculty);
     }

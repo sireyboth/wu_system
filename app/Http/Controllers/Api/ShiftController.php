@@ -11,7 +11,6 @@ class ShiftController extends Controller
 {
     public function __construct()
     {
-        $this->name     = 'Shift';
         $this->model    = Shift::class;
         $this->resource = ShiftResource::class;
     }
@@ -45,7 +44,7 @@ class ShiftController extends Controller
      */
     public function update(ShiftRequest $request, Shift $shift)
     {
-        return $this->release($request, $shift);
+        return $this->save($request, $shift);
     }
 
     /**
@@ -67,7 +66,7 @@ class ShiftController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function force_destroy(Shift $shift)
+    public function empty(Shift $shift)
     {
         return $this->clear($shift);
     }

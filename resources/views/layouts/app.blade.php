@@ -37,7 +37,9 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('scripts')
+
     @ddfsnStyles
+    @ddfsnAppearance
 </head>
 
 <body class="font-sans antialiased">
@@ -58,7 +60,8 @@
             {{ $slot }}
         </main>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    @ddfsnScripts
 </body>
 
 </html>

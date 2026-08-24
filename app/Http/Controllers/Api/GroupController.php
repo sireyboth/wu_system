@@ -11,7 +11,6 @@ class GroupController extends Controller
 {
     public function __construct()
     {
-        $this->name     = 'Group';
         $this->model    = Group::class;
         $this->resource = GroupResource::class;
     }
@@ -45,7 +44,7 @@ class GroupController extends Controller
      */
     public function update(GroupRequest $request, Group $group)
     {
-        return $this->release($request, $group);
+        return $this->save($request, $group);
     }
 
     /**
@@ -67,7 +66,7 @@ class GroupController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function force_destroy(Group $group)
+    public function empty(Group $group)
     {
         return $this->clear($group);
     }

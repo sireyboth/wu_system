@@ -16,7 +16,7 @@ class StudentResource extends IResource
             'from_school'    => $this->from_school,
             'intake'         => $this->intake,
             'scholarship'    => $this->scholarship,
-            'admission_date' => $this->admission_date?->format('Y-m-d'),
+            'admission_date' => dated_format($this->admission_date),
             'status'         => new StatusResource($this->whenLoaded('status')),
             'batch'          => new BatchResource($this->whenLoaded('batch')),
             'group'          => new GroupResource($this->whenLoaded('group')),

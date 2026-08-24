@@ -145,21 +145,28 @@
 
                     <li class="pt-4 pb-1">
 
-                        <span class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Exam</span>
+                        <span
+                            class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Exam</span>
                     </li>
                     <x-sidebar-link route="stateExam.index">
                         <x-slot name="icon">
-                            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l9-5 9 5-9 5-9-5z"/>
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10v5c0 1.5 3.1 3 7 3s7-1.5 7-3v-5"/>
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 10v6"/>
+                            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="M3 8l9-5 9 5-9 5-9-5z" />
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="M5 10v5c0 1.5 3.1 3 7 3s7-1.5 7-3v-5" />
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="M19 10v6" />
                             </svg>
                         </x-slot>
                         ប្រឡងបញ្ចប់ការសិក្សា (StateExam)
                     </x-sidebar-link>
 
                     <li class="pt-4 pb-1">
-                        <span class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Certificate</span>
+                        <span
+                            class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Certificate</span>
 
                     </li>
                     <x-sidebar-link route="StudentStatusCertificate.index">
@@ -267,8 +274,8 @@
                     </x-sidebar-link>
 
                     <x-ui.side-link title="Sample" :options="[
+                        ['text' => 'Event', 'icon' => 'calendar-alt', 'route' => 'event.calendar'],
                         ['text' => 'Exam Schedule', 'icon' => 'calendar-check', 'route' => 'exam.schedule'],
-                        // ['text' => 'Student', 'icon' => 'user', 'route' => 'student.index'],
                     ]" />
 
                 </ul>

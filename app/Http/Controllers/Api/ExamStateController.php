@@ -11,7 +11,6 @@ class ExamStateController extends Controller
 {
     public function __construct()
     {
-        $this->name     = 'Exam State';
         $this->model    = ExamState::class;
         $this->resource = ExamStateResource::class;
     }
@@ -45,7 +44,7 @@ class ExamStateController extends Controller
      */
     public function update(ExamStateRequest $request, ExamState $examState)
     {
-        return $this->release($request, $examState);
+        return $this->save($request, $examState);
     }
 
     /**
@@ -67,7 +66,7 @@ class ExamStateController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function force_destroy(ExamState $examState)
+    public function empty(ExamState $examState)
     {
         return $this->clear($examState);
     }

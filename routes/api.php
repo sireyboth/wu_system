@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Api\BatchController;
 use App\Http\Controllers\Api\CampusController;
 use App\Http\Controllers\Api\CertificateController;
+use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\ExamStateController;
 use App\Http\Controllers\Api\FacultyController;
 use App\Http\Controllers\Api\GroupController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\Api\ShiftController;
 use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\SubjectController;
+use App\Http\Controllers\Api\TermController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -46,6 +48,8 @@ Route::prefix('v1')->group(function () {
         'certificates' => CertificateController::class,
         'exam-states'  => ExamStateController::class,
         'users'        => UserController::class,
+        'events'       => EventController::class,
+        'terms'        => TermController::class,
     ]);
 
     // Address API routes

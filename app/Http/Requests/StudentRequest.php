@@ -22,11 +22,13 @@ class StudentRequest extends IRequest
 
         $rules = array_merge($rules,
             check_unique('code', 'students'),
-            check_exist('batch_id', 'batches'),
-            check_exist('major_id', 'majors'),
-            check_exist('group_id', 'groups'),
-            check_exist('shift_id', 'shifts'),
-            check_exist('status_id', 'statuses'),
+            check_exist_many([
+                'batch_id'  => 'batches',
+                'major_id'  => 'majors',
+                'group_id'  => 'groups',
+                'shift_id'  => 'shifts',
+                'status_id' => 'statuses',
+            ]),
             [
                 'admission_date'           => 'nullable|date',
                 'from_school'              => 'nullable|string|max:100',
@@ -43,8 +45,11 @@ class StudentRequest extends IRequest
                 'guardians.*.relationship' => 'required|string|max:50',
                 'guardians.*.job'          => 'nullable|string|max:100',
                 'guardians.*.remark'       => 'nullable|string|max:500',
-                'guardians.*.phones'       => 'nullable',
+                'guardians.*.phones'       => 'nullable|array',
+                'guardians.*.phones.*'     => 'nullable|string|max:50',
                 'guardians.*.addresses'    => 'nullable|array',
+                'guardians.*.addresses.*'  => 'nullable|string|max:500',
+
             ]);
 
         if (is_array(DEFAULT_VALIDATE)) {

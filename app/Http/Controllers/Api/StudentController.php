@@ -12,7 +12,6 @@ class StudentController extends Controller
 {
     public function __construct()
     {
-        $this->name          = 'Student';
         $this->model         = Student::class;
         $this->resource      = StudentResource::class;
         $this->relationships = array_merge([
@@ -95,12 +94,10 @@ class StudentController extends Controller
     public function destroy(Student $student)
     {
         return execute(function () use ($student) {
-            $student->person->addresses()->forceDelete(); // if addresses relation is via person, adjust accordingly
-            $student->guardians()->forceDelete();
-            $student->person->forceDelete();
-            $student->forceDelete();
+            $student->delete();
+            $student->person->delete();
 
-            return has_data(null, 'Permanently deleted.');
+            return has_data(null, 'Moved to trash.');
         });
     }
 
@@ -120,13 +117,15 @@ class StudentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function trash(Student $student)
+    public function empty(Student $student)
     {
         return execute(function () use ($student) {
-            $student->delete();
-            $student->person->delete();
+            $student->person->addresses()->forceDelete(); // if addresses relation is via person, adjust accordingly
+            $student->guardians()->forceDelete();
+            $student->person->forceDelete();
+            $student->forceDelete();
 
-            return has_data(null, 'Moved to trash.');
+            return has_data(null, 'Permanently deleted.');
         });
     }
 }

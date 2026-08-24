@@ -3,7 +3,9 @@ namespace App\Helpers;
 
 use App\Models\Person;
 use App\Models\Student;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Maatwebsite\Excel\Facades\Excel;
 
 trait Generic
 {
@@ -32,5 +34,38 @@ trait Generic
                 Arr::except($address, ['id', 'type']) // don't overwrite the match key itself
             );
         }
+    }
+
+    protected function withStudent(string $key = 'student')
+    {
+        return $this->relations($key, array_merge(['person', 'guardians'], $this->withPerson()));
+    }
+
+    protected function withPerson(string $key = 'person', string $otherKey = 'addresses')
+    {
+        return $this->relations($key, array_merge(
+            ['nationality', 'addresses'],
+            $this->relations($otherKey, ['province', 'district', 'commune', 'village'])
+        ));
+    }
+
+    protected function export(object $data, string $file_name = 'student')
+    {
+        $time = now()->format('Y_m_d_His');
+        return Excel::download($data, "{$file_name}_{$time}.xlsx");
+    }
+
+    protected function import(object $data, UploadedFile $file): array
+    {
+        Excel::import($data, $file);
+        return [
+            'imported' => true,
+            'failures' => $data->failures(), // rows that failed validation
+        ];
+    }
+
+    protected function relations(string $key, array $values): array
+    {
+        return array_map(fn($cnx) => "{$key}.{$cnx}", $values);
     }
 }

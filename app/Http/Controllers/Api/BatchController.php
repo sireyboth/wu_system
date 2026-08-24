@@ -11,7 +11,6 @@ class BatchController extends Controller
 {
     public function __construct()
     {
-        $this->name     = 'Batch';
         $this->model    = Batch::class;
         $this->resource = BatchResource::class;
     }
@@ -45,7 +44,7 @@ class BatchController extends Controller
      */
     public function update(BatchRequest $request, Batch $batch)
     {
-        return $this->release($request, $batch);
+        return $this->save($request, $batch);
     }
 
     /**
@@ -67,7 +66,7 @@ class BatchController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function force_destroy(Batch $batch)
+    public function empty(Batch $batch)
     {
         return $this->clear($batch);
     }

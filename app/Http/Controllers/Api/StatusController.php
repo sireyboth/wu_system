@@ -11,7 +11,6 @@ class StatusController extends Controller
 {
     public function __construct()
     {
-        $this->name     = 'Status';
         $this->model    = Status::class;
         $this->resource = StatusResource::class;
     }
@@ -45,7 +44,7 @@ class StatusController extends Controller
      */
     public function update(StatusRequest $request, Status $status)
     {
-        return $this->release($request, $status);
+        return $this->save($request, $status);
     }
 
     /**
@@ -67,7 +66,7 @@ class StatusController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function force_destroy(Status $status)
+    public function empty(Status $status)
     {
         return $this->clear($status);
     }

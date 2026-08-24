@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         make_fields('nationalities', function (Blueprint $table) {
-            $table->string('code', 3)->unique();
+            $table->string('code')->unique();
         });
     }
 

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         make_fields('number_counters', function (Blueprint $table) {
             $table->unsignedSmallInteger('year');
-            $table->string('type', 50)->default('status');
+            $table->string('type')->default('status');
             $table->unsignedInteger('last_sequence')->default(0);
 
             $table->unique(['year', 'type']);

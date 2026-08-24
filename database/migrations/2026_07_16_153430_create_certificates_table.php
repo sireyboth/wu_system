@@ -16,9 +16,9 @@ return new class extends Migration
             $table->date('issue_date');
             $table->string('full_date_kh')->nullable();
             $table->string('short_date_kh')->nullable();
-            $table->string('certificate_no', 20)->nullable()->unique();
-            $table->string('status', 50)->nullable()->default('pending');
-            $table->string('type', 50)->nullable()->default('status');
+            $table->string('certificate_no')->nullable()->unique();
+            $table->string('status')->nullable()->default('pending');
+            $table->string('type')->nullable()->default('status');
 
             $table->index(['issue_date', 'certificate_no']);
         }, false);

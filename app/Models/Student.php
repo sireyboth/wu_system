@@ -10,32 +10,31 @@ class Student extends IModel
     public const YEARLY       = 'yearly';
     public const SEMESTER     = 'semester';
 
+    protected $fillable = [
+        'person_id',
+        'guardian_id',
+        'batch_id',
+        'major_id',
+        'group_id',
+        'shift_id',
+        'status_id',
+        'code',
+        'payment_as',
+        'year_level',
+        'from_school',
+        'admission_date',
+        'degree_type',
+        'bacc_2_code',
+        'intake',
+        'scholarship',
+        'entrance_exam',
+        'exit_exam',
+        'remark',
+    ];
+
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
-
-        $this->fillable = [
-            'person_id',
-            'guardian_id',
-            'batch_id',
-            'major_id',
-            'group_id',
-            'shift_id',
-            'status_id',
-            'code',
-            'payment_as',
-            'year_level',
-            'from_school',
-            'admission_date',
-            'degree_type',
-            'bacc_2_code',
-            'intake',
-            'scholarship',
-            'entrance_exam',
-            'exit_exam',
-            'remark',
-        ];
-
         $this->searchable = array_map(fn($p) => "person.{$p}", [
             'first_name',
             'last_name',

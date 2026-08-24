@@ -1,22 +1,6 @@
 import "./bootstrap";
 import "flowbite";
-import Alpine from "alpinejs";
-import { apiCrud } from "./uitilities/config";
-import { table } from "./uitilities/gloabal";
-import { formatDate, getValue } from "./uitilities/helper";
-
-document.addEventListener("alpine:init", () => {
-    Alpine.magic("api", () => apiCrud);
-    Alpine.data("table", table);
-
-    Alpine.magic("formatDate", () => formatDate);
-    Alpine.magic("getValue", () => getValue);
-});
-
-if (!window.Alpine) {
-    window.Alpine = Alpine;
-    Alpine.start();
-}
+import "./";
 
 window.toggleDarkMode = function () {
     const isDark = document.documentElement.classList.toggle("dark");

@@ -7,13 +7,13 @@ use App\Http\Requests\CertificateRequest;
 use App\Http\Resources\CertificateResource;
 use App\Models\Certificate;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class CertificateController extends Controller
 {
     public function __construct(protected NumberGenerator $generator)
     {
-        $this->name          = 'Certificate';
         $this->model         = Certificate::class;
         $this->resource      = CertificateResource::class;
         $this->relationships = $this->withStudent();
@@ -24,7 +24,7 @@ class CertificateController extends Controller
      */
     public function index(Request $request)
     {
-        return $this->list($request, fn($query) => $request->type === Certificate::PROVISIONAL
+        return $this->list($request, fn(Builder $query) => $request->type === Certificate::PROVISIONAL
                 ? $query->provisional()
                 : $query->status());
     }
@@ -41,7 +41,7 @@ class CertificateController extends Controller
                 Carbon::parse($data['issue_date'])
             );
 
-            return $this->save($request, ['certificate_no' => $code]);
+            return $this->save($request, columns: ['certificate_no' => $code]);
         });
     }
 
@@ -58,7 +58,7 @@ class CertificateController extends Controller
      */
     public function update(CertificateRequest $request, Certificate $certificate)
     {
-        return $this->release($request, $certificate);
+        return $this->save($request, $certificate);
     }
 
     /**
@@ -80,7 +80,7 @@ class CertificateController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function force_destroy(Certificate $certificate)
+    public function empty(Certificate $certificate)
     {
         return $this->clear($certificate);
     }

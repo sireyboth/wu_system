@@ -11,7 +11,7 @@
     "require": {
         "php": "^8.2|^8.4",
         "blade-ui-kit/blade-icons": "^1.10",
-        "ddfsn/blade-components": "^1.3",
+        "ddfsn/blade-components": "^1.5",
         "distortedfusion/blade-forms": "^3.0",
         "fakerphp/faker": "^1.24",
         "laravel/framework": "^12.0",
@@ -37,8 +37,11 @@
             "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
-            "app/Helpers/Functions.php",
-            "app/Helpers/Constants.php"
+            "app/Helpers/const.php",
+            "app/Helpers/condition.php",
+            "app/Helpers/data.php",
+            "app/Helpers/formatter.php",
+            "app/Helpers/handler.php"
         ]
     },
     "autoload-dev": {

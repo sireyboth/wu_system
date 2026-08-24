@@ -5,8 +5,7 @@ class ExamStateResource extends IResource
 {
     public function toList(): array
     {
-        return [
-            'id'            => $this->id,
+        return to_list($this, [
             'no'            => $this->no ?? 0,
             'room'          => $this->room,
             'floor'         => $this->floor ?? 0,
@@ -18,11 +17,7 @@ class ExamStateResource extends IResource
             'majors'        => $this->majors ?? [],
             'absences'      => $this->absences ?? [],
             'invigilators'  => $this->invigilators ?? [],
-            'exam_date'     => $this->exam_date?->format('Y-m-d'),
-
-            'remark'        => $this->remark,
-            'created_at'    => $this->created_at?->format('Y-m-d H:i:s'),
-            'updated_at'    => $this->updated_at?->format('Y-m-d H:i:s'),
-        ];
+            'exam_date'     => dated_format($this->exam_date),
+        ], false);
     }
 }

@@ -190,7 +190,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
                 </svg>
             </div>
-            <div id="geoIconBlocked" class="hidden mx-auto mb-5 flex items-center justify-center w-16 h-16 rounded-2xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400">
+            <div id="geoIconBlocked" class="mx-auto mb-5 flex items-center justify-center w-16 h-16 rounded-2xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
@@ -202,7 +202,7 @@
                 <span class="text-xs">Verifying that you're on campus...</span>
             </p>
             <button id="geoRetryBtn" type="button" onclick="window.__geoCheck()"
-                class="hidden mt-5 inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-indigo-600 rounded-xl shadow-lg shadow-indigo-500/25 hover:bg-indigo-700 active:scale-95 transition-all">
+                class="mt-5 inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-indigo-600 rounded-xl shadow-lg shadow-indigo-500/25 hover:bg-indigo-700 active:scale-95 transition-all">
                 ព្យាយាមម្តងទៀត (Try Again)
             </button>
         </div>

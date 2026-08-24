@@ -26,7 +26,7 @@
                 <!-- FIX: Added utility style to force remove browser-default arrows across all engines -->
                 <select required name="faculty_id" id="facultySelect"
                         data-hint="សូមជ្រើសរើសមហាវិទ្យាល័យឲ្យបានត្រឹមត្រូវ"
-                        class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white dark:placeholder-neutral-600 focus:ring-4 focus:ring-indigo-500/40 focus:border-indigo-500 focus:bg-white dark:focus:bg-neutral-900 transition-all duration-200 outline-none appearance-none cursor-pointer [appearance:none] [&::-ms-expand]:hidden">
+                        class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white dark:placeholder-neutral-600 focus:ring-4 focus:ring-indigo-500/40 focus:border-indigo-500 focus:bg-white dark:focus:bg-neutral-900 transition-all duration-200 outline-none cursor-pointer [appearance:none] [&::-ms-expand]:hidden">
                     <option value="" disabled selected hidden>-- ជ្រើសរើសមហាវិទ្យាល័យ --</option>
                     <!-- Dynamic options will be injected here by JS -->
                 </select>

@@ -11,7 +11,6 @@ class SubjectController extends Controller
 {
     public function __construct()
     {
-        $this->name          = 'Subject';
         $this->model         = Subject::class;
         $this->resource      = SubjectResource::class;
         $this->relationships = 'major';
@@ -46,7 +45,7 @@ class SubjectController extends Controller
      */
     public function update(SubjectRequest $request, Subject $subject)
     {
-        return $this->release($request, $subject);
+        return $this->save($request, $subject);
     }
 
     /**
@@ -68,7 +67,7 @@ class SubjectController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function force_destroy(Subject $subject)
+    public function empty(Subject $subject)
     {
         return $this->clear($subject);
     }

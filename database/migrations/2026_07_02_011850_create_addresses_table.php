@@ -34,11 +34,11 @@ return new class extends Migration
                 ->constrained()
                 ->restrictOnDelete();
 
-            $table->string('street', 255)->nullable();
-            $table->string('house_no', 50)->nullable();
+            $table->string('street')->nullable();
+            $table->string('house_no')->nullable();
 
             // Address type
-            $table->enum('type', ['current', 'birth']);
+            $table->string('type')->default('current');
 
             // Prevent duplicate address types for the same person
             $table->unique(['person_id', 'type']);

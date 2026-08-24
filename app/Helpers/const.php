@@ -20,7 +20,7 @@ const ADDRESS_VALIDATE = [
     'addresses.*.village_id'  => 'required|exists:villages,id',
     'addresses.*.street'      => 'nullable|string',
     'addresses.*.house_no'    => 'nullable|string',
-    'addresses.*.type'        => 'required|in:current,birth',
+    'addresses.*.type'        => 'nullable|string',
 ];
 
 const PERSON_VALIDATE = [
@@ -34,5 +34,5 @@ const PERSON_VALIDATE = [
     'email'          => 'nullable|email|max:50',
     'remark'         => 'nullable|string|max:500',
     'phones'         => 'nullable|array',
-    'phones.*'       => 'nullable',
+    'phones.*'       => 'nullable|string|max:50',
 ];

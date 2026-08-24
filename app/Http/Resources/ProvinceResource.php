@@ -7,7 +7,7 @@ class ProvinceResource extends IResource
     {
         return [
             'id'      => $this->id,
-            'name'    => $this->name,
+            'name'    => $this->full_name,
             'name_en' => $this->name_en,
             'name_kh' => $this->name_kh,
         ];

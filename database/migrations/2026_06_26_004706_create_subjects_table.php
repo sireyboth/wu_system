@@ -13,7 +13,7 @@ return new class extends Migration
     {
         make_fields('subjects', function (Blueprint $table) {
             $table->foreignId('major_id')->constrained()->cascadeOnDelete();
-            $table->string('code', 50)->unique()->nullable();
+            $table->string('code')->unique()->nullable();
             $table->unsignedTinyInteger('year_level')->default(1);
             $table->unsignedTinyInteger('semester')->default(1);
             $table->integer('credit')->default(0);

@@ -11,7 +11,6 @@ class CampusController extends Controller
 {
     public function __construct()
     {
-        $this->name     = 'Campus';
         $this->model    = Campus::class;
         $this->resource = CampusResource::class;
     }
@@ -45,7 +44,7 @@ class CampusController extends Controller
      */
     public function update(CampusRequest $request, Campus $campus)
     {
-        return $this->release($request, $campus);
+        return $this->save($request, $campus);
     }
 
     /**
@@ -67,7 +66,7 @@ class CampusController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function force_destroy(Campus $campus)
+    public function empty(Campus $campus)
     {
         return $this->clear($campus);
     }

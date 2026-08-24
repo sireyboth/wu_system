@@ -21,25 +21,24 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Builder::macro('whereLike', function ($attributes, string $searchTerm) {
-            $this->where(function (Builder $query) use ($attributes, $searchTerm) {
+            /** @var Builder $this */
+            return $this->where(function (Builder $query) use ($attributes, $searchTerm) {
                 foreach (Arr::wrap($attributes) as $attribute) {
                     $query->when(
                         str_contains($attribute, '.'),
-                        function (Builder $query) use ($attribute, $searchTerm) {
-                            [$relationName, $relationAttribute] = explode('.', $attribute, 2);
+                        function (Builder $q) use ($attribute, $searchTerm) {
+                            [$relation, $field] = explode('.', $attribute, 2);
 
-                            $query->orWhereHas($relationName, function (Builder $query) use ($relationAttribute, $searchTerm) {
-                                $query->where($relationAttribute, 'LIKE', "%{$searchTerm}%");
+                            $q->orWhereHas($relation, function (Builder $rel) use ($field, $searchTerm) {
+                                $rel->where($field, 'LIKE', "%{$searchTerm}%");
                             });
                         },
-                        function (Builder $query) use ($attribute, $searchTerm) {
-                            $query->orWhere($attribute, 'LIKE', "%{$searchTerm}%");
+                        function (Builder $q) use ($attribute, $searchTerm) {
+                            $q->orWhere($attribute, 'LIKE', "%{$searchTerm}%");
                         }
                     );
                 }
             });
-
-            return $this;
         });
     }
 }

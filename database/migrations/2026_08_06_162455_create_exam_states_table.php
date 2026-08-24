@@ -13,11 +13,11 @@ return new class extends Migration
     {
         make_fields('exam_states', function (Blueprint $table) {
             $table->unsignedInteger('no')->nullable();            // row number on the sheet; same 'no' repeats across "Mix" rows
-            $table->string('room', 50);                           // Room name, e.g. "101"
-            $table->string('shift', 50)->nullable();              // Morning / Afternoon / Evening
-            $table->string('major', 100);                         // Morning major, e.g. "CS+CNT+DCA"
+            $table->string('room');                               // Room name, e.g. "101"
+            $table->string('shift')->nullable();                  // Morning / Afternoon / Evening
+            $table->string('major');                              // Morning major, e.g. "CS+CNT+DCA"
             $table->unsignedInteger('student_total')->default(0); // Total of all students in the morning shift
-            $table->string('degree', 50);                         // BA / AA
+            $table->string('degree');                             // BA / AA
             $table->json('majors')->nullable();                   // [{ "major": "CS", "total": 15 }, ...] up to 4 entries
             $table->json('absences')->nullable();
             $table->json('invigilators')->nullable();

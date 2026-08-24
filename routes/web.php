@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\Admin\ExamScheduleController;
+use App\Http\Controllers\Admin\EnventController;
+use App\Http\Controllers\Admin\SampleController;
 use App\Http\Controllers\BatchController;
 use App\Http\Controllers\CampusController;
 use App\Http\Controllers\DashboardController;
@@ -10,10 +11,10 @@ use App\Http\Controllers\LecturerController;
 use App\Http\Controllers\MajorController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ShiftController;
+use App\Http\Controllers\StateExamController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentStatusController;
-use App\Http\Controllers\StateExamController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn() => redirect()->route('dashboard'));
@@ -43,7 +44,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('StudentStatusCertificate', StudentStatusController::class)->only('index');
     Route::resource('app-status', StatusController::class)->only('index');
 
-    Route::get('/exam-schedule', ExamScheduleController::class)->name('exam.schedule');
+    Route::get('/sample', SampleController::class)->name('sample.test');
+    Route::get('/event-calendar', EnventController::class)->name('event.calendar');
 
     Route::resource('profile', ProfileController::class)->only(['edit', 'update', 'destroy']);
 });

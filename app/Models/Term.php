@@ -10,22 +10,22 @@ class Term extends IModel
         'semester',
         'code',
         'name',
-        'start_date',
-        'end_date',
+        'start',
+        'end',
+        'active',
         'remark',
-        'is_active',
     ];
 
     protected $casts = [
-        'start_date' => 'date',
-        'end_date'   => 'date',
-        'is_active'  => 'boolean',
+        'start'     => 'date',
+        'end'       => 'date',
+        'active' => 'boolean',
     ];
 
     // Scope for current active term
     public function scopeActive(Builder $query)
     {
-        return $query->where('is_active', true);
+        return $query->where('active', true);
     }
 
     // Scope for current academic year
@@ -37,10 +37,10 @@ class Term extends IModel
     // Helper methods
     public function isCurrent(): bool
     {
-        return $this->is_active;
+        return $this->active;
     }
 
-    public function getFullNameAttribute(): string
+    public function getFormatedNameAttribute(): string
     {
         return "{$this->name} - Semester {$this->semester}";
     }

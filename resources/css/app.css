@@ -2,12 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
-
 body {
-  font-family: theme('fontFamily.sans');
+    font-family: theme("fontFamily.sans");
 }
 @layer utilities {
-  .dark input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
-  }
+    .dark input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+    }
+}
+
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Custom thin scrollbar – Tailwind can't do this without a plugin */
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(99, 102, 241, 0.3) transparent;
+}
+.custom-scrollbar::-webkit-scrollbar {
+    width: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(99, 102, 241, 0.3);
+    border-radius: 9999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(99, 102, 241, 0.6);
+}
+html.dark .custom-scrollbar {
+    scrollbar-color: rgba(165, 180, 252, 0.25) transparent;
+}
+html.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(165, 180, 252, 0.25);
+}
+html.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(165, 180, 252, 0.5);
+}
+
+@media (min-width: 640px) {
+    body.sidebar-open #main-content {
+        margin-left: 16rem;
+    }
 }

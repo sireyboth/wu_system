@@ -11,7 +11,6 @@ class MajorController extends Controller
 {
    public function __construct()
     {
-        $this->name     = 'Major';
         $this->model    = Major::class;
         $this->resource = MajorResource::class;
         $this->relationships = 'faculty';
@@ -46,7 +45,7 @@ class MajorController extends Controller
      */
     public function update(MajorRequest $request, Major $major)
     {
-        return $this->release($request, $major);
+        return $this->save($request, $major);
     }
 
     /**
@@ -68,7 +67,7 @@ class MajorController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function force_destroy(Major $major)
+    public function empty(Major $major)
     {
         return $this->clear($major);
     }

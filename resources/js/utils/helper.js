@@ -1,8 +1,4 @@
-/**
- * Shared, framework-agnostic helpers used by both staticTable.js and remoteTable.js.
- * These only ever operate on plain JS arrays/objects — no Alpine, no axios, no Blade.
- * Keeping them pure makes them trivially unit-testable on their own.
- */
+import Swal from "sweetalert2";
 
 /**
  * Read a value from a row, supporting dot-notation for nested/relation fields.
@@ -73,3 +69,84 @@ function formatRelative(date) {
 
     return "just now";
 }
+
+// Success Toast
+export const showMessage = (
+    message = "Success",
+    position = "top-end",
+    timer = 1600,
+) =>
+    Swal.fire({
+        toast: true,
+        position,
+        icon: "success",
+        title: message,
+        showConfirmButton: false,
+        timer,
+        timerProgressBar: true,
+    });
+
+// Error Alert
+export const showError = (
+    message = "Something went wrong!",
+    title = "Oops...",
+) =>
+    Swal.fire({
+        icon: "error",
+        title,
+        text: message,
+    });
+
+// Confirmation Dialog (for Delete / Edit)
+export const showConfirm = ({
+    title = "Are you sure?",
+    text = "You won't be able to revert this!",
+    confirmText = "Yes, do it!",
+    icon = "warning",
+    confirmColor = "#ef4444",
+} = {}) =>
+    Swal.fire({
+        title,
+        text,
+        icon,
+        showCancelButton: true,
+        confirmButtonColor: confirmColor,
+        cancelButtonColor: "#6b7280",
+        confirmButtonText: confirmText,
+        cancelButtonText: "Cancel",
+        reverseButtons: true,
+    });
+
+export function showValidations(errors, title = "Validation Error") {
+    // errors = { name: ["The name field is required."], email: ["The email must be valid."] }
+
+    let html = '<ul class="text-left list-disc list-inside space-y-1">';
+
+    Object.values(errors).forEach((messages) => {
+        messages.forEach((msg) => {
+            html += `<li>${msg}</li>`;
+        });
+    });
+
+    html += "</ul>";
+
+    return Swal.fire({
+        icon: "error",
+        title,
+        html: html,
+        confirmButtonText: "OK",
+        confirmButtonColor: "#ef4444",
+    });
+}
+
+export function showFirstValidation(errors, title = "Validation Error") {
+    const firstError = Object.values(errors)[0][0];
+
+    return Swal.fire({
+        icon: "error",
+        title,
+        text: firstError,
+    });
+}
+
+export const getStatus = (value) => (value ? "Active" : "Inactive");

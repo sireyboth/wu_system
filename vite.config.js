@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 import laravel from "laravel-vite-plugin";
 import { globSync } from "glob";
 
-const pageEntries = globSync("resources/js/**/*.js");
+const pageEntries = globSync(["resources/js/**/*.js", "resources/js/pages/**/*.js"]);
 
 export default defineConfig({
     plugins: [

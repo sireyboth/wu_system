@@ -11,7 +11,6 @@ class LecturerController extends Controller
 {
     public function __construct()
     {
-        $this->name     = 'Lecturer';
         $this->model    = Lecturer::class;
         $this->resource = LecturerResource::class;
     }
@@ -45,7 +44,7 @@ class LecturerController extends Controller
      */
     public function update(LecturerRequest $request, Lecturer $lecturer)
     {
-        return $this->release($request, $lecturer);
+        return $this->save($request, $lecturer);
     }
 
     /**
@@ -67,7 +66,7 @@ class LecturerController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function force_destroy(Lecturer $lecturer)
+    public function empty(Lecturer $lecturer)
     {
         return $this->clear($lecturer);
     }
