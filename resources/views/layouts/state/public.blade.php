@@ -129,6 +129,36 @@
         .fade-up {
             animation: fadeUp .6s cubic-bezier(.16,1,.3,1) both;
         }
+
+        /* ---------- Scroll-reveal (fade + zoom in) — plain IntersectionObserver, no library ---------- */
+        .scroll-reveal {
+            opacity: 0;
+            transform: scale(.75);
+            transition: opacity 1.2s cubic-bezier(.16,1,.3,1), transform 1.2s cubic-bezier(.16,1,.3,1);
+        }
+
+        .scroll-reveal.in-view {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .scroll-reveal { opacity: 1; transform: none; transition: none; }
+        }
+
+        /* ---------- Hover brightness — logos, icons, and links light up on hover so
+           they're easier to pick out, especially against the dark-mode background ---------- */
+        .hover-brighten {
+            transition: filter .25s ease-out;
+        }
+
+        .hover-brighten:hover {
+            filter: brightness(1.25);
+        }
+
+        html.dark .hover-brighten:hover {
+            filter: brightness(1.5);
+        }
     </style>
 </head>
 
@@ -145,7 +175,7 @@
     <!-- Official header bar -->
     <header class="relative z-10 border-b border-neutral-200/70 dark:border-white/10 bg-white/70 dark:bg-neutral-950/60 backdrop-blur-xl">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3 hover-brighten">
                 <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-800 text-white shadow-lg shadow-indigo-500/30 shrink-0">
                       <!-- University logo — drop the real file at public/images/logo.png and this fills in automatically -->
                 <div class="shrink-0 flex items-center justify-center w-10 h-10 rounded-xl bg-white/80 dark:bg-white/5 backdrop-blur-sm border border-neutral-200/80 dark:border-white/10 shadow-sm overflow-hidden p-1">
@@ -161,7 +191,7 @@
             </div>
 
             <button onclick="toggleDarkMode()" title="Toggle light / dark mode"
-                class="flex items-center justify-center w-10 h-10 bg-white dark:bg-white/5 border border-neutral-200 dark:border-white/10 rounded-xl shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-500/40 transition-all">
+                class="hover-brighten flex items-center justify-center w-10 h-10 bg-white dark:bg-white/5 border border-neutral-200 dark:border-white/10 rounded-xl shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-500/40 transition-all">
                 <svg class="hidden w-4.5 h-4.5 text-amber-500 dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
@@ -182,6 +212,68 @@
         <p class="text-[11px] tracking-wide text-neutral-400 dark:text-neutral-600">
             &copy; {{ date('Y') }} Western University &middot; Official Exam Attendance Portal &middot; Authorized on-site staff use only
         </p>
+    </footer>
+
+    <footer id="roumdoulFooter" pAnimateOnScroll enterClass="animate-enter fade-in-10 zoom-in-75 animate-duration-1200"
+        class="scroll-reveal mt-20 px-4 mb-32">
+        <div class="flex flex-col items-center justify-center space-y-3">
+
+            <div class="flex items-center gap-0 opacity-40 mb-0">
+                <div class="h-px w-12 bg-pink-900/30 dark:bg-pink-400/30"></div>
+                <span class="text-pink-900 dark:text-pink-400" style="font-size: 64px">❦</span>
+                <div class="h-px w-12 bg-pink-900/30 dark:bg-pink-400/30"></div>
+            </div>
+
+            <div class="text-center group transition-all duration-500 hover:scale-105">
+                <h3 class="text-gray-800 dark:text-neutral-400 tracking-[0.4em] text-[10px] uppercase mb-1">
+                    Digital Invitation by
+                </h3>
+                <div class="flex flex-col items-center">
+                    <span class="my-3 text-3xl text-pink-900 dark:text-pink-400 font-bold">
+                        <a href="https://t.me/roumdol_invite" target="_blank" class="hover-brighten hover:text-pink-700 dark:hover:text-pink-300 transition-colors">
+                            រំដួល </a>
+                    </span>
+                    <span class="text-lg font-medium text-pink-900 dark:text-pink-400 tracking-widest uppercase">
+                        <a href="https://t.me/roumdol_invite" target="_blank" class="hover-brighten hover:text-pink-700 dark:hover:text-pink-300 transition-colors">
+                            ROUMDOUL </a>
+                    </span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-6 py-6">
+                <a href="https://www.facebook.com/share/1AoKyVb4t3/?mibextid=wwXIfr" target="_blank"
+                    class="hover-brighten flex items-center justify-center w-10 h-10 rounded-full dark:bg-white/5 transition-all duration-300 opacity-60 hover:opacity-100 hover:-translate-y-1 hover:scale-110">
+                    <img src="https://img.icons8.com/material-rounded/48/831843/facebook-f.png" class="w-6 h-6"
+                        alt="Facebook">
+                </a>
+                <a href="https://www.instagram.com/roumd_oul" target="_blank"
+                    class="hover-brighten flex items-center justify-center w-10 h-10 rounded-full dark:bg-white/5 transition-all duration-300 opacity-60 hover:opacity-100 hover:-translate-y-1 hover:scale-110">
+                    <img src="https://img.icons8.com/material-rounded/48/831843/instagram-new.png" class="w-6 h-6"
+                        alt="Instagram">
+                </a>
+                <a href="https://www.tiktok.com/@roum_doul?_r=1&_t=ZS-92Nr8NVeJhE" target="_blank"
+                    class="hover-brighten flex items-center justify-center w-10 h-10 rounded-full dark:bg-white/5 transition-all duration-300 opacity-60 hover:opacity-100 hover:-translate-y-1 hover:scale-110">
+                    <img src="https://img.icons8.com/material-rounded/48/831843/tiktok.png" class="w-6 h-6" alt="TikTok">
+                </a>
+                <a href="https://t.me/roumdoul_official" target="_blank"
+                    class="hover-brighten flex items-center justify-center w-10 h-10 rounded-full dark:bg-white/5 transition-all duration-300 opacity-60 hover:opacity-100 hover:-translate-y-1 hover:scale-110">
+                    <img src="https://img.icons8.com/material-rounded/48/831843/telegram-app.png" class="w-6 h-6"
+                        alt="Telegram">
+                </a>
+            </div>
+
+            <div class="text-center">
+                <p class="text-[14px] text-gray-800 dark:text-neutral-300 uppercase tracking-tighter leading-relaxed">
+                    (+855) 71 260 0078 <br />
+                    (+855) 15 57 87 07 <br />
+                    (+855) 85 949 008
+                </p>
+            </div>
+
+            <p class="text-[9px] text-gray-700 dark:text-neutral-500 uppercase mt-5 tracking-tighter">
+                All Rights Reserved
+            </p>
+        </div>
     </footer>
 
     {{-- Page-level modals render here — a direct child of <body>, outside
@@ -258,6 +350,10 @@
                 gate.classList.add('hidden');
                 content.classList.remove('hidden');
                 footer.classList.remove('hidden');
+                // Real page height only exists once the gated content is
+                // shown — start observing the scroll-reveal footer now, or
+                // it sees the pre-unlock (collapsed) layout and fires early.
+                if (window.__startFooterReveal) requestAnimationFrame(window.__startFooterReveal);
             }
 
             // Haversine distance in meters
@@ -324,6 +420,40 @@
 
             window.__geoCheck();
         })();
+    </script>
+
+    <script>
+        window.__startFooterReveal = function () {
+            var setup = function () {
+                var el = document.getElementById('roumdoulFooter');
+                if (!el || el.dataset.revealBound) return;
+                el.dataset.revealBound = '1';
+
+                if (!('IntersectionObserver' in window)) {
+                    el.classList.add('in-view');
+                    return;
+                }
+
+                var observer = new IntersectionObserver(function (entries) {
+                    entries.forEach(function (entry) {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('in-view');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.15 });
+
+                observer.observe(el);
+            };
+
+            // Wait for webfonts too — a late font swap can shift layout
+            // enough to falsely trigger (or miss) the intersection check.
+            if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(setup);
+            } else {
+                setup();
+            }
+        };
     </script>
 
     @stack('scripts')
