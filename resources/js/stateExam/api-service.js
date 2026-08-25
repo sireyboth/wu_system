@@ -18,7 +18,7 @@ export function createApiService(dom) {
                 const { headers, method = 'GET', body, signal, ...restOptions } = options;
                 const response = await fetch(url, {
                     method,
-                    credentials: 'omit',
+                    credentials: 'same-origin',
                     headers: {
                         Accept: 'application/json',
                         ...headers,

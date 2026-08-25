@@ -1,8 +1,16 @@
-<div id="panel-academic" class="tab-panel hidden space-y-6">
-    <div>
-        <h4
-            class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-4 pb-1 border-b border-neutral-100 dark:border-white/5">
-            ព័ត៌មានរដ្ឋបាលសិក្សា (Institutional Academic Routing)</h4>
+<div id="panel-academic" class="tab-panel hidden space-y-5">
+    <div class="rounded-2xl border border-neutral-100 dark:border-white/5 bg-neutral-50/60 dark:bg-white/[0.02] p-5">
+        <div class="flex items-center gap-2 mb-4">
+            <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-indigo-600/10 text-indigo-600 dark:text-indigo-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 10 12 5 2 10l10 5 10-5z"></path>
+                    <path d="M6 12v5c0 1.66 2.69 3 6 3s6-1.34 6-3v-5"></path>
+                </svg>
+            </span>
+            <h4 class="text-sm font-bold text-neutral-800 dark:text-white">
+                ព័ត៌មានរដ្ឋបាលសិក្សា (Institutional Academic Routing)</h4>
+        </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             <div>
                 <label
@@ -74,13 +82,42 @@
                 <input type="text" name="from_school" placeholder="e.g., វិទ្យាល័យ ជា ស៊ីម សាមគ្គី"
                     class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
             </div>
+            <div class="flex flex-col justify-end gap-1.5 pb-2.5">
+                <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1">
+                    របៀបទូទាត់ថ្លៃសិក្សា (Payment As)
+                </label>
+                <div class="flex items-center gap-4">
+                    <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                        <input type="checkbox" id="payment_as_semester"
+                            class="w-4 h-4 rounded border-neutral-300 dark:border-white/20 text-indigo-600 focus:ring-4 focus:ring-indigo-500/10 focus:ring-offset-0 cursor-pointer">
+                        <span class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">ឆមាស
+                            (Semesterly)</span>
+                    </label>
+                    <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                        <input type="checkbox" id="payment_as_yearly"
+                            class="w-4 h-4 rounded border-neutral-300 dark:border-white/20 text-indigo-600 focus:ring-4 focus:ring-indigo-500/10 focus:ring-offset-0 cursor-pointer">
+                        <span class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">ឆ្នាំ
+                            (Yearly)</span>
+                    </label>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="pt-2">
-        <h4
-            class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-4 pb-1 border-b border-neutral-100 dark:border-white/5">
-            កាលបរិច្ឆេទ និងលទ្ធផលវាយតម្លៃ (Metrics & Admission Timelines)</h4>
+    <div class="rounded-2xl border border-neutral-100 dark:border-white/5 bg-neutral-50/60 dark:bg-white/[0.02] p-5">
+        <div class="flex items-center gap-2 mb-4">
+            <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-emerald-600/10 text-emerald-600 dark:text-emerald-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+            </span>
+            <h4 class="text-sm font-bold text-neutral-800 dark:text-white">
+                កាលបរិច្ឆេទ និងលទ្ធផលវាយតម្លៃ (Metrics & Admission Timelines)</h4>
+        </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             <div>
                 <label

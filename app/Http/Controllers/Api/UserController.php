@@ -19,15 +19,8 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $limit = $request->integer('per_page', 10);
-        $query = $this->model::query();
-
-        if ($search = $request->input('search')) {
-            $fields = $request->input('by');
-            $fields = $fields ? explode(',', $fields) : null;
-
-            $query->search($search, $fields); // scopeSearch from IModel
-        }
+        $limit    = $request->integer('per_page', 10);
+        $query = $this->model::query()->with('roles');
 
         if ($sort = $request->input('sort')) {
             $direction = str_starts_with($sort, '-') ? 'desc' : 'asc';
@@ -38,5 +31,21 @@ class UserController extends Controller
         }
 
         return $this->resource::collection($query->paginate($limit)->onEachSide(1));
+    }
+
+    /**
+     * Reassigns a user's role(s) — the only thing this admin surface edits
+     * about another account. A user's own profile page handles name/password.
+     */
+    public function updateRoles(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'roles'   => 'array',
+            'roles.*' => 'string|exists:roles,name',
+        ]);
+
+        $user->syncRoles($validated['roles'] ?? []);
+
+        return new UserResource($user->fresh('roles'));
     }
 }

@@ -99,6 +99,10 @@ export function switchTab(tabId) {
     document.querySelectorAll('[id^="tab-"]').forEach((button) => {
         button.classList.remove('bg-white', 'dark:bg-neutral-900', 'text-indigo-600', 'dark:text-white', 'shadow-sm', 'font-bold');
         button.classList.add('text-neutral-500', 'dark:text-neutral-400', 'font-medium');
+
+        const circle = button.querySelector('span');
+        circle?.classList.remove('bg-indigo-600', 'text-white');
+        circle?.classList.add('bg-neutral-300', 'dark:bg-white/10', 'text-neutral-600', 'dark:text-neutral-300');
     });
 
     const targetPanel = document.getElementById(`panel-${tabId}`);
@@ -108,5 +112,9 @@ export function switchTab(tabId) {
         targetPanel.classList.remove('hidden');
         targetTab.classList.remove('text-neutral-500', 'dark:text-neutral-400', 'font-medium');
         targetTab.classList.add('bg-white', 'dark:bg-neutral-900', 'text-indigo-600', 'dark:text-white', 'shadow-sm', 'font-bold');
+
+        const targetCircle = targetTab.querySelector('span');
+        targetCircle?.classList.remove('bg-neutral-300', 'dark:bg-white/10', 'text-neutral-600', 'dark:text-neutral-300');
+        targetCircle?.classList.add('bg-indigo-600', 'text-white');
     }
 }

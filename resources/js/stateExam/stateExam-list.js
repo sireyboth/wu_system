@@ -14,7 +14,8 @@ export async function loadStateExam(dom, ApiService, searchQuery = '', page = 1)
     state.searchAbortController = new AbortController();
 
     const trashedParam = state.showingTrash ? '&trashed=1' : '';
-    const url = `${CONFIG.API_BASE}?search=${encodeURIComponent(searchQuery)}${trashedParam}&page=${page}`;
+    const sortParam = state.sortKey ? (state.sortDir === 'desc' ? `-${state.sortKey}` : state.sortKey) : '';
+    const url = `${CONFIG.API_BASE}?search=${encodeURIComponent(searchQuery)}${trashedParam}&page=${page}&per_page=${CONFIG.PER_PAGE}&sort=${encodeURIComponent(sortParam)}`;
     const { error, aborted, data } = await ApiService.request(url, {
         signal: state.searchAbortController.signal,
     });

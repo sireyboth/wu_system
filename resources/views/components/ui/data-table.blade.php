@@ -74,10 +74,21 @@
                         @php
                             $label = is_array($header) ? ($header['label'] ?? '') : $header;
                             $align = is_array($header) ? ($header['align'] ?? 'left') : 'left';
+                            $sortKey = is_array($header) ? ($header['sort'] ?? null) : null;
                         @endphp
                         <th scope="col"
                             class="px-6 py-4 {{ $i === 0 && !$selectable ? 'font-bold tracking-wider' : '' }} {{ $align === 'right' ? 'text-right' : '' }}">
-                            {{ $label }}
+                            @if ($sortKey)
+                                <button type="button" data-sort-key="{{ $sortKey }}" data-sort-table="{{ $bodyId }}"
+                                    class="sortable-th inline-flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                                    {{ $label }}
+                                    <svg class="sort-icon w-3.5 h-3.5 text-neutral-300 dark:text-neutral-600 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                                    </svg>
+                                </button>
+                            @else
+                                {{ $label }}
+                            @endif
                         </th>
                     @endforeach
                 </tr>

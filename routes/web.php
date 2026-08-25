@@ -10,6 +10,7 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\LecturerController;
 use App\Http\Controllers\MajorController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\StateExamController;
 use App\Http\Controllers\StatusController;
@@ -24,6 +25,8 @@ Route::prefix('state-exam/attendance')->name('state-exam.attendance.')->group(fu
     Route::get('/', [StateExamController::class, 'attendance'])->name('index');
     Route::get('/{round}', [StateExamController::class, 'attendanceSearch'])->name('search');
 });
+
+Route::get('/state-exam/invigilators', [StateExamController::class, 'invigilators'])->name('state-exam.invigilators.index');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

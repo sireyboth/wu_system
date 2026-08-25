@@ -24,13 +24,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Kept for old inline onclick="" markup that hasn't been migrated yet
     // (see Blade snippet below). New buttons should use data-close-modal instead.
-    window.AppModal = { toggle: (open) => toggleModal(dom, open) };
+    window.AppModal = {
+        toggle: (open) => {
+            if (open) initFormLookups(ApiService);
+            toggleModal(dom, open);
+        },
+    };
     window.toggleModal = (open) => toggleModal(dom, open);
     window.togglePreviewModal = togglePreviewModal;
     window.switchTab = switchTab;
 
     initEvents(dom, ApiService);
-    initFormLookups(ApiService);
     loadStudents(dom, ApiService);
 });
 
@@ -53,6 +57,16 @@ function initEvents(dom, ApiService) {
 
     // Create/update form submit
     dom.form?.addEventListener('submit', (e) => handleFormSubmit(dom, ApiService, e));
+
+    // payment_as is either yearly or semester, never both — checking one unchecks the other
+    const yearlyCheckbox = dom.form?.querySelector('#payment_as_yearly');
+    const semesterCheckbox = dom.form?.querySelector('#payment_as_semester');
+    yearlyCheckbox?.addEventListener('change', () => {
+        if (yearlyCheckbox.checked) semesterCheckbox.checked = false;
+    });
+    semesterCheckbox?.addEventListener('change', () => {
+        if (semesterCheckbox.checked) yearlyCheckbox.checked = false;
+    });
 
     // Table row actions (preview / edit / delete) via event delegation
     dom.tableBody?.addEventListener('click', (e) => {

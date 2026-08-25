@@ -3,7 +3,7 @@ import { state, Toast } from "./core.js";
 import { parseNestedFormData } from "./form-utils.js";
 import { renderTable } from "./table-render.js";
 import { toggleModal, switchTab } from "./ui.js";
-import { populateAddressCascade } from "./address-cascade.js";
+import { populateAddressCascade, initFormLookups } from "./address-cascade.js";
 import { getById, toList } from "../app.js";
 
 /**
@@ -65,6 +65,10 @@ export async function handleEditAction(dom, ApiService, id) {
 
     if (!dom.form) return;
 
+    // Ensure dropdown option lists exist before we set their selected values below
+    // (memoized — a no-op if the modal was already opened once this page load).
+    await initFormLookups(ApiService);
+
     // 1. Academic details
     const scalarFields = {
         code: payload.code,
@@ -78,6 +82,11 @@ export async function handleEditAction(dom, ApiService, id) {
         remark: payload.remark,
     };
     toList(scalarFields, dom);
+
+    const yearlyCheckbox = dom.form.querySelector("#payment_as_yearly");
+    const semesterCheckbox = dom.form.querySelector("#payment_as_semester");
+    if (yearlyCheckbox) yearlyCheckbox.checked = payload.payment_as === "yearly";
+    if (semesterCheckbox) semesterCheckbox.checked = payload.payment_as === "semester";
 
     const relationalFields = {
         status_id: payload.status,
@@ -211,6 +220,13 @@ export async function handleFormSubmit(dom, ApiService, e) {
 
     dom.submitBtn.disabled = true;
     const payload = parseNestedFormData(dom.form);
+    if (dom.form.querySelector("#payment_as_yearly")?.checked) {
+        payload.payment_as = "yearly";
+    } else if (dom.form.querySelector("#payment_as_semester")?.checked) {
+        payload.payment_as = "semester";
+    } else {
+        payload.payment_as = "none";
+    }
 
     const url = state.isEditMode
         ? `${CONFIG.API_BASE}/${state.editingStudentId}`

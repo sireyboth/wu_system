@@ -10,6 +10,7 @@ class UserResource extends IResource
             'name'       => $this->name,
             'email'      => $this->email,
             'verified'   => $this->email_verified_at,
+            'roles'      => $this->whenLoaded('roles', fn () => $this->roles->pluck('name')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

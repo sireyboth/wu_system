@@ -3,60 +3,50 @@
         "shortcut": "student",
         "name_kh": "កំពុងសិក្សា",
         "name_en": "Active"
-        "name_en": "Active"
     },
     {
         "shortcut": "student",
         "name_kh": "ព្យួរការសិក្សា",
-        "name_en": "Deferred"
         "name_en": "Deferred"
     },
     {
         "shortcut": "student",
         "name_kh": "បោះបង់ការសិក្សា (ជូនដំណឹង)",
         "name_en": "Dropout"
-        "name_en": "Dropout"
     },
     {
         "shortcut": "student",
         "name_kh": "បោះបង់ការសិក្សា (មិនជូនដំណឹង)",
-        "name_en": "Quit"
         "name_en": "Quit"
     },
     {
         "shortcut": "student",
         "name_kh": "ឈប់ហើយសុំចូលរៀនវិញ",
         "name_en": "Re-enrolled"
-        "name_en": "Re-enrolled"
     },
     {
         "shortcut": "student",
         "name_kh": "សិស្សបន្តផ្ទេររៀនថែមមុខវិជ្ជា",
-        "name_en": "Add Subject"
         "name_en": "Add Subject"
     },
     {
         "shortcut": "student",
         "name_kh": "សិស្សរៀនសង",
         "name_en": "Retake Subject"
-        "name_en": "Retake Subject"
     },
     {
         "shortcut": "student",
         "name_kh": "សិស្សបញ្ចប់បរិញ្ញាបត្រ/បរិញ្ញាបត្ររង",
-        "name_en": "Graduated"
         "name_en": "Graduated"
     },
     {
         "shortcut": "student",
         "name_kh": "សិស្សផ្ទេរចូល",
         "name_en": "Transferred"
-        "name_en": "Transferred"
     },
     {
         "shortcut": "student",
         "name_kh": "សិស្សផ្ទេរទៅសាខា",
-        "name_en": "Campus Move Out"
         "name_en": "Campus Move Out"
     },
     {

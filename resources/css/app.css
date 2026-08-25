@@ -15,8 +15,6 @@ body {
     }
 }
 
-
-
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* Custom thin scrollbar – Tailwind can't do this without a plugin */

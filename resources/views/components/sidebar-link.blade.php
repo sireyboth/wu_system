@@ -2,22 +2,19 @@
 
 @php
     use Illuminate\Support\Facades\Route as RouteFacade;
-    use Illuminate\Support\Str;
 
     $href = $route && RouteFacade::has($route) ? route($route) : '#';
 
-    $base = $route ? Str::before($route, '.') : '';
-    $isActive = $base ? request()->routeIs($base . '.*') : false;
+    // Defaults to an exact match on $route. Pass `active` explicitly
+    // (comma-separated or array) for links that should also stay active
+    // on sibling CRUD routes, e.g. active="student.index,student.create,student.edit"
+    $activePatterns = $active ? (is_array($active) ? $active : explode(',', $active)) : [$route];
 
-    $activeClasses = 'text-indigo-600 dark:text-indigo-400
-                      bg-indigo-50 dark:bg-indigo-500/10
-                      border border-indigo-200 dark:border-indigo-500/20
-                      shadow-sm';
+    $isActive = collect($activePatterns)->filter()->contains(fn($pattern) => request()->routeIs(trim($pattern)));
 
-    $inactiveClasses = 'text-neutral-600 dark:text-neutral-400
-                        hover:bg-neutral-100 dark:hover:bg-white/5
-                        hover:text-neutral-900 dark:hover:text-white
-                        border border-transparent';
+    $activeClasses = 'text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-500/10';
+    $inactiveClasses = 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-white/5
+hover:text-neutral-900 dark:hover:text-white';
 @endphp
 
 <li>
@@ -26,16 +23,7 @@
             'class' =>
                 'flex items-center px-3 py-2.5 rounded-xl transition-all duration-200 group ' .
                 ($isActive ? $activeClasses : $inactiveClasses),
-    <a href="{{ $href }}"
-        {{ $attributes->merge([
-            'class' =>
-                'flex items-center px-3 py-2.5 rounded-xl transition-all duration-200 group ' .
-                ($isActive ? $activeClasses : $inactiveClasses),
         ]) }}>
-        @if ($icon)
-            <div class="transition-transform duration-200 group-hover:scale-110">
-                {{ $icon }}
-            </div>
         @if ($icon)
             <div class="transition-transform duration-200 group-hover:scale-110">
                 {{ $icon }}

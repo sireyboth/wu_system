@@ -1,4 +1,4 @@
-<x-ui.modal id="stateExamModal" title="បន្ថែមបន្ទប់ប្រឡងថ្មី (Add Exam Room)" form-id="stateExamForm">
+<x-ui.modal id="stateExamModal" title="បន្ថែមបន្ទប់ប្រឡងថ្មី (Add Exam Room)" form-id="stateExamForm" max-width="max-w-3xl">
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="relative group">
@@ -29,7 +29,7 @@
     <!-- Majors Breakdown (dynamic, clonable) -->
     <div>
         <div class="flex items-center justify-between mb-1.5">
-            <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">ការបំបែកតាមជំនាញ (Majors Breakdown)</label>
+            <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">ការបំបែកតាមជំនាញ និងអនុរក្ស (Majors Breakdown & Invigilators)</label>
             <button type="button" id="addMajorRowBtn"
                     class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors">
                 + បន្ថែមជំនាញ (Add Major)
@@ -50,6 +50,13 @@
             <input type="date" name="exam_date"
                    class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white dark:placeholder-neutral-600 focus:ring-4 focus:ring-indigo-500/40 focus:border-indigo-500 focus:bg-white dark:focus:bg-neutral-900 transition-all duration-200 outline-none">
         </div>
+    </div>
+
+    <!-- Attendance per Session (super admin manual override — mirrors the public attendance page) -->
+    <div>
+        <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">អវត្តមានតាមវគ្គ (Attendance per Session)</label>
+        <div id="absencesContainer" class="grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
+        <p class="mt-1.5 text-[11px] text-neutral-400">ទុកចន្លោះទទេប្រសិនបើវគ្គនោះមិនទាន់បញ្ចូលទិន្នន័យ (Leave a session blank if it hasn't been recorded yet)</p>
     </div>
 
     <!-- Input Row: Remark -->
