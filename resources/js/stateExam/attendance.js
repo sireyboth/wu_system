@@ -154,7 +154,11 @@ function byRoomAscending(a, b) {
 }
 
 async function fetchRooms(search = '') {
-    const res = await fetch(`${API_BASE}?search=${encodeURIComponent(search)}`, {
+    // per_page defaults to 10 server-side — without it, "list all rooms"
+    // silently truncates to the first 10 (by creation date) before the
+    // sort below even runs, so it looked "sorted" but was actually missing
+    // most rooms. A large per_page here is the actual fix for that.
+    const res = await fetch(`${API_BASE}?search=${encodeURIComponent(search)}&per_page=1000`, {
         headers: { Accept: 'application/json' },
     });
     const json = await res.json();

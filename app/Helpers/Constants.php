@@ -14,10 +14,13 @@ const DEFAULT_VALIDATE = [
 
 const ADDRESS_VALIDATE = [
     'addresses'               => 'sometimes|array',
-    'addresses.*.province_id' => 'required|exists:provinces,id',
-    'addresses.*.district_id' => 'required|exists:districts,id',
-    'addresses.*.commune_id'  => 'required|exists:communes,id',
-    'addresses.*.village_id'  => 'required|exists:villages,id',
+    // Nullable — staff can leave these as "មិនមាន" (not available) when a
+    // student doesn't remember their address, instead of being blocked
+    // from saving the rest of the form.
+    'addresses.*.province_id' => 'nullable|exists:provinces,id',
+    'addresses.*.district_id' => 'nullable|exists:districts,id',
+    'addresses.*.commune_id'  => 'nullable|exists:communes,id',
+    'addresses.*.village_id'  => 'nullable|exists:villages,id',
     'addresses.*.street'      => 'nullable|string',
     'addresses.*.house_no'    => 'nullable|string',
     'addresses.*.type'        => 'required|in:current,birth',
