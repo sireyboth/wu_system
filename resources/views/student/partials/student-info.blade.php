@@ -148,35 +148,35 @@
                 <label
                     class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">ខេត្ត
                     / រាជធានី</label>
-                <select required name="addresses[0][province_id]" id="student_province"
+                <select name="addresses[0][province_id]" id="student_province"
                     class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none">
-                    <option value="" disabled selected>-- ជ្រើសរើសខេត្ត --</option>
+                    <option value="" selected>មិនមាន (Not Available)</option>
                 </select>
             </div>
             <div>
                 <label
                     class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">ស្រុក
                     / ខណ្ឌ</label>
-                <select required name="addresses[0][district_id]" id="student_district" disabled
+                <select name="addresses[0][district_id]" id="student_district" disabled
                     class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none">
-                    <option value="" disabled selected>-- ជ្រើសរើសស្រុក --</option>
+                    <option value="" selected>មិនមាន (Not Available)</option>
                 </select>
             </div>
             <div>
                 <label
                     class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">ឃុំ
                     / សង្កាត់</label>
-                <select required name="addresses[0][commune_id]" id="student_commune" disabled
+                <select name="addresses[0][commune_id]" id="student_commune" disabled
                     class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none">
-                    <option value="" disabled selected>-- ជ្រើសរើសឃុំ --</option>
+                    <option value="" selected>មិនមាន (Not Available)</option>
                 </select>
             </div>
             <div>
                 <label
                     class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">ភូមិ</label>
-                <select required name="addresses[0][village_id]" id="student_village" disabled
+                <select name="addresses[0][village_id]" id="student_village" disabled
                     class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none">
-                    <option value="" disabled selected>-- ជ្រើសរើសភូមិ --</option>
+                    <option value="" selected>មិនមាន (Not Available)</option>
                 </select>
             </div>
             <input type="hidden" name="addresses[0][type]" value="current">
@@ -200,35 +200,35 @@
                 <label
                     class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">ខេត្ត
                     / រាជធានី</label>
-                <select required name="addresses[1][province_id]" id="student-province"
+                <select name="addresses[1][province_id]" id="student-province"
                     class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none">
-                    <option value="" disabled selected>-- ជ្រើសរើសខេត្ត --</option>
+                    <option value="" selected>មិនមាន (Not Available)</option>
                 </select>
             </div>
             <div>
                 <label
                     class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">ស្រុក
                     / ខណ្ឌ</label>
-                <select required name="addresses[1][district_id]" id="student-district" disabled
+                <select name="addresses[1][district_id]" id="student-district" disabled
                     class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none">
-                    <option value="" disabled selected>-- ជ្រើសរើសស្រុក --</option>
+                    <option value="" selected>មិនមាន (Not Available)</option>
                 </select>
             </div>
             <div>
                 <label
                     class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">ឃុំ
                     / សង្កាត់</label>
-                <select required name="addresses[1][commune_id]" id="student-commune" disabled
+                <select name="addresses[1][commune_id]" id="student-commune" disabled
                     class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none">
-                    <option value="" disabled selected>-- ជ្រើសរើសឃុំ --</option>
+                    <option value="" selected>មិនមាន (Not Available)</option>
                 </select>
             </div>
             <div>
                 <label
                     class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">ភូមិ</label>
-                <select required name="addresses[1][village_id]" id="student-village" disabled
+                <select name="addresses[1][village_id]" id="student-village" disabled
                     class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none">
-                    <option value="" disabled selected>-- ជ្រើសរើសភូមិ --</option>
+                    <option value="" selected>មិនមាន (Not Available)</option>
                 </select>
             </div>
             <input type="hidden" name="addresses[1][type]" value="birth">

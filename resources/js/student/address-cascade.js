@@ -8,7 +8,7 @@ import { fillSelectOptions } from "./form-utils.js";
 export function resetSelectField(elementId, labelKhmer) {
     const el = getById(elementId);
     if (el) {
-        el.innerHTML = `<option value="" disabled selected>-- ជ្រើសរើស${labelKhmer} --</option>`;
+        el.innerHTML = `<option value="" selected>មិនមាន (Not Available)</option>`;
         el.disabled = true;
     }
 }
@@ -32,7 +32,7 @@ export function setupCascadeListener(
     parentEl.addEventListener("change", async function handleChange() {
         const apiLookupId = this.value;
 
-        childEl.innerHTML = `<option value="" disabled selected>-- ជ្រើសរើស${labelKhmer} --</option>`;
+        childEl.innerHTML = `<option value="" selected>មិនមាន (Not Available)</option>`;
         childEl.disabled = true;
 
         const prefix = parentId.startsWith("student_")

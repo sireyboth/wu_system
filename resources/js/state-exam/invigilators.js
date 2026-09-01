@@ -273,7 +273,9 @@ function attachTilt() {
 // ---------- Data flow ----------
 
 async function fetchRooms(search = '') {
-    const res = await fetch(`${API_BASE}?search=${encodeURIComponent(search)}`, {
+    // per_page defaults to 10 server-side — a broad search (common surname,
+    // short room prefix) could silently drop matches past the first 10.
+    const res = await fetch(`${API_BASE}?search=${encodeURIComponent(search)}&per_page=1000`, {
         headers: { Accept: 'application/json' },
     });
     const json = await res.json();
