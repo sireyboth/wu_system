@@ -1,12 +1,10 @@
 <?php
-
 namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
 
 class StudentStatusController extends Controller
 {
-    public function Index(){
-        return view ('StudentStatusCertificate.index');
+    public function index()
+    {
+        return view('certificate.index');
     }
 }

@@ -5,6 +5,7 @@ import { initFormLookups } from './address-cascade.js';
 import { toggleModal, togglePreviewModal, registerModalCloser, closeModalByName, switchTab } from './ui.js';
 import { handlePreviewAction } from './preview.js';
 import { loadStudents, handleEditAction, handleDeleteAction, handleFormSubmit } from './student-form.js';
+import { bindPagination } from './student-pagination.js';
 
 /**
  * THE single DOMContentLoaded listener for this page.
@@ -34,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.togglePreviewModal = togglePreviewModal;
     window.switchTab = switchTab;
 
+    bindPagination((page) => loadStudents(dom, ApiService, dom.searchInput?.value || '', page));
     initEvents(dom, ApiService);
     loadStudents(dom, ApiService);
 });

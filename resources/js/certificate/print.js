@@ -27,6 +27,8 @@ function set(id, value) {
 function fillPrintArea(cert, student) {
     const person = student.person || {};
     const major = student.major || {};
+    const { en, kh } = student.degree_label;
+
     const address = Array.isArray(person.addresses) && person.addresses.length ? person.addresses[0] : null;
 
     const nameKh = [person.first_name_kh, person.last_name_kh].filter(Boolean).join(' ') || '—';
@@ -39,8 +41,8 @@ function fillPrintArea(cert, student) {
     set('printNationalityKh', person.nationality?.name_kh ?? 'ខ្មែរ');
     set('printDobKh', formatDobKh(person.dob));
     set('printAddressKh', address?.province?.name_kh);
-    set('printDegreeKh', student.degree_type);
-    set('printMajorKh', major.name_kh ?? major.name);
+    set('printDegreeKh', kh);
+    set('printMajorKh', major.name_kh);
 
     set('printNameEn', nameEn);
     set('printSexEn', person.gender === 'female' ? 'Female' : 'Male');
@@ -48,8 +50,8 @@ function fillPrintArea(cert, student) {
     set('printNationalityEn', person.nationality?.name_en ?? 'Khmer');
     set('printDobEn', formatDateEn(person.dob));
     set('printAddressEn', address?.province?.name_en);
-    set('printDegreeEn', student.degree_type);
-    set('printMajorEn', major.name ?? major.name_kh);
+    set('printDegreeEn', en);
+    set('printMajorEn', major.name_en);
 
     set('printFullDateKh', cert.full_date_kh);
     set('printIssueDateEn', `Phnom Penh, ${formatDateEn(cert.issue_date)}`);

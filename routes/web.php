@@ -41,8 +41,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('campus', CampusController::class)->only('index')->middleware('can:campus.view');
 
     Route::middleware('can:state-exam.view')->group(function () {
-        Route::resource('stateExam', StateExamController::class)->only('index');
-        Route::get('stateExam/report', [StateExamController::class, 'report'])->name('stateExam.report');
+        Route::resource('state-exam', StateExamController::class)->only('index');
+        Route::get('state-exam/report', [StateExamController::class, 'report'])->name('state-exam.report');
         Route::get('/exam-schedule', ExamScheduleController::class)->name('exam.schedule');
     });
 
@@ -50,7 +50,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('alert', AlertController::class)->only('index');
 
     Route::resource('student', StudentController::class)->only('index')->middleware('can:student.view');
-    Route::resource('StudentStatusCertificate', StudentStatusController::class)->only('index')->middleware('can:certificate.view');
+    Route::resource('certificate', StudentStatusController::class)->only('index')->middleware('can:certificate.view');
     Route::resource('app-status', StatusController::class)->only('index')->middleware('can:app-status.view');
 
     Route::resource('role', RoleController::class)->only('index')->middleware('can:role.view');

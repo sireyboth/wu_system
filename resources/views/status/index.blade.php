@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 @section('title', 'Status')
 @section('content')
-    <x-core.page-header title="Status" />
+    <x-core.page-header title="គ្រប់គ្រងស្ថានភាព" />
 
     <div class="space-y-4">
         <div class="flex flex-col justify-between gap-4 md:flex-row md:items-center">
@@ -58,7 +58,7 @@
 
             <div
                 class="overflow-x-auto max-h-[600px] scrollbar-thin scrollbar-thumb-neutral-200 dark:scrollbar-thumb-white/10">
-                <table class="w-full text-sm text-left border-collapse text-neutral-500 dark:text-neutral-400">
+                <table class="w-full text-sm text-left border-collapse whitespace-nowrap text-neutral-500 dark:text-neutral-400">
                     <thead
                         class="sticky top-0 z-20 text-xs uppercase text-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 dark:text-neutral-300 backdrop-blur-md">
                         <tr>
@@ -74,7 +74,7 @@
                             </th>
                             <th scope="col" class="px-6 py-4">Name Khmer</th>
                             <th scope="col" class="px-6 py-4">Name English</th>
-                            <th scope="col" class="px-6 py-4">Shortcut</th>
+                            <th scope="col" class="px-6 py-4">Group By</th>
                             <th scope="col" class="px-6 py-4">Remark</th>
                             <th scope="col" class="px-6 py-4">Create At</th>
                             <th scope="col" class="px-6 py-4 text-right">Actions</th>

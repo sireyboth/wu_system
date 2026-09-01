@@ -150,6 +150,7 @@
         .rp-remember input{ width:15px; height:15px; accent-color:var(--brass); border:none; padding:0; }
         .rp-recover{ font-size:.72rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--rp-form-text); text-decoration:none; border-bottom:1px solid var(--brass); padding-bottom:1px; transition:color .4s ease; }
         .rp-recover:hover{ color:var(--brass); }
+        .box {border-radius: 4px}
 
         .rp-submit{
             margin-top:.2rem; width:100%; padding:1.05rem; background:var(--rp-submit-bg); color:var(--rp-submit-text); border:none;
@@ -255,7 +256,7 @@
 
                     <div class="rp-row-between">
                         <label class="rp-remember">
-                            <input type="checkbox" name="remember"> Keep me signed in
+                            <input type="checkbox" class="box" name="remember"> Keep me signed in
                         </label>
                         <a class="rp-recover" href="{{ route('password.request') }}">Recover access</a>
                     </div>

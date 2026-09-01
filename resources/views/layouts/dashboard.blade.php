@@ -31,7 +31,7 @@
 
         @include('partials.sidebar')
 
-        <div id="main-content" class="flex-1 min-w-0 p-6 transition-all duration-300">
+        <div id="main-content" class="flex-1 min-w-0 p-6 transition-all duration-300 ease-in-out [[body.sidebar-open]_&]:sm:ml-64">
             @yield('content')
         </div>
 

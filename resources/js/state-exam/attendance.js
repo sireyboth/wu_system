@@ -8,7 +8,9 @@
  * needs to without touching the admin experience.
  */
 
-const API_BASE = '/api/v1/exam-states';
+import { baseUri } from "../app";
+
+const API_BASE = baseUri('exam-states');
 const round = window.EXAM_ROUND; // 1, 2, or 3
 const roundIndex = round - 1;
 

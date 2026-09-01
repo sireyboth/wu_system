@@ -1,22 +1,22 @@
-import {Toast} from './core.js';
+import { Toast } from './core.js';
 // student-status-modal.js
 
 const El = {
-    modal:           () => document.getElementById('student-status-modal'),
-    form:            () => document.getElementById('student-status-form'),
-    studentIdInput:  () => document.getElementById('student_id'),
-    dateEng:         () => document.getElementById('issue_date'),
-    dateKh:          () => document.getElementById('full_date_kh'),
-    shortDateKh:     () => document.getElementById('short_date_kh'),
-    certificateNo:   () => document.getElementById('certificate_no'),
-    cerNoHint:       () => document.getElementById('cerNoHint'),
-    type:            () => document.getElementById('type'),
-    infoNameKh:      () => document.getElementById('infoNameKh'),
-    infoNameEn:      () => document.getElementById('infoNameEn'),
-    infoSexBadge:    () => document.getElementById('infoSexBadge'),
-    infoCode:        () => document.getElementById('infoCode'),
-    infoDob:         () => document.getElementById('infoDob'),
-    infoMajor:       () => document.getElementById('infoMajor'),
+    modal: () => document.getElementById('student-status-modal'),
+    form: () => document.getElementById('student-status-form'),
+    studentIdInput: () => document.getElementById('student_id'),
+    dateEng: () => document.getElementById('issue_date'),
+    dateKh: () => document.getElementById('full_date_kh'),
+    shortDateKh: () => document.getElementById('short_date_kh'),
+    certificateNo: () => document.getElementById('certificate_no'),
+    cerNoHint: () => document.getElementById('cerNoHint'),
+    type: () => document.getElementById('type'),
+    infoNameKh: () => document.getElementById('infoNameKh'),
+    infoNameEn: () => document.getElementById('infoNameEn'),
+    infoSexBadge: () => document.getElementById('infoSexBadge'),
+    infoCode: () => document.getElementById('infoCode'),
+    infoDob: () => document.getElementById('infoDob'),
+    infoMajor: () => document.getElementById('infoMajor'),
 };
 
 function formatDob(iso) {
@@ -54,9 +54,13 @@ function open(student, cert = null) {
     }
 
     // If editing an existing certificate, pre-fill certificate date
+    // without triggering a preview-number fetch (that should only happen
+    // when the user actually changes the date themselves).
     if (cert && El.dateEng()) {
-        El.dateEng().value = cert.issue_date || cert.date_eng || '';
-        El.dateEng().dispatchEvent(new Event('change'));
+        const val = cert.issue_date || cert.date_eng || '';
+        El.dateEng().value = val;
+        updateKhmerDate(val);
+        El.certificateNo().value = cert.certificate_no;
     }
 
     modal.classList.remove('hidden');
@@ -85,8 +89,7 @@ function close() {
     if (El.infoMajor()) El.infoMajor().textContent = '—';
 }
 
-function handleDateChange(e) {
-    const val = e.target.value;
+function updateKhmerDate(val) {
     if (!val) {
         if (El.dateKh()) El.dateKh().value = '';
         if (El.shortDateKh()) El.shortDateKh().value = '';
@@ -100,8 +103,12 @@ function handleDateChange(e) {
 
     if (El.dateKh()) El.dateKh().value = momentkh.format(khmer);
     if (El.shortDateKh()) El.shortDateKh().value = momentkh.format(khmer, 'Ds ខែM ឆ្នាំc');
+}
 
-    fetchPreviewNumber(val);
+function handleDateChange(e) {
+    const val = e.target.value;
+    updateKhmerDate(val);
+    if (val && El.dateKh()) fetchPreviewNumber(val);
 }
 
 function fetchPreviewNumber(issueDate) {

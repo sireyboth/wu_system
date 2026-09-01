@@ -8,7 +8,7 @@ export const CONFIG = {
     API_BASE: baseUri("students"),
     DEBOUNCE_DELAY: 300,
     LOCALE: "en-GB",
-    PER_PAGE: 25, // used once server-side pagination is wired in (see api-service.js note)
+    PER_PAGE: 10,
 };
 
 CONFIG.API_LOOKUPS = {

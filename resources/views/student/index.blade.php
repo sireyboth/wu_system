@@ -58,7 +58,7 @@
             <div
                 class="overflow-y-auto md:overflow-x-auto max-h-[600px] scrollbar-thin scrollbar-thumb-neutral-200 dark:scrollbar-thumb-white/10">
                 <table
-                    class="w-full text-sm text-left text-neutral-500 dark:text-neutral-400 block md:table md:border-collapse">
+                    class="w-full whitespace-nowrap text-sm text-left text-neutral-500 dark:text-neutral-400 block md:table md:border-collapse">
                     <thead
                         class="hidden md:table-header-group sticky top-0 z-20 text-xs text-neutral-700 uppercase bg-neutral-50 dark:bg-neutral-800/50 dark:text-neutral-300 backdrop-blur-md border-b border-neutral-200 dark:border-white/5">
                         <tr>

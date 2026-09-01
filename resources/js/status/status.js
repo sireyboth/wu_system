@@ -213,8 +213,8 @@ const ApiService = {
                     <td class="px-6 py-4">
                         <div class="flex items-center">
                             <div>
-                                <div class="font-semibold text-neutral-900 dark:text-white">${status.name_kh}</div>
-                                <div class="text-xs text-neutral-400 font-mono">${status.name_en}</div>
+                                <div class="font-semibold text-neutral-900 dark:text-white whitespace-nowrap">${status.name_kh}</div>
+                                <div class="text-xs text-neutral-400 font-mono whitespace-nowrap">${status.name_en}</div>
                             </div>
                         </div>
                     </td>

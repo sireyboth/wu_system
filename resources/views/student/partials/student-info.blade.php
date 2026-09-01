@@ -98,9 +98,9 @@
                 <select required name="degree_type" id="student_degree_type"
                     class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-colors">
                     <option value="" disabled selected>-- ជ្រើសរើសកម្រិតសិក្សា --</option>
-                    <option value="associate">បរិញ្ញាបត្ររង (Associate Degree)</option>
-                    <option value="bachelor">បរិញ្ញាបត្រ (Bachelor Degree)</option>
-                    <option value="master">បរិញ្ញាបត្រជាន់ខ្ពស់ (Master Degree)</option>
+                    <option value="associate">បរិញ្ញាបត្ររង (Associate's degree)</option>
+                    <option value="bachelor">បរិញ្ញាបត្រ (Bachelor's degree)</option>
+                    <option value="master">បរិញ្ញាបត្រជាន់ខ្ពស់ (Master's degree)</option>
                     <option value="phd">បណ្ឌិត (PhD)</option>
                 </select>
             </div>

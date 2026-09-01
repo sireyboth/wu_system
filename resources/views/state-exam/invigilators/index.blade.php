@@ -45,5 +45,5 @@
 @endsection
 
 @push('scripts')
-    @vite(['resources/js/stateExam/invigilators.js'])
+    @vite(['resources/js/state-exam/invigilators.js'])
 @endpush
