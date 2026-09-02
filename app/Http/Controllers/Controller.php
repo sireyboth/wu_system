@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Helpers\Generic;
@@ -25,7 +26,7 @@ abstract class Controller
         return no_data("{$this->name} {$message} with ID: {$id}", 404);
     }
 
-    protected function list(Request $request,  ? callable $fn = null)
+    protected function list(Request $request,  ?callable $fn = null)
     {
         $limit    = $request->integer('per_page', 10);
         $response = $this->model::query();
@@ -90,7 +91,7 @@ abstract class Controller
         return Excel::download($data, "{$file_name}_{$time}.xlsx");
     }
 
-    protected function import(object $data, UploadedFile $file) : array
+    protected function import(object $data, UploadedFile $file): array
     {
         Excel::import($data, $file);
         return [
@@ -101,15 +102,26 @@ abstract class Controller
 
     protected function withStudent(string $key = 'student')
     {
-        return array_map(fn($s) => "{$key}.{$s}",
-            array_merge(['person', 'guardians'], $this->withPerson())
+        return array_map(
+            fn($s) => "{$key}.{$s}",
+            array_merge([
+                'person',
+                'guardians',
+                'batch',
+                'group',
+                'shift',
+                'major',
+                'status',
+            ], $this->withPerson())
         );
     }
 
     protected function withPerson(string $key = 'person', string $otherKey = 'addresses')
     {
-        return array_map(fn($p) => "{$key}.{$p}",
-            array_merge(['nationality', 'addresses'],
+        return array_map(
+            fn($p) => "{$key}.{$p}",
+            array_merge(
+                ['nationality', 'addresses'],
                 array_map(fn($a) => "{$otherKey}.$a", ['province', 'district', 'commune', 'village'])
             )
         );

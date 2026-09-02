@@ -60,8 +60,8 @@
         </div>
     @endif
 
-    <div class="overflow-y-auto md:overflow-x-auto max-h-[600px] scrollbar-thin scrollbar-thumb-neutral-200 dark:scrollbar-thumb-white/10">
-        <table class="block w-full text-sm text-left text-neutral-500 dark:text-neutral-400 md:table md:border-collapse">
+    <div class="overflow-x-auto md:overflow-x-auto max-h-[600px] scrollbar-thin scrollbar-thumb-neutral-200 dark:scrollbar-thumb-white/10">
+        <table class="block w-full text-sm text-left whitespace-nowrap text-neutral-500 dark:text-neutral-400 md:table md:border-collapse">
             <thead class="sticky top-0 z-20 hidden text-xs uppercase border-b md:table-header-group text-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 dark:text-neutral-300 backdrop-blur-md border-neutral-200 dark:border-white/5">
                 <tr>
                     @if ($selectable)

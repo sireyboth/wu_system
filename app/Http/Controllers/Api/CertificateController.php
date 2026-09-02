@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
 use App\Helpers\NumberGenerator;
@@ -25,8 +26,8 @@ class CertificateController extends Controller
     public function index(Request $request)
     {
         return $this->list($request, fn($query) => $request->type === Certificate::PROVISIONAL
-                ? $query->provisional()
-                : $query->status());
+            ? $query->provisional()
+            : $query->status());
     }
 
     /**
@@ -36,10 +37,7 @@ class CertificateController extends Controller
     {
         $data = $request->validated();
         return execute(function () use ($request, $data) {
-            $code = $this->generator->generate(
-                $data['type'] ?? 'status',
-                Carbon::parse($data['issue_date'])
-            );
+            $code = $this->generateCode($data);
 
             return $this->save($request, ['certificate_no' => $code]);
         });
@@ -58,7 +56,16 @@ class CertificateController extends Controller
      */
     public function update(CertificateRequest $request, Certificate $certificate)
     {
-        return $this->release($request, $certificate);
+        $data = $request->validated();
+        return execute(function () use ($request, $data, $certificate) {
+            $code = $this->generateCode($data);
+
+            return $this->release(
+                $request,
+                $certificate,
+                ['certificate_no' => $certificate->certificate_no ?? $code]
+            );
+        });
     }
 
     /**
@@ -108,5 +115,13 @@ class CertificateController extends Controller
             'printed' => (int) ($counts['printed'] ?? 0),
             'other'   => (int) $counts->except(['pending', 'printed'])->sum(),
         ]);
+    }
+
+    private function generateCode(mixed $data): string
+    {
+        return $this->generator->generate(
+            $data['type'] ?? 'status',
+            Carbon::parse($data['issue_date'])
+        );
     }
 }

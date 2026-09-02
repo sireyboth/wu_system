@@ -4,21 +4,19 @@ import { parseNestedFormData } from "./form-utils.js";
 import { renderTable } from "./table-render.js";
 import { toggleModal, switchTab } from "./ui.js";
 import { populateAddressCascade, initFormLookups } from "./address-cascade.js";
+import { renderPagination } from "./student-pagination.js";
 import { getById, toList } from "../app.js";
 
 /**
  * Loads the student list (optionally filtered by search) and renders it.
  * Cancels any still-in-flight previous search so a slow response can't
  * overwrite the table with stale results after a faster, newer one lands.
- *
- * NOTE: no page/per_page params yet — add these once the backend paginates
- * (CONFIG.PER_PAGE is already there for it). See code review notes.
  */
-export async function loadStudents(dom, ApiService, searchQuery = "") {
+export async function loadStudents(dom, ApiService, searchQuery = "", page = 1) {
     state.searchAbortController?.abort();
     state.searchAbortController = new AbortController();
 
-    const url = `${CONFIG.API_BASE}?search=${encodeURIComponent(searchQuery)}`;
+    const url = `${CONFIG.API_BASE}?search=${encodeURIComponent(searchQuery)}&page=${page}&per_page=${CONFIG.PER_PAGE}`;
     const { error, aborted, data } = await ApiService.request(url, {
         signal: state.searchAbortController.signal,
     });
@@ -36,6 +34,7 @@ export async function loadStudents(dom, ApiService, searchQuery = "") {
               ? data
               : [];
     renderTable(dom, records);
+    renderPagination(data?.meta);
 }
 
 /**

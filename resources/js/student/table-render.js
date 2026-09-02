@@ -4,10 +4,7 @@ import { escapeHtml } from "./form-utils.js";
 /**
  * Renders the student list into dom.tableBody.
  * Each row ships both a mobile-card layout and a desktop-row layout,
- * toggled with Tailwind's hidden/md: classes. That's fine at typical
- * page sizes (25-50 rows) once server-side pagination is in place —
- * it stops being fine if this is ever asked to render hundreds of
- * rows at once (see code review notes on pagination).
+ * toggled with Tailwind's hidden/md: classes.
  */
 export function renderTable(dom, students) {
     if (!dom.tableBody) return;

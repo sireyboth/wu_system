@@ -49,13 +49,13 @@
                 class="relative overflow-hidden bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-2xl shadow-sm transition-colors duration-300">
 
                 <div id="loading-overlay"
-                    class="hidden absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-neutral-900/50 backdrop-blur-[2px]">
+                    class="hidden absolute inset-0 z-10 items-center justify-center bg-white/50 dark:bg-neutral-900/50 backdrop-blur-[2px]">
                     <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
                 </div>
 
                     <div class="w-full max-h-[600px] overflow-y-auto overflow-x-hidden md:overflow-x-auto scrollbar-thin scrollbar-thumb-neutral-200 dark:scrollbar-thumb-white/10">
             <!-- Changed to a grid block on mobile, switches back to regular table layouts on desktop (md:) -->
-            <table class="w-full text-sm text-left text-neutral-500 dark:text-neutral-400 border-collapse block md:table">
+            <table class="w-full text-sm text-left text-neutral-500 whitespace-nowrap dark:text-neutral-400 border-collapse block md:table">
                 <!-- Hidden on small screens, shown as proper table-header-group on desktop -->
                 <thead class="hidden md:table-header-group sticky top-0 z-20 text-xs text-neutral-700 uppercase bg-neutral-50 dark:bg-neutral-800/50 dark:text-neutral-300 backdrop-blur-md">
                     <tr>

@@ -1,14 +1,11 @@
 <?php
-
 namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
 
 class StateExamController extends Controller
 {
     public function index()
     {
-       return view('stateExam.index');
+        return view('state-exam.index');
     }
 
     /**
@@ -16,7 +13,7 @@ class StateExamController extends Controller
      */
     public function attendance()
     {
-        return view('stateExam.attendance.index', ['rounds' => $this->rounds]);
+        return view('state-exam.attendance.index', ['rounds' => $this->rounds]);
     }
 
     /**
@@ -26,7 +23,7 @@ class StateExamController extends Controller
     {
         abort_unless($round >= 1 && $round <= count($this->rounds), 404);
 
-        return view('stateExam.attendance.search', [
+        return view('state-exam.attendance.search', [
             'round'      => $round,
             'roundLabel' => $this->rounds[$round - 1],
         ]);
@@ -37,7 +34,7 @@ class StateExamController extends Controller
      */
     public function report()
     {
-        return view('stateExam.report.index');
+        return view('state-exam.report.index');
     }
 
     /**
@@ -47,6 +44,6 @@ class StateExamController extends Controller
      */
     public function invigilators()
     {
-        return view('stateExam.invigilators.index');
+        return view('state-exam.invigilators.index');
     }
 }

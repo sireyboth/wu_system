@@ -43,7 +43,7 @@
 </style>
 
 <div id="certificateReportModal"
-    class="fixed inset-0 z-50 flex items-center justify-center hidden px-4 py-6 bg-neutral-950/70 backdrop-blur-xl transition-all duration-300">
+    class="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 bg-neutral-950/70 backdrop-blur-xl transition-all duration-300">
 
     <!-- Ambient Background Glow Effect -->
     <div class="absolute w-96 h-96 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-30 animate-hue pointer-events-none"></div>

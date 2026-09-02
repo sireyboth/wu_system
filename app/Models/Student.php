@@ -1,6 +1,8 @@
 <?php
+
 namespace App\Models;
 
+use App\Helpers\Degree;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 
 class Student extends IModel
@@ -58,7 +60,7 @@ class Student extends IModel
 
     protected function casts(): array
     {
-        return ['admission_date' => 'date'];
+        return ['admission_date' => 'date', 'degree_type' => Degree::class,];
     }
 
     public function person()

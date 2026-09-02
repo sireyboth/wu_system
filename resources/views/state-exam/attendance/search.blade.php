@@ -109,5 +109,5 @@
 @endpush
 
 @push('scripts')
-    @vite(['resources/js/stateExam/attendance.js'])
+    @vite(['resources/js/state-exam/attendance.js'])
 @endpush

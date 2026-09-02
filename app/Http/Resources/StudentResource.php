@@ -1,16 +1,22 @@
 <?php
+
 namespace App\Http\Resources;
 
 class StudentResource extends IResource
 {
     public function toList(): array
     {
+        $degree = $this->degree_type;
         return to_list($this, [
             'code'           => $this->code,
             'bacc_2_code'    => $this->bacc_2_code,
             'entrance_exam'  => $this->entrance_exam,
             'exit_exam'      => $this->exit_exam,
-            'degree_type'    => $this->degree_type,
+            'degree_type'    => $degree?->value ?? $degree,
+            'degree_label' => [
+                'en' => $degree?->labelEn(),
+                'kh' => $degree?->labelKh(),
+            ],
             'payment_as'     => $this->payment_as,
             'year_level'     => $this->year_level,
             'from_school'    => $this->from_school,

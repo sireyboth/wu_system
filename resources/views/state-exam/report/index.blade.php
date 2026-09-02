@@ -4,7 +4,7 @@
 
 <div class="mb-8 flex items-center justify-between flex-wrap gap-4">
     <div>
-        <a href="{{ route('stateExam.index') }}"
+        <a href="{{ route('state-exam.index') }}"
            class="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-500 hover:text-indigo-600 dark:text-neutral-400 dark:hover:text-indigo-400 transition-colors mb-2">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
@@ -132,5 +132,5 @@
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    @vite(['resources/js/stateExam/report.js'])
+    @vite(['resources/js/state-exam/report.js'])
 @endpush
