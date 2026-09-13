@@ -3,10 +3,8 @@
 @section('content')
 
 <div class="text-center mb-12 fade-up">
-    <div class="mx-auto mb-5 flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-600 to-indigo-800 text-white shadow-lg shadow-indigo-500/25">
-        <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-        </svg>
+    <div class="mx-auto mb-5 flex items-center justify-center w-20 h-20 rounded-2xl bg-white dark:bg-white/5 border border-neutral-200/80 dark:border-white/10 shadow-lg p-2">
+        <img src="{{ asset('images/logo.png') }}" alt="Western University logo" class="w-full h-full object-contain">
     </div>
 
     <div class="inline-flex items-center gap-2 px-3 py-1 mb-5 text-[11px] font-bold tracking-widest uppercase rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-500/20">
@@ -104,9 +102,10 @@
      footer, so this lives outside it, in the layout's 'modals' stack. --}}
 <div id="retakeToastStack" class="fixed top-5 right-5 z-[70] flex flex-col gap-2 w-[calc(100%-2.5rem)] max-w-sm"></div>
 
-{{-- Roumdoul promo splash — shown on every visit for 3s, then fades away
-     on its own (Leng's call: this is the university's own student-facing
-     page, so a promo shouldn't force a click to get past it). Same
+{{-- Roumdoul promo splash — shown on every visit for 1.5s, then plays a
+     pop-out animation and fades away on its own (Leng's call: this is the
+     university's own student-facing page, so a promo shouldn't force a
+     click to get past it). Same
      logo/wordmark/socials/phone numbers as this layout's own footer, just
      presented up front instead of at the bottom of the page. Lives in the
      'modals' stack for the same z-index/stacking reason as the toast
@@ -114,7 +113,7 @@
 <div id="retakeSplash" class="fixed inset-0 z-[90] flex items-center justify-center overflow-y-auto bg-white dark:bg-neutral-950 py-10">
     <div id="retakeSplashContent" class="text-center px-6 w-full max-w-sm splash-pop">
         <h3 class="text-neutral-400 dark:text-neutral-500 tracking-[0.35em] text-[10px] uppercase mb-5">
-            Premium Services
+            Developed By
         </h3>
 
         <div class="mx-auto mb-5 flex items-center justify-center w-28 h-28 rounded-3xl bg-white dark:bg-white/5 border border-neutral-200/80 dark:border-white/10 shadow-xl shadow-pink-900/10 p-3">
@@ -163,28 +162,41 @@
         animation: splashPop .8s cubic-bezier(.34,1.56,.64,1) both;
     }
 
+    .splash-pop.splash-pop-out {
+        animation: splashPopOut .4s cubic-bezier(.4,0,.2,1) both;
+    }
+
     @keyframes splashPop {
         from { opacity: 0; transform: scale(.8) translateY(8px); }
         to   { opacity: 1; transform: scale(1) translateY(0); }
     }
 
+    @keyframes splashPopOut {
+        from { opacity: 1; transform: scale(1) translateY(0); }
+        to   { opacity: 0; transform: scale(.8) translateY(-8px); }
+    }
+
     @media (prefers-reduced-motion: reduce) {
         #retakeSplash { transition: none; }
         .splash-pop { animation: none; }
+        .splash-pop.splash-pop-out { animation: none; }
     }
 </style>
 
 <script>
-    // Shown on every visit — holds for 3s, then fades out on its own and
-    // is removed so it never intercepts clicks on the real page underneath.
+    // Shown on every visit — holds for 1.5s, then plays a pop-out animation
+    // before fading away and being removed so it never intercepts clicks on
+    // the real page underneath.
     window.addEventListener('load', function () {
         var splash = document.getElementById('retakeSplash');
+        var content = document.getElementById('retakeSplashContent');
         if (!splash) return;
 
         setTimeout(function () {
+            if (content) content.classList.add('splash-pop-out');
             splash.classList.add('splash-hide');
             setTimeout(function () { splash.remove(); }, 550);
-        }, 3000);
+        }, 1500);
     });
 </script>
 @endpush
