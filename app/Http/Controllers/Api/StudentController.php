@@ -188,7 +188,7 @@ class StudentController extends Controller
 
         return execute(function () use ($data, $student) {
             $student->update($data);
-            $this->advanceAcademicHistory($student);
+            $this->advanceAcademicHistory($student, forTermChangeToo: true);
 
             return new StudentResource($student->load($this->relationships));
         });
@@ -199,15 +199,29 @@ class StudentController extends Controller
      * major, shift, group, campus, status, or year_level actually changed
      * on this update — the previous row is left untouched (just flipped to
      * is_current = false) so past terms keep reading exactly what was true
-     * at the time. A no-op when none of those fields changed.
+     * at the time.
+     *
+     * $forTermChangeToo additionally advances when NONE of those fields
+     * changed but the active Term has moved on since the student's current
+     * snapshot — e.g. Year 1 Semester 1 -> Year 1 Semester 2 touches
+     * nothing on the student themselves, only which term is now active, so
+     * a field-only diff would see this as a no-op. Only the two dedicated
+     * "advance semester" actions opt into this; a plain profile edit
+     * (fixing a phone number, say) must never silently advance a student
+     * just because time has passed and the active term changed underneath
+     * them.
      */
-    private function advanceAcademicHistory(Student $student): void
+    private function advanceAcademicHistory(Student $student, bool $forTermChangeToo = false): void
     {
-        if (! $student->wasChanged(self::ACADEMIC_FIELDS)) {
+        $current = $student->currentAcademicHistory;
+        $activeTermId = Term::active()->value('id');
+        $termAdvanced = $forTermChangeToo && $activeTermId && (int) $current?->term_id !== (int) $activeTermId;
+
+        if (! $student->wasChanged(self::ACADEMIC_FIELDS) && ! $termAdvanced) {
             return;
         }
 
-        $student->currentAcademicHistory()->update(['is_current' => false]);
+        $current?->update(['is_current' => false]);
         $student->academicHistories()->create($this->academicSnapshot($student) + ['is_current' => true]);
     }
 
@@ -253,7 +267,7 @@ class StudentController extends Controller
             'filters.group_id'     => 'nullable|integer|exists:groups,id',
             'filters.campus_id'    => 'nullable|integer|exists:campuses,id',
             'filters.status_id'    => 'nullable|integer|exists:statuses,id',
-            'changes'              => 'required|array',
+            'changes'              => 'sometimes|array',
             'changes.major_id'     => 'nullable|integer|exists:majors,id',
             'changes.batch_id'     => 'nullable|integer|exists:batches,id',
             'changes.shift_id'     => 'nullable|integer|exists:shifts,id',
@@ -263,13 +277,16 @@ class StudentController extends Controller
             'changes.year_level'   => 'nullable|integer|min:1|max:10',
         ]);
 
+        // Empty is valid on its own — "advance everyone in this filtered
+        // group to the current semester" with no other field changes is a
+        // real case (e.g. Year 1 Semester 1 -> Year 1 Semester 2, nothing
+        // about the student themselves changes). advanceAcademicHistory()
+        // still records a new snapshot for anyone whose term actually
+        // moved on, and is a no-op for anyone already on the active term.
         $changes = array_filter(
-            $validated['changes'],
+            $validated['changes'] ?? [],
             fn($value) => $value !== null && $value !== ''
         );
-        if (empty($changes)) {
-            return no_data('Select at least one field to change.', 422);
-        }
 
         $all = $validated['all'] ?? false;
         if (! $all && empty($validated['ids'])) {
@@ -303,7 +320,7 @@ class StudentController extends Controller
             $count = 0;
             $query->each(function (Student $student) use ($changes, &$count) {
                 $student->update($changes);
-                $this->advanceAcademicHistory($student);
+                $this->advanceAcademicHistory($student, forTermChangeToo: true);
                 $count++;
             });
 

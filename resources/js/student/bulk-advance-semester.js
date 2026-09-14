@@ -126,8 +126,15 @@ export function initBulkAdvanceSemester(ApiService, onAdvanced) {
         if (yearLevel) changes.year_level = yearLevel;
 
         if (Object.keys(changes).length === 0) {
-            window.Swal?.fire({ icon: "warning", title: "Nothing to change", text: "Set at least one field before advancing." });
-            return;
+            const confirmation = await window.Swal?.fire({
+                icon: "question",
+                title: "Advance to the current semester only?",
+                text: "No fields are set to change — this will just move the selected students onto the currently active term, keeping every one of their academic fields exactly as it is.",
+                showCancelButton: true,
+                confirmButtonColor: "#0d9488",
+                confirmButtonText: "Yes, advance them",
+            });
+            if (!confirmation?.isConfirmed) return;
         }
 
         const selection = getSelection();
