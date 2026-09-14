@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,6 +22,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Admin bypasses every permission check outright — new modules
+        // (e.g. class.view) work for Admin immediately on ship, without
+        // waiting on PermissionSeeder to run again in every environment.
+        // Returning null (not false) for non-Admins lets the normal
+        // spatie/laravel-permission check still decide their access.
+        Gate::before(function ($user, string $ability) {
+            return $user->hasRole('Admin') ? true : null;
+        });
+
         Builder::macro('whereLike', function ($attributes, string $searchTerm) {
             /** @var Builder $this */
             $this->where(function (Builder $query) use ($attributes, $searchTerm) {

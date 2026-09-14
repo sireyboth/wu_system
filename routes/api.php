@@ -6,12 +6,20 @@ use App\Http\Controllers\Api\AlertController;
 use App\Http\Controllers\Api\BatchController;
 use App\Http\Controllers\Api\CampusController;
 use App\Http\Controllers\Api\CertificateController;
+use App\Http\Controllers\Api\AttendanceReviewController;
+use App\Http\Controllers\Api\AttendanceScanController;
+use App\Http\Controllers\Api\ClassScheduleController;
+use App\Http\Controllers\Api\ClassScoreController;
+use App\Http\Controllers\Api\ClassSectionController;
+use App\Http\Controllers\Api\ClassSessionController;
+use App\Http\Controllers\Api\CourseEnrollmentController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ExamStateController;
 use App\Http\Controllers\Api\ExamTypeController;
 use App\Http\Controllers\Api\FacultyController;
 use App\Http\Controllers\Api\GroupController;
 use App\Http\Controllers\Api\LecturerController;
+use App\Http\Controllers\Api\LecturerPortalController;
 use App\Http\Controllers\Api\MajorController;
 use App\Http\Controllers\Api\PaymentBatchController;
 use App\Http\Controllers\Api\PaymentEntryController;
@@ -20,10 +28,13 @@ use App\Http\Controllers\Api\RetakeExamPublicController;
 use App\Http\Controllers\Api\RetakeRegistrationController;
 use App\Http\Controllers\Api\RetakeTermController;
 use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\RoomController;
 use App\Http\Controllers\Api\ShiftController;
 use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\StudentController;
+use App\Http\Controllers\Api\StudentLeaveController;
 use App\Http\Controllers\Api\SubjectController;
+use App\Http\Controllers\Api\TeacherAssignmentController;
 use App\Http\Controllers\Api\TermController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
@@ -57,6 +68,17 @@ Route::prefix('v1/retake-exam')->name('retake-exam-public.')->group(function () 
     Route::post('/lookup', [RetakeExamPublicController::class, 'lookup'])->name('lookup');
     Route::post('/select', [RetakeExamPublicController::class, 'select'])->name('select');
     Route::post('/confirm', [RetakeExamPublicController::class, 'confirm'])->name('confirm');
+});
+
+// Public attendance scan — same reasoning as retake-exam above: no
+// student login exists, so the rotating token + student code are the
+// only guardrails. Throttle key is per-IP, and a whole classroom (or
+// campus Wi-Fi) commonly shares one public IP behind NAT — a real 30-
+// student class scanning within the same minute is normal traffic here,
+// not abuse, so this needs to be generous rather than "API default"
+// tight. The scan page itself is served from routes/web.php's attend.index.
+Route::prefix('v1/attend')->name('attend-public.')->middleware('throttle:120,1')->group(function () {
+    Route::post('/scan', [AttendanceScanController::class, 'scan'])->name('scan');
 });
 
 Route::prefix('v1')->middleware('auth')->group(function () {
@@ -310,6 +332,13 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         'payment-entries' => PaymentEntryController::class,
         'terms'           => TermController::class,
         'users'           => UserController::class,
+        'rooms'               => RoomController::class,
+        'classes'             => ClassSectionController::class,
+        'class-schedules'     => ClassScheduleController::class,
+        'teacher-assignments' => TeacherAssignmentController::class,
+        'course-enrollments'  => CourseEnrollmentController::class,
+        'student-leaves'      => StudentLeaveController::class,
+        'class-scores'        => ClassScoreController::class,
     ], [
         'faculties'       => 'faculty',
         'majors'          => 'major',
@@ -331,7 +360,83 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         // 'exam-states' registered separately above, fully public.
         'terms'           => 'term',
         'users'           => 'role',
+        'rooms'               => 'room',
+        'classes'             => 'class',
+        'class-schedules'     => 'class',
+        'teacher-assignments' => 'class',
+        'course-enrollments'  => 'class',
+        'student-leaves'      => 'student-leave',
+        'class-scores'        => 'class',
     ]);
+
+    // Class scoring — one config row per class, so this is a get-or-empty
+    // + upsert, not a generic CRUD resource with its own id. See
+    // ClassSectionController::scoreConfig()/updateScoreConfig().
+    Route::middleware('permission:class.view')
+        ->get('/classes/{class}/score-config', [ClassSectionController::class, 'scoreConfig'])
+        ->name('classes.score-config.show');
+    Route::middleware('permission:class.edit')
+        ->put('/classes/{class}/score-config', [ClassSectionController::class, 'updateScoreConfig'])
+        ->name('classes.score-config.update');
+
+    // Automatic mixed-major rostering — enroll every student matching a
+    // filter set (major deliberately optional) into this class in one
+    // call, instead of adding students to a class one at a time.
+    Route::middleware('permission:class.edit')
+        ->post('/classes/{class}/auto-enroll', [ClassSectionController::class, 'autoEnroll'])
+        ->name('classes.auto-enroll');
+
+    // Registrar approve/reject on a student leave request.
+    Route::middleware('permission:student-leave.edit')
+        ->patch('/student-leaves/{student_leave}/decide', [StudentLeaveController::class, 'decide'])
+        ->name('student-leaves.decide');
+
+    // Lecturer's own portal — row-scoped by TeacherAssignment inside the
+    // controller, not by which classes exist overall (that's the
+    // registrar's `class.*` permission, a different thing entirely).
+    Route::prefix('lecturer-portal')->name('lecturer-portal.')->group(function () {
+        Route::middleware('permission:lecturer-portal.view')->group(function () {
+            Route::get('/classes', [LecturerPortalController::class, 'classes'])->name('classes');
+            Route::get('/classes/{class}/score-config', [LecturerPortalController::class, 'scoreConfig'])->name('score-config.show');
+            Route::get('/classes/{class}/roster', [LecturerPortalController::class, 'roster'])->name('roster');
+        });
+        Route::middleware('permission:lecturer-portal.edit')->group(function () {
+            Route::put('/classes/{class}/score-config', [LecturerPortalController::class, 'updateScoreConfig'])->name('score-config.update');
+            Route::post('/scores', [LecturerPortalController::class, 'storeScore'])->name('scores.store');
+
+            // Attendance: start a session, watch it live, rotate the QR,
+            // manually mark stragglers, and lock it at the end.
+            Route::post('/classes/{class}/sessions', [ClassSessionController::class, 'start'])->name('sessions.start');
+            Route::get('/sessions/{session}', [ClassSessionController::class, 'show'])->name('sessions.show');
+            Route::get('/sessions/{session}/qr-token', [ClassSessionController::class, 'qrToken'])->name('sessions.qr-token');
+            Route::post('/sessions/{session}/mark', [ClassSessionController::class, 'markManual'])->name('sessions.mark');
+            Route::patch('/sessions/{session}/submit', [ClassSessionController::class, 'submit'])->name('sessions.submit');
+            Route::post('/attendance-records/{record}/corrections', [ClassSessionController::class, 'requestCorrection'])->name('records.corrections.store');
+        });
+    });
+
+    // Registrar action: create/link a login account for a lecturer.
+    Route::middleware('permission:lecturer.edit')
+        ->post('/lecturers/{lecturer}/create-account', [LecturerController::class, 'createAccount'])
+        ->name('lecturers.create-account');
+
+    // Registrar's attendance review queue — flagged scans + pending
+    // corrections. Nothing here changes a record except decideCorrection's
+    // approve path; everything else is read-only or a no-op acknowledgement.
+    // Named "attendance-review-api.*", distinct from the web page route
+    // "attendance-review.index" — both are registered under the literal
+    // path /attendance-review (this one prefixed with /api/v1), and
+    // sharing a route *name* between them silently made route()
+    // resolve to whichever was registered last, sending the sidebar
+    // link straight to raw JSON instead of the page.
+    Route::prefix('attendance-review')->name('attendance-review-api.')->group(function () {
+        Route::middleware('permission:attendance-review.view')
+            ->get('/', [AttendanceReviewController::class, 'index'])->name('index');
+        Route::middleware('permission:attendance-review.edit')->group(function () {
+            Route::patch('/verifications/{verification}/review', [AttendanceReviewController::class, 'reviewVerification'])->name('verifications.review');
+            Route::patch('/corrections/{correction}/decide', [AttendanceReviewController::class, 'decideCorrection'])->name('corrections.decide');
+        });
+    });
 
     // "Activate" a term (deactivating every other one) — separate from the
     // generic update() so this is a one-click action in the terms list,

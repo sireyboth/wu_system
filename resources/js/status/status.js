@@ -138,6 +138,8 @@ const ApiService = {
                 const element = DOM.form.querySelector(`[name="${field}"]`);
                 if (element) element.value = payload[field] ?? '';
             });
+            const canAttendEl = DOM.form.querySelector('[name="can_attend"]');
+            if (canAttendEl) canAttendEl.checked = Boolean(payload.can_attend);
         }
         toggleModal(true);
     }
@@ -174,10 +176,13 @@ const ApiService = {
         const payload = {};
 
         for (const [key, value] of formData.entries()) {
-            if (key === 'search') continue;
+            if (key === 'search' || key === 'can_attend') continue;
             const cleanVal = value.toString().trim();
             payload[key] = cleanVal === '' ? null : cleanVal;
         }
+        // Unchecked checkboxes never appear in FormData, so this can't be
+        // read from formData.entries() above — read the element directly.
+        payload.can_attend = DOM.form.querySelector('[name="can_attend"]')?.checked ?? false;
 
         const url = state.isEditMode ? `${CONFIG.API_BASE}/${state.editingstatusId}` : CONFIG.API_BASE;
         const method = state.isEditMode ? 'PUT' : 'POST';
@@ -219,7 +224,7 @@ const ApiService = {
         if (!DOM.tableBody) return;
 
         if (!statuss || statuss.length === 0) {
-            DOM.tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-neutral-500">No records found.</td></tr>';
+            DOM.tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-10 text-neutral-500">No records found.</td></tr>';
             return;
         }
 
@@ -249,6 +254,11 @@ const ApiService = {
                         <p class="text-sm text-neutral-600 dark:text-neutral-400 max-w-[250px] truncate" title="${status.remark ?? ''}">
                             ${status.remark ?? '<span class="italic opacity-40 text-xs">No remarks</span>'}
                         </p>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        ${status.can_attend
+                            ? '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">Eligible</span>'
+                            : '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-neutral-100 text-neutral-500 dark:bg-white/5 dark:text-neutral-500">Not eligible</span>'}
                     </td>
                     <td class="px-6 py-4 text-xs text-neutral-500 font-mono">${formattedDate}</td>
                     <td class="px-6 py-4 text-right">

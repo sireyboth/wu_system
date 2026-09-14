@@ -24,6 +24,11 @@ class PermissionSeeder extends Seeder
         'app-status'  => 'Student Status Options',
         'lecturer'    => 'Lecturer',
         'subject'     => 'Subject',
+        'room'          => 'Room',
+        'class'         => 'Class (incl. schedules, teacher assignments, enrollments, scoring)',
+        'student-leave' => 'Student Leave',
+        'lecturer-portal' => 'Lecturer Portal (own classes only — row-level, enforced in code, not by this grid)',
+        'attendance-review' => 'Attendance Review (flagged scans + correction requests)',
         'state-exam'  => 'State Exam',
         'certificate' => 'Certificate',
         'role'        => 'Roles & Permissions',
@@ -45,10 +50,11 @@ class PermissionSeeder extends Seeder
     protected const ACTIONS = ['view', 'create', 'edit', 'delete'];
 
     protected const ROLE_MODULES = [
-        'Enrollment Officer'         => ['student', 'batch', 'group', 'major', 'faculty', 'campus', 'shift', 'app-status', 'term'],
-        'Exam Officer'               => ['state-exam', 'lecturer', 'subject'],
+        'Enrollment Officer'         => ['student', 'batch', 'group', 'major', 'faculty', 'campus', 'shift', 'app-status', 'term', 'attendance-review'],
+        'Exam Officer'               => ['state-exam', 'lecturer', 'subject', 'room', 'class', 'student-leave'],
         'Score/Certificate Officer'  => ['certificate'],
         'Registrar Office'           => ['retake-term', 'exam-type', 'retake-batch'],
+        'Lecturer'                   => ['lecturer-portal'],
     ];
 
     /**

@@ -8,7 +8,7 @@ class Lecturer extends IModel
      *
      * @var array
      */
-    protected $fillable = DEFAULT_FIELD_AND_CODE;
+    protected $fillable = [...DEFAULT_FIELD_AND_CODE, 'user_id'];
 
     protected function casts(): array
     {
@@ -23,5 +23,15 @@ class Lecturer extends IModel
     public function major()
     {
         return $this->belongsTo(Major::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function teacherAssignments()
+    {
+        return $this->hasMany(TeacherAssignment::class);
     }
 }

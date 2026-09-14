@@ -63,4 +63,9 @@ class StudentAcademicHistory extends IModel
     {
         return $this->belongsTo(Status::class);
     }
+
+    public function courseEnrollments()
+    {
+        return $this->hasMany(CourseEnrollment::class);
+    }
 }

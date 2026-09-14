@@ -139,4 +139,20 @@ class Student extends IModel
     {
         return $this->hasOne(StudentAcademicHistory::class)->where('is_current', true);
     }
+
+    public function leaves()
+    {
+        return $this->hasMany(StudentLeave::class);
+    }
+
+    public function attendanceRecords()
+    {
+        return $this->hasMany(AttendanceRecord::class);
+    }
+
+    /** Whether this student's current status is allowed to scan attendance. See statuses.can_attend. */
+    public function canAttend(): bool
+    {
+        return (bool) ($this->status?->can_attend ?? false);
+    }
 }

@@ -480,6 +480,45 @@
                                         </x-sidebar-link>
                                     @endcan
 
+                                    @can('class.view')
+                                        <x-sidebar-link route="class.index">
+                                            <x-slot name="icon">
+                                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                                    stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M4.26 10.147a60.436 60.436 0 0 0-.491 6.347A48.627 48.627 0 0 1 12 20.904a48.627 48.627 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.57 50.57 0 0 0-2.658-.813A59.905 59.905 0 0 1 12 3.493a59.902 59.902 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" />
+                                                </svg>
+                                            </x-slot>
+                                            ថ្នាក់រៀន (Class)
+                                        </x-sidebar-link>
+                                    @endcan
+
+                                    @can('lecturer-portal.view')
+                                        <x-sidebar-link route="lecturer-portal.index">
+                                            <x-slot name="icon">
+                                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                                    stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M12 14l9-5-9-5-9 5 9 5Zm0 0l6.16-3.422a12.083 12.083 0 0 1 .665 6.479A11.952 11.952 0 0 0 12 20.055a11.952 11.952 0 0 0-6.824-2.998 12.078 12.078 0 0 1 .665-6.479L12 14Zm-4 6v-7.5l4-2.222" />
+                                                </svg>
+                                            </x-slot>
+                                            ថ្នាក់រៀនរបស់ខ្ញុំ (My Classes)
+                                        </x-sidebar-link>
+                                    @endcan
+
+                                    @can('attendance-review.view')
+                                        <x-sidebar-link route="attendance-review.index">
+                                            <x-slot name="icon">
+                                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                                    stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                </svg>
+                                            </x-slot>
+                                            ត្រួតពិនិត្យវត្តមាន (Attendance Review)
+                                        </x-sidebar-link>
+                                    @endcan
+
                                     @can('app-status.view')
                                         <x-sidebar-link route="app-status.index">
                                             <x-slot name="icon">

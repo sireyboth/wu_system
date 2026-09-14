@@ -99,6 +99,7 @@
                             <th scope="col" class="px-6 py-4">Name English</th>
                             <th scope="col" class="px-6 py-4">Group By</th>
                             <th scope="col" class="px-6 py-4">Remark</th>
+                            <th scope="col" class="px-6 py-4 text-center">Attendance</th>
                             <th scope="col" class="px-6 py-4">Create At</th>
                             <th scope="col" class="px-6 py-4 text-right">Actions</th>
                         </tr>

@@ -8,7 +8,11 @@ class Status extends IModel
      *
      * @var array
      */
-    protected $fillable = DEFAULT_FIELD_AND_SHORTCUT;
+    protected $fillable = [...DEFAULT_FIELD_AND_SHORTCUT, 'can_attend'];
+
+    protected $casts = [
+        'can_attend' => 'boolean',
+    ];
 
     public function student()
     {

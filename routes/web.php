@@ -42,6 +42,11 @@ Route::get('/state-exam/invigilators', [StateExamController::class, 'invigilator
 // required. JSON actions live in routes/api.php's public group.
 Route::get('/retake-exam', [RetakeExamPublicController::class, 'index'])->name('retake-exam.index');
 
+// Public — student attendance scan page, no login required (no student
+// accounts exist). Reached by scanning the lecturer's projected QR code.
+// The scan action itself lives in routes/api.php's attend-public group.
+Route::get('/attend', [\App\Http\Controllers\AttendancePublicController::class, 'index'])->name('attend.index');
+
 Route::middleware(['auth'])->group(function () {
     // This is the missing piece that connects to your Controller
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -104,6 +109,14 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('can:student.view');
     Route::resource('certificate', StudentStatusController::class)->only('index')->middleware('can:certificate.view');
     Route::resource('app-status', StatusController::class)->only('index')->middleware('can:app-status.view');
+
+    Route::resource('class', \App\Http\Controllers\ClassSectionController::class)->only('index')->middleware('can:class.view');
+    Route::get('/lecturer-portal', [\App\Http\Controllers\LecturerPortalController::class, 'index'])
+        ->name('lecturer-portal.index')
+        ->middleware('can:lecturer-portal.view');
+    Route::get('/attendance-review', [\App\Http\Controllers\AttendanceReviewPageController::class, 'index'])
+        ->name('attendance-review.index')
+        ->middleware('can:attendance-review.view');
 
     Route::resource('role', RoleController::class)->only('index')->middleware('can:role.view');
     Route::resource('activity', ActivityLogController::class)->only('index')->middleware('can:activity.view');

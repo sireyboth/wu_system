@@ -7,7 +7,8 @@ class StatusRequest extends IRequest
     {
         return array_merge(
             DEFAULT_VALIDATE,
-            check_unique('statuses', 'shortcut', true)
+            check_unique('statuses', 'shortcut', true),
+            ['can_attend' => 'sometimes|boolean']
         );
     }
 }

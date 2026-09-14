@@ -45,6 +45,18 @@
                 <div class="smart-hint pointer-events-none absolute right-3 -top-2 opacity-0 scale-95 translate-y-1 bg-indigo-600 text-white text-[11px] px-2.5 py-1 rounded-md shadow-md transition-all duration-200 font-medium"></div>
             </div>
 
+            <!-- Input Row: Can Attend -->
+            <div class="relative group">
+                <label class="flex items-center gap-2.5 px-4 py-2.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl cursor-pointer">
+                    <input type="checkbox" name="can_attend" value="1"
+                           class="w-4 h-4 rounded border-neutral-300 dark:border-white/20 text-indigo-600 focus:ring-4 focus:ring-indigo-500/40">
+                    <span class="text-sm text-neutral-700 dark:text-neutral-300">
+                        អាចស្កេនវត្តមានបាន (Eligible to scan attendance)
+                        <span class="block text-xs text-neutral-400 dark:text-neutral-500">Students with this status can scan the attendance QR. Off by default — a status must be explicitly opted in.</span>
+                    </span>
+                </label>
+            </div>
+
             <!-- Input Row: Remark -->
             <div class="relative group">
                 <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">សម្គាល់ (Remarks)</label>

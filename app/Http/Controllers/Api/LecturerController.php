@@ -7,7 +7,9 @@ use App\Http\Requests\LecturerRequest;
 use App\Http\Resources\LecturerResource;
 use App\Imports\LecturerImport;
 use App\Models\Lecturer;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
 
 class LecturerController extends Controller
@@ -103,6 +105,36 @@ class LecturerController extends Controller
     public function force_destroy(Lecturer $lecturer)
     {
         return $this->clear($lecturer);
+    }
+
+    /**
+     * Creates a login for this lecturer and grants the Lecturer role —
+     * deliberately its own endpoint rather than reusing /register, which
+     * calls Auth::login() on the new account and would log the acting
+     * registrar out of their own session.
+     */
+    public function createAccount(Request $request, Lecturer $lecturer)
+    {
+        if ($lecturer->user_id) {
+            return no_data('This lecturer already has a login account.', 422);
+        }
+
+        $validated = $request->validate([
+            'email'    => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8',
+        ]);
+
+        return execute(function () use ($validated, $lecturer) {
+            $user = User::create([
+                'name'     => trim("{$lecturer->name_en}") ?: $lecturer->code,
+                'email'    => $validated['email'],
+                'password' => Hash::make($validated['password']),
+            ]);
+            $user->assignRole('Lecturer');
+            $lecturer->update(['user_id' => $user->id]);
+
+            return has_data(['user_id' => $user->id, 'email' => $user->email], "Login created for {$lecturer->code}.");
+        });
     }
 
     /**

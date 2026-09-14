@@ -54,6 +54,11 @@ class User extends Authenticatable
      * technically hashed already, it has no business sitting in an
      * otherwise-readable audit trail.
      */
+    public function lecturer()
+    {
+        return $this->hasOne(Lecturer::class);
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

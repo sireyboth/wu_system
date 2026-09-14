@@ -157,6 +157,45 @@
         }
     }
 
+    async function handleCreateAccount(id, code) {
+        const { value: formValues } = await Swal.fire({
+            title: `Create login for ${code || 'this lecturer'}`,
+            html:
+                '<input id="swal-account-email" type="email" class="swal2-input" placeholder="Email">' +
+                '<input id="swal-account-password" type="password" class="swal2-input" placeholder="Password (min 8 chars)">',
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: 'Create',
+            confirmButtonColor: '#4f46e5',
+            preConfirm: () => {
+                const email = document.getElementById('swal-account-email').value.trim();
+                const password = document.getElementById('swal-account-password').value;
+                if (!email || !password || password.length < 8) {
+                    Swal.showValidationMessage('Enter a valid email and a password of at least 8 characters.');
+                    return false;
+                }
+                return { email, password };
+            },
+        });
+
+        if (!formValues) return;
+
+        const { error, data } = await ApiService.request(`${CONFIG.API_BASE}/${id}/create-account`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formValues),
+        });
+
+        if (error) {
+            const messages = data?.errors ? Object.values(data.errors).flat() : [data?.message || 'Failed to create login.'];
+            Toast.fire({ icon: 'error', title: messages[0] });
+            return;
+        }
+
+        Toast.fire({ icon: 'success', title: data?.message || 'Login created.' });
+        loadLecturers(DOM.searchInput?.value || '');
+    }
+
     async function handleFormSubmit(e) {
         e.preventDefault();
         if (!DOM.form || !DOM.submitBtn) return;
@@ -242,7 +281,10 @@
                     </td>
                     <td class="px-6 py-4 text-xs text-neutral-500 font-mono">${formattedDate}</td>
                     <td class="px-6 py-4 text-right">
-                        <div class="flex justify-end gap-2">
+                        <div class="flex justify-end items-center gap-2">
+                            ${lecturer.has_account
+                                ? '<span class="text-xs font-semibold text-emerald-600 mr-1">Has login</span>'
+                                : `<button data-action="create-account" data-id="${lecturer.id}" data-code="${lecturer.code ?? ''}" class="px-2 py-1.5 text-xs font-semibold text-sky-600 hover:bg-sky-100 dark:hover:bg-sky-500/20 rounded-lg transition-colors">Create Login</button>`}
                             <button data-action="edit" data-id="${lecturer.id}" class="p-2 text-amber-600 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 rounded-lg transition-colors" title="Edit Lecturer">
                                 <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                             </button>
@@ -536,6 +578,7 @@
 
             if (action === 'edit') handleEditAction(targetId);
             if (action === 'delete') handleDeleteAction(targetId);
+            if (action === 'create-account') handleCreateAccount(targetId, targetBtn.getAttribute('data-code'));
         });
 
         // Interactive Tooltips Hint Dynamic Engine
