@@ -28,6 +28,7 @@ class Student extends IModel
             'code',
             'payment_as',
             'year_level',
+            'semester',
             'from_school',
             'admission_date',
             'degree_type',

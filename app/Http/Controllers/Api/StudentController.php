@@ -28,6 +28,7 @@ class StudentController extends Controller
         'campus_id',
         'status_id',
         'year_level',
+        'semester',
     ];
 
     public function __construct()
@@ -183,7 +184,10 @@ class StudentController extends Controller
             check_exist('shift_id', 'shifts'),
             check_exist('campus_id', 'campuses', required: false),
             check_exist('status_id', 'statuses'),
-            ['year_level' => 'required|integer|min:1|max:10'],
+            [
+                'year_level' => 'required|integer|min:1|max:10',
+                'semester'   => 'nullable|integer|in:1,2',
+            ],
         ));
 
         return execute(function () use ($data, $student) {
@@ -275,6 +279,7 @@ class StudentController extends Controller
             'changes.campus_id'    => 'nullable|integer|exists:campuses,id',
             'changes.status_id'    => 'nullable|integer|exists:statuses,id',
             'changes.year_level'   => 'nullable|integer|min:1|max:10',
+            'changes.semester'     => 'nullable|integer|in:1,2',
         ]);
 
         // Empty is valid on its own — "advance everyone in this filtered

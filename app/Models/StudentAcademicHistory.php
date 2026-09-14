@@ -13,6 +13,7 @@ class StudentAcademicHistory extends IModel
         'campus_id',
         'status_id',
         'year_level',
+        'semester',
         'effective_date',
         'is_current',
         'remark',

@@ -128,6 +128,8 @@ export function initAdvanceSemester(ApiService, onAdvanced) {
             setSelect('advance_status_id', student.status);
             const yearLevelEl = getById('advance_year_level');
             if (yearLevelEl) yearLevelEl.value = student.year_level ?? 1;
+            const semesterEl = getById('advance_semester');
+            if (semesterEl) semesterEl.value = student.semester ?? '';
         }
 
         toggle(true);
@@ -148,6 +150,7 @@ export function initAdvanceSemester(ApiService, onAdvanced) {
             campus_id: getById('advance_campus_id').value || null,
             status_id: getById('advance_status_id').value,
             year_level: getById('advance_year_level').value,
+            semester: getById('advance_semester').value || null,
         };
 
         const { error, status, data } = await ApiService.request(`${CONFIG.API_BASE}/${studentId}/advance-semester`, {

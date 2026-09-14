@@ -22,8 +22,16 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
  * row per student:
  *   Code | First Name | Last Name | First Name Kh | Last Name Kh | Sex |
  *   Dob | Nationality | Email | Phone | Batch | Major | Group | Shift |
- *   Campus | Status | Year Level | Payment As | Admission Date |
+ *   Campus | Status | Year Level | Semester | Payment As | Admission Date |
  *   From School | Degree Type | Intake | Scholarship | Bacc 2 Code | Remark
+ *
+ * Semester (1 or 2) has no reliable source for already-imported students —
+ * it was never tracked before this column existed. Rather than guess a
+ * default, a duplicate row (same code/major/status as an existing student)
+ * that carries a real Semester value fills it in on that existing student
+ * IF AND ONLY IF their semester is still blank — see the duplicate check
+ * below. It never overwrites a semester that's already set, so re-running
+ * the same export/import cycle is always safe to repeat.
  *
  * Addresses and guardians are deliberately out of scope here — too much
  * structure for a flat spreadsheet row; staff add those afterward via the
@@ -54,6 +62,7 @@ class StudentImport implements ToCollection, WithHeadingRow, WithCustomCsvSettin
 {
     public array $created = [];
     public array $skipped = [];
+    public array $semesterFilled = [];
 
     /**
      * Two independent CSV-parsing footguns, both only visible at real-file
@@ -166,11 +175,25 @@ class StudentImport implements ToCollection, WithHeadingRow, WithCustomCsvSettin
             }
         }
 
+        // Semester (1 or 2) — the one column with no historical source of
+        // truth (see docblock). Anything else in the cell (blank, "N/A",
+        // a typo) is treated as "not provided," never as an error.
+        $semesterRaw = trim((string) ($row['semester'] ?? ''));
+        $semester    = in_array($semesterRaw, ['1', '2'], true) ? (int) $semesterRaw : null;
+
         // Code/Bacc 2 Code only need to be unique within this major — same
         // value reused under a different major OR status (e.g. re-enrolling
         // after "Dropout") is allowed (see docblock).
-        if (Student::withTrashed()->where('code', $code)->where('major_id', $majorId)->where('status_id', $statusId)->exists()) {
-            $this->skip($rowNumber, $code, 'A student with this code, major, and status already exists.');
+        $existing = Student::withTrashed()->where('code', $code)->where('major_id', $majorId)->where('status_id', $statusId)->first();
+        if ($existing) {
+            if ($semester !== null && $existing->semester === null) {
+                $existing->update(['semester' => $semester]);
+                $existing->currentAcademicHistory?->update(['semester' => $semester]);
+                $this->semesterFilled[] = $existing->id;
+                $this->skip($rowNumber, $code, "Already existed — filled in missing Semester ({$semester}) only, nothing else touched.");
+            } else {
+                $this->skip($rowNumber, $code, 'A student with this code, major, and status already exists.');
+            }
             return;
         }
 
@@ -213,6 +236,7 @@ class StudentImport implements ToCollection, WithHeadingRow, WithCustomCsvSettin
                 'campus_id'       => $campusId,
                 'status_id'       => $statusId,
                 'year_level'      => (int) ($row['year_level'] ?? 1) ?: 1,
+                'semester'        => $semester,
                 'payment_as'      => trim((string) ($row['payment_as'] ?? '')) ?: Student::NONE,
                 'admission_date'  => $this->parseDate($row['admission_date'] ?? null),
                 'from_school'     => trim((string) ($row['from_school'] ?? '')) ?: null,
@@ -231,6 +255,7 @@ class StudentImport implements ToCollection, WithHeadingRow, WithCustomCsvSettin
                 'campus_id'      => $campusId,
                 'status_id'      => $statusId,
                 'year_level'     => $student->year_level,
+                'semester'       => $student->semester,
                 'term_id'        => \App\Models\Term::active()->value('id'),
                 'effective_date' => now(),
                 'is_current'     => true,
@@ -313,9 +338,11 @@ class StudentImport implements ToCollection, WithHeadingRow, WithCustomCsvSettin
     public function report(): array
     {
         return [
-            'created_count' => count($this->created),
-            'created_ids'   => $this->created,
-            'skipped'       => $this->skipped,
+            'created_count'          => count($this->created),
+            'created_ids'            => $this->created,
+            'semester_filled_count'  => count($this->semesterFilled),
+            'semester_filled_ids'    => $this->semesterFilled,
+            'skipped'                => $this->skipped,
         ];
     }
 }

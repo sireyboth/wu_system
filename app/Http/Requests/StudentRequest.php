@@ -62,6 +62,7 @@ class StudentRequest extends IRequest
                 'intake'                   => 'nullable|string',
                 'payment_as'               => 'nullable|string',
                 'year_level'               => 'nullable|integer',
+                'semester'                 => 'nullable|integer|in:1,2',
                 'scholarship'              => 'nullable|string',
 
                 'guardians'                => 'sometimes|array|min:1',

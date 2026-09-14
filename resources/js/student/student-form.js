@@ -83,6 +83,7 @@ export async function handleEditAction(dom, ApiService, id) {
         scholarship: payload.scholarship,
         admission_date: payload.admission_date,
         year_level: payload.year_level,
+        semester: payload.semester,
         remark: payload.remark,
     };
     toList(scalarFields, dom);

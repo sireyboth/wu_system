@@ -20,6 +20,7 @@ class StudentResource extends IResource
             'payment_as'     => $this->payment_as,
             'is_restudy'     => (bool) $this->is_restudy,
             'year_level'     => $this->year_level,
+            'semester'       => $this->semester,
             'from_school'    => $this->from_school,
             'intake'         => $this->intake,
             'scholarship'    => $this->scholarship,

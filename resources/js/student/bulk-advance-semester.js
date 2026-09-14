@@ -124,6 +124,8 @@ export function initBulkAdvanceSemester(ApiService, onAdvanced) {
         });
         const yearLevel = getById("bulk_advance_year_level")?.value;
         if (yearLevel) changes.year_level = yearLevel;
+        const semester = getById("bulk_advance_semester")?.value;
+        if (semester) changes.semester = semester;
 
         if (Object.keys(changes).length === 0) {
             const confirmation = await window.Swal?.fire({

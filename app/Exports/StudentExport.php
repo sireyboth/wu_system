@@ -19,7 +19,7 @@ class StudentExport extends IExport
         'No', 'Code', 'First Name', 'Last Name', 'First Name Kh', 'Last Name Kh',
         'Sex', 'Dob', 'Nationality', 'Email', 'Phone',
         'Batch', 'Major', 'Group', 'Shift', 'Campus', 'Status',
-        'Year Level', 'Payment As', 'Admission Date', 'From School',
+        'Year Level', 'Semester', 'Payment As', 'Admission Date', 'From School',
         'Degree Type', 'Intake', 'Scholarship', 'Bacc 2 Code', 'Remark',
     ];
 
@@ -72,6 +72,7 @@ class StudentExport extends IExport
             $data->campus?->name_en,
             $data->status?->name_en,
             $data->year_level,
+            $data->semester,
             $data->payment_as,
             $data->admission_date?->format('Y-m-d'),
             $data->from_school,

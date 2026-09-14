@@ -79,6 +79,15 @@
                     <input type="number" name="year_level" id="bulk_advance_year_level" min="1" max="10" placeholder="No change"
                         class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500">
                 </div>
+                <div>
+                    <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">Semester</label>
+                    <select name="semester" id="bulk_advance_semester"
+                        class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500">
+                        <option value="">— No change —</option>
+                        <option value="1">Semester 1</option>
+                        <option value="2">Semester 2</option>
+                    </select>
+                </div>
             </div>
 
             <div class="flex justify-end items-center gap-3 pt-4 border-t border-neutral-100 dark:border-white/5 bg-white dark:bg-neutral-900">

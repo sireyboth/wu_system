@@ -116,13 +116,21 @@ function importIssueTable(rows) {
 function renderImportResults(dom, report) {
     if (!dom.resultsBody) return;
 
+    const semesterFilled = report.semester_filled_count ?? 0;
     const summary = `
         <div class="flex items-center gap-3 px-4 py-3.5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200/70 dark:border-emerald-500/20 rounded-xl">
             <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
             </svg>
             <span class="text-sm font-bold text-emerald-800 dark:text-emerald-300">${report.created_count ?? 0} student(s) created</span>
-        </div>`;
+        </div>
+        ${semesterFilled > 0 ? `
+        <div class="flex items-center gap-3 px-4 py-3.5 mt-2 bg-teal-50 dark:bg-teal-500/10 border border-teal-200/70 dark:border-teal-500/20 rounded-xl">
+            <svg class="w-5 h-5 text-teal-600 dark:text-teal-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/>
+            </svg>
+            <span class="text-sm font-bold text-teal-800 dark:text-teal-300">${semesterFilled} existing student(s) had their missing Semester filled in</span>
+        </div>` : ''}`;
 
     dom.resultsBody.innerHTML = summary + importIssueTable(report.skipped);
     openModal(dom.resultsModal);
