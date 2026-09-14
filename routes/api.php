@@ -201,6 +201,12 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         ->patch('/students-bulk-advance-semester', [StudentController::class, 'bulkAdvanceSemester'])
         ->name('students.bulk-advance-semester');
 
+    // Full academic timeline for one student — read-only, same permission
+    // as viewing the student themselves.
+    Route::middleware('permission:student.view')
+        ->get('/students/{student}/academic-history', [StudentController::class, 'academicHistory'])
+        ->name('students.academic-history');
+
     // Flat sibling routes for subjects — same reasoning as students above:
     // registered before api_routes()'s /subjects/{subject} wildcard so
     // "export"/"import" are never swallowed as an id.

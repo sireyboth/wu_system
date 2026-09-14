@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 use App\Exports\StudentExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StudentRequest;
+use App\Http\Resources\StudentAcademicHistoryResource;
 use App\Http\Resources\StudentResource;
 use App\Imports\StudentImport;
 use App\Models\Person;
@@ -145,6 +146,22 @@ class StudentController extends Controller
     public function show(Student $student)
     {
         return new StudentResource($student->load($this->relationships));
+    }
+
+    /**
+     * Full academic timeline for one student — every batch/major/shift/
+     * group/campus/status/year_level/semester snapshot they've ever had,
+     * oldest first, each tagged with whichever term it was recorded under.
+     */
+    public function academicHistory(Student $student)
+    {
+        $history = $student->academicHistories()
+            ->with(['term', 'batch', 'major', 'group', 'shift', 'campus', 'status'])
+            ->orderBy('effective_date')
+            ->orderBy('id')
+            ->get();
+
+        return StudentAcademicHistoryResource::collection($history);
     }
 
     /**

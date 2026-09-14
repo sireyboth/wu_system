@@ -323,6 +323,16 @@
                                 </x-slot>
                                 និស្សិត (Student)
                             </x-sidebar-link>
+                            <x-sidebar-link route="student-history.index">
+                                <x-slot name="icon">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </x-slot>
+                                ប្រវត្តិសិក្សា (Student History)
+                            </x-sidebar-link>
                         @endcan
 
                         @php

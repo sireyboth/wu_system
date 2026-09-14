@@ -21,6 +21,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\StudentHistoryController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TermController;
 use App\Http\Controllers\StudentStatusController;
@@ -98,6 +99,9 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('can:retake-cs.view');
 
     Route::resource('student', StudentController::class)->only('index')->middleware('can:student.view');
+    Route::get('/student-history', [StudentHistoryController::class, 'index'])
+        ->name('student-history.index')
+        ->middleware('can:student.view');
     Route::resource('certificate', StudentStatusController::class)->only('index')->middleware('can:certificate.view');
     Route::resource('app-status', StatusController::class)->only('index')->middleware('can:app-status.view');
 
