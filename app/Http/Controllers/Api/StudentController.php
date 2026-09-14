@@ -49,11 +49,27 @@ class StudentController extends Controller
     }
 
     /**
+     * Filterable by any of these academic fields via query string (e.g.
+     * ?major_id=3) — what lets the student list narrow down to "whole
+     * major" or "whole batch" before a bulk advance-semester action.
+     */
+    private const FILTERABLE_FIELDS = [
+        'major_id',
+        'batch_id',
+        'shift_id',
+        'group_id',
+        'campus_id',
+        'status_id',
+    ];
+
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
         return $this->list($request, function ($query) use ($request) {
+            $this->applyFilters($query, $request);
+
             if ($request->payment === Student::YEARLY) {
                 return $query->yearly();
             }
@@ -202,6 +218,89 @@ class StudentController extends Controller
             'term_id'        => Term::active()->value('id'),
             'effective_date' => now(),
         ];
+    }
+
+    private function applyFilters($query, Request $request): void
+    {
+        foreach (self::FILTERABLE_FIELDS as $field) {
+            if ($request->filled($field)) {
+                $query->where($field, $request->input($field));
+            }
+        }
+    }
+
+    /**
+     * Bulk "advance to a new semester" — the group version of
+     * advanceSemester() above. Scoped either to an explicit list of ids
+     * or to "every student matching these filters" (so the frontend can
+     * filter down to one major/batch and advance the whole thing without
+     * listing every id). Only the fields present in `changes` are ever
+     * touched — a student's other academic fields are left exactly as
+     * they were, same "only touch what's provided" contract as a normal
+     * edit, just applied to many students at once.
+     */
+    public function bulkAdvanceSemester(Request $request)
+    {
+        $validated = $request->validate([
+            'all'                  => 'sometimes|boolean',
+            'ids'                  => 'sometimes|array|min:1',
+            'ids.*'                => 'integer|exists:students,id',
+            'filters'              => 'sometimes|array',
+            'filters.search'       => 'nullable|string',
+            'filters.major_id'     => 'nullable|integer|exists:majors,id',
+            'filters.batch_id'     => 'nullable|integer|exists:batches,id',
+            'filters.shift_id'     => 'nullable|integer|exists:shifts,id',
+            'filters.group_id'     => 'nullable|integer|exists:groups,id',
+            'filters.campus_id'    => 'nullable|integer|exists:campuses,id',
+            'filters.status_id'    => 'nullable|integer|exists:statuses,id',
+            'changes'              => 'required|array',
+            'changes.major_id'     => 'nullable|integer|exists:majors,id',
+            'changes.batch_id'     => 'nullable|integer|exists:batches,id',
+            'changes.shift_id'     => 'nullable|integer|exists:shifts,id',
+            'changes.group_id'     => 'nullable|integer|exists:groups,id',
+            'changes.campus_id'    => 'nullable|integer|exists:campuses,id',
+            'changes.status_id'    => 'nullable|integer|exists:statuses,id',
+            'changes.year_level'   => 'nullable|integer|min:1|max:10',
+        ]);
+
+        $changes = array_filter(
+            $validated['changes'],
+            fn($value) => $value !== null && $value !== ''
+        );
+        if (empty($changes)) {
+            return no_data('Select at least one field to change.', 422);
+        }
+
+        $all = $validated['all'] ?? false;
+        if (! $all && empty($validated['ids'])) {
+            return no_data('Either "ids" (non-empty array) or "all": true with filters is required.', 422);
+        }
+
+        return execute(function () use ($validated, $changes, $all) {
+            $query = Student::query();
+
+            if (! $all) {
+                $query->whereIn('id', $validated['ids']);
+            } else {
+                if (! empty($validated['filters']['search'])) {
+                    $query->search($validated['filters']['search']);
+                }
+                foreach (self::FILTERABLE_FIELDS as $field) {
+                    if (! empty($validated['filters'][$field])) {
+                        $query->where($field, $validated['filters'][$field]);
+                    }
+                }
+            }
+
+            $count = 0;
+            $query->each(function (Student $student) use ($changes, &$count) {
+                $student->update($changes);
+                $this->advanceAcademicHistory($student);
+                $count++;
+            });
+
+            return has_data(['advanced' => $count], "{$count} student(s) advanced to the new semester.");
+        });
     }
 
     /**

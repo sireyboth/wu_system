@@ -195,6 +195,12 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         ->patch('/students/{student}/advance-semester', [StudentController::class, 'advanceSemester'])
         ->name('students.advance-semester');
 
+    // Bulk version — filter the list down to a major/batch/etc (or pass
+    // explicit ids) and advance every matching student in one request.
+    Route::middleware('permission:student.edit')
+        ->patch('/students-bulk-advance-semester', [StudentController::class, 'bulkAdvanceSemester'])
+        ->name('students.bulk-advance-semester');
+
     // Flat sibling routes for subjects — same reasoning as students above:
     // registered before api_routes()'s /subjects/{subject} wildcard so
     // "export"/"import" are never swallowed as an id.

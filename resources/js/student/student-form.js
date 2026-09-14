@@ -5,6 +5,7 @@ import { renderTable } from "./table-render.js";
 import { toggleModal, switchTab } from "./ui.js";
 import { populateAddressCascade, initFormLookups } from "./address-cascade.js";
 import { renderPagination } from "./student-pagination.js";
+import { activeFiltersQueryString } from "./filters.js";
 import { getById, toList } from "../app.js";
 
 /**
@@ -16,7 +17,8 @@ export async function loadStudents(dom, ApiService, searchQuery = "", page = 1) 
     state.searchAbortController?.abort();
     state.searchAbortController = new AbortController();
 
-    const url = `${CONFIG.API_BASE}?search=${encodeURIComponent(searchQuery)}&page=${page}&per_page=${CONFIG.PER_PAGE}`;
+    const filterParams = activeFiltersQueryString();
+    const url = `${CONFIG.API_BASE}?search=${encodeURIComponent(searchQuery)}&page=${page}&per_page=${CONFIG.PER_PAGE}${filterParams ? `&${filterParams}` : ""}`;
     const { error, aborted, data } = await ApiService.request(url, {
         signal: state.searchAbortController.signal,
     });
@@ -35,6 +37,7 @@ export async function loadStudents(dom, ApiService, searchQuery = "", page = 1) 
               : [];
     renderTable(dom, records);
     renderPagination(data?.meta);
+    document.dispatchEvent(new CustomEvent("students:meta", { detail: data?.meta }));
 }
 
 /**

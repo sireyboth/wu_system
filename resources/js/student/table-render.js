@@ -11,7 +11,8 @@ export function renderTable(dom, students) {
 
     if (!students || students.length === 0) {
         dom.tableBody.innerHTML =
-            '<tr><td colspan="9" class="text-center py-10 text-neutral-500">រកមិនឃើញទិន្នន័យនិស្សិតទេ (No student records found).</td></tr>';
+            '<tr><td colspan="10" class="text-center py-10 text-neutral-500">រកមិនឃើញទិន្នន័យនិស្សិតទេ (No student records found).</td></tr>';
+        document.dispatchEvent(new CustomEvent("students:rendered"));
         return;
     }
 
@@ -21,6 +22,11 @@ export function renderTable(dom, students) {
     dom.tableBody.innerHTML = students
         .map((student, index) => renderRow(student, index))
         .join("");
+
+    // Lets bulk-select.js re-apply checkbox state and recompute the
+    // select-all/indeterminate state after every re-render, without this
+    // module needing to know anything about selection.
+    document.dispatchEvent(new CustomEvent("students:rendered"));
 }
 
 function renderRow(student, index) {
@@ -97,11 +103,15 @@ function renderRow(student, index) {
     return `
         <tr class="block md:table-row bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-2xl shadow-sm md:shadow-none md:border-0 md:border-b md:rounded-none overflow-hidden md:overflow-visible">
 
+            <td class="hidden md:table-cell px-4 py-4">
+                <input type="checkbox" class="row-checkbox w-4 h-4 rounded border-neutral-300 dark:border-white/20 text-teal-600 focus:ring-2 focus:ring-teal-500/30" data-id="${student.id}">
+            </td>
             <td class="hidden md:table-cell px-6 py-4 text-neutral-400 font-mono text-xs">${index + 1}</td>
 
             <!-- MOBILE CARD -->
             <td class="block md:hidden p-0">
                 <div class="flex items-center gap-3 p-4 border-b border-neutral-100 dark:border-white/5">
+                    <input type="checkbox" class="row-checkbox w-4 h-4 rounded border-neutral-300 dark:border-white/20 text-teal-600 focus:ring-2 focus:ring-teal-500/30 shrink-0" data-id="${student.id}">
                     <div class="shrink-0 w-11 h-11 rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-lg">
                         ${initials}
                     </div>

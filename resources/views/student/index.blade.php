@@ -67,6 +67,61 @@
             </div>
         </div>
 
+        <div class="flex flex-wrap items-end gap-3 p-4 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-2xl">
+            <div class="min-w-[150px]">
+                <label class="block text-[11px] font-bold text-neutral-400 uppercase tracking-wider mb-1">Major</label>
+                <select id="filter_major_id" class="w-full px-3 py-2 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-lg text-neutral-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/30">
+                    <option value="">All Majors</option>
+                </select>
+            </div>
+            <div class="min-w-[150px]">
+                <label class="block text-[11px] font-bold text-neutral-400 uppercase tracking-wider mb-1">Batch</label>
+                <select id="filter_batch_id" class="w-full px-3 py-2 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-lg text-neutral-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/30">
+                    <option value="">All Batches</option>
+                </select>
+            </div>
+            <div class="min-w-[130px]">
+                <label class="block text-[11px] font-bold text-neutral-400 uppercase tracking-wider mb-1">Shift</label>
+                <select id="filter_shift_id" class="w-full px-3 py-2 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-lg text-neutral-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/30">
+                    <option value="">All Shifts</option>
+                </select>
+            </div>
+            <div class="min-w-[130px]">
+                <label class="block text-[11px] font-bold text-neutral-400 uppercase tracking-wider mb-1">Group</label>
+                <select id="filter_group_id" class="w-full px-3 py-2 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-lg text-neutral-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/30">
+                    <option value="">All Groups</option>
+                </select>
+            </div>
+            <div class="min-w-[130px]">
+                <label class="block text-[11px] font-bold text-neutral-400 uppercase tracking-wider mb-1">Campus</label>
+                <select id="filter_campus_id" class="w-full px-3 py-2 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-lg text-neutral-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/30">
+                    <option value="">All Campuses</option>
+                </select>
+            </div>
+            <div class="min-w-[150px]">
+                <label class="block text-[11px] font-bold text-neutral-400 uppercase tracking-wider mb-1">Status</label>
+                <select id="filter_status_id" class="w-full px-3 py-2 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-lg text-neutral-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/30">
+                    <option value="">All Statuses</option>
+                </select>
+            </div>
+            <button type="button" id="filterClearBtn"
+                class="px-3 py-2 text-xs font-semibold text-neutral-500 hover:text-neutral-800 dark:hover:text-white transition-colors">
+                Clear filters
+            </button>
+        </div>
+
+        <div id="bulkActionBar" class="hidden items-center gap-3 px-4 py-3 bg-teal-50 dark:bg-teal-500/10 border border-teal-200 dark:border-teal-500/20 rounded-2xl">
+            <span id="bulkSelectedCount" class="text-sm font-bold text-teal-700 dark:text-teal-300">0 selected</span>
+            <button type="button" id="bulkSelectAllFilteredBtn" class="text-xs font-medium text-teal-700 dark:text-teal-300 underline hover:no-underline"></button>
+            <button type="button" id="bulkAdvanceSemesterBtn"
+                class="ml-auto inline-flex items-center px-4 py-2 text-sm font-bold text-white bg-teal-600 rounded-xl hover:bg-teal-700 shadow-md shadow-teal-500/20 transition-all active:scale-95">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5M9 15.75l2.25 2.25L15 13.5"/>
+                </svg>
+                Advance Selected to New Semester
+            </button>
+        </div>
+
         <div
             class="relative overflow-hidden bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-2xl shadow-sm transition-colors duration-300">
 
@@ -82,6 +137,9 @@
                     <thead
                         class="hidden md:table-header-group sticky top-0 z-20 text-xs text-neutral-700 uppercase bg-neutral-50 dark:bg-neutral-800/50 dark:text-neutral-300 backdrop-blur-md border-b border-neutral-200 dark:border-white/5">
                         <tr>
+                            <th scope="col" class="px-4 py-4 w-10">
+                                <input type="checkbox" id="selectAllCheckbox" class="w-4 h-4 rounded border-neutral-300 dark:border-white/20 text-teal-600 focus:ring-2 focus:ring-teal-500/30">
+                            </th>
                             <th scope="col" class="px-6 py-4 font-bold tracking-wider w-12">N.O</th>
                             <th scope="col" class="px-6 py-4">Student Identity (ឈ្មោះ/អត្តសញ្ញាណ)</th>
                             <th scope="col" class="px-6 py-4">Student ID (កូដសម្គាល់)</th>
@@ -95,7 +153,7 @@
                     </thead>
                     <tbody id="student-table-body" class="divide-y divide-neutral-200 dark:divide-white/5">
                         <tr>
-                            <td colspan="9" class="px-6 py-10 text-center">
+                            <td colspan="10" class="px-6 py-10 text-center">
                                 <span class="text-neutral-500">Loading student registry records...</span>
                             </td>
                         </tr>
@@ -112,6 +170,7 @@
     @include('student.partials.preview')
     @include('student.partials.importModal')
     @include('student.partials.advanceSemesterModal')
+    @include('student.partials.bulkAdvanceSemesterModal')
 @endsection
 
 @push('scripts')
