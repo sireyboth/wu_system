@@ -78,6 +78,7 @@ async function loadFormLookups(ApiService) {
     const [
         batchesRes,
         majorsRes,
+        campusesRes,
         provinceRes,
         nationalityRes,
         groupRes,
@@ -86,6 +87,7 @@ async function loadFormLookups(ApiService) {
     ] = await Promise.all([
         ApiService.request(CONFIG.API_LOOKUPS.batches),
         ApiService.request(CONFIG.API_LOOKUPS.majors),
+        ApiService.request(CONFIG.API_LOOKUPS.campuses),
         ApiService.request(CONFIG.API_LOOKUPS.provinces),
         ApiService.request(CONFIG.API_LOOKUPS.nationalities),
         ApiService.request(CONFIG.API_LOOKUPS.groups),
@@ -103,6 +105,12 @@ async function loadFormLookups(ApiService) {
         fillSelectOptions(
             getById("academic_major_id"),
             majorsRes.data?.data || majorsRes.data,
+        );
+    }
+    if (!campusesRes.error) {
+        fillSelectOptions(
+            getById("academic_campus_id"),
+            campusesRes.data?.data || campusesRes.data,
         );
     }
     if (!nationalityRes.error) {

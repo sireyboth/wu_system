@@ -128,4 +128,14 @@ class Student extends IModel
     {
         return $this->getBy($query, self::SEMESTER);
     }
+
+    public function academicHistories()
+    {
+        return $this->hasMany(StudentAcademicHistory::class);
+    }
+
+    public function currentAcademicHistory()
+    {
+        return $this->hasOne(StudentAcademicHistory::class)->where('is_current', true);
+    }
 }

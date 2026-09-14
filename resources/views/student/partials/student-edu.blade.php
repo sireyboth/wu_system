@@ -37,6 +37,15 @@
                     <option value="" disabled selected>-- ជ្រើសរើសជំនាញ --</option>
                 </select>
             </div>
+            <div>
+                <label
+                    class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">សាខា
+                    (Campus)</label>
+                <select name="campus_id" id="academic_campus_id"
+                    class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
+                    <option value="" selected>-- ជ្រើសរើសសាខា --</option>
+                </select>
+            </div>
             <div class="flex flex-col gap-1.5">
                 <label class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">វេននិស្សិត
                     (Student Shift) <span class="text-rose-500">*</span></label>
@@ -134,6 +143,14 @@
                     class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">ថ្ងៃចូលរៀនដំបូង
                     (Official Admission Date)</label>
                 <input required type="date" name="admission_date"
+                    class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
+            </div>
+
+            <div>
+                <label
+                    class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">ឆ្នាំសិក្សា
+                    (Year Level)</label>
+                <input type="number" name="year_level" min="1" max="10" placeholder="e.g., 1"
                     class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
             </div>
 

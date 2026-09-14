@@ -50,7 +50,8 @@ export async function handleEditAction(dom, ApiService, id) {
     }
 
     const payload = data.data || data;
-    const { person, batch, status, group, shift, major, guardians } = payload;
+    const { person, batch, status, group, shift, major, campus, guardians } =
+        payload;
     const { addresses, nationality } = payload.person;
 
     state.isEditMode = true;
@@ -78,6 +79,7 @@ export async function handleEditAction(dom, ApiService, id) {
         intake: payload.intake,
         scholarship: payload.scholarship,
         admission_date: payload.admission_date,
+        year_level: payload.year_level,
         remark: payload.remark,
     };
     toList(scalarFields, dom);
@@ -93,6 +95,7 @@ export async function handleEditAction(dom, ApiService, id) {
         group_id: payload.group,
         shift_id: payload.shift,
         major_id: payload.major,
+        campus_id: payload.campus,
     };
     toList(relationalFields, dom, true);
 

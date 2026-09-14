@@ -8,11 +8,28 @@ use App\Http\Resources\StudentResource;
 use App\Imports\StudentImport;
 use App\Models\Person;
 use App\Models\Student;
+use App\Models\Term;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
 class StudentController extends Controller
 {
+    /**
+     * Fields that define a student's academic snapshot — a change to any
+     * of these means "advance to a new term," not "correct a typo," so
+     * each change gets its own student_academic_histories row instead of
+     * silently overwriting the last one (see advanceAcademicHistory()).
+     */
+    private const ACADEMIC_FIELDS = [
+        'batch_id',
+        'major_id',
+        'group_id',
+        'shift_id',
+        'campus_id',
+        'status_id',
+        'year_level',
+    ];
+
     public function __construct()
     {
         $this->name          = 'Student';
@@ -99,6 +116,7 @@ class StudentController extends Controller
 
             $person->addresses()->createMany($data['addresses']);
             $student->guardians()->createMany($data['guardians']);
+            $student->academicHistories()->create($this->academicSnapshot($student) + ['is_current' => true]);
 
             return new StudentResource($student->load($this->relationships));
         });
@@ -126,9 +144,36 @@ class StudentController extends Controller
 
             $this->sync_addresses($person, $data['addresses'] ?? []);
             $this->sync_guardians($student, $data['guardians'] ?? []);
+            $this->advanceAcademicHistory($student);
 
             return new StudentResource($student->load($this->relationships));
         });
+    }
+
+    /**
+     * Advance a student to a new academic history row when their batch,
+     * major, shift, group, campus, status, or year_level actually changed
+     * on this update — the previous row is left untouched (just flipped to
+     * is_current = false) so past terms keep reading exactly what was true
+     * at the time. A no-op when none of those fields changed.
+     */
+    private function advanceAcademicHistory(Student $student): void
+    {
+        if (! $student->wasChanged(self::ACADEMIC_FIELDS)) {
+            return;
+        }
+
+        $student->currentAcademicHistory()->update(['is_current' => false]);
+        $student->academicHistories()->create($this->academicSnapshot($student) + ['is_current' => true]);
+    }
+
+    private function academicSnapshot(Student $student): array
+    {
+        return [
+            ...$student->only(self::ACADEMIC_FIELDS),
+            'term_id'        => Term::active()->value('id'),
+            'effective_date' => now(),
+        ];
     }
 
     /**
