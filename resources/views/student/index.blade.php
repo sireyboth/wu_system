@@ -104,6 +104,14 @@
                     <option value="">All Statuses</option>
                 </select>
             </div>
+            <div class="min-w-[130px]">
+                <label class="block text-[11px] font-bold text-neutral-400 uppercase tracking-wider mb-1">Semester</label>
+                <select id="filter_semester" class="w-full px-3 py-2 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-lg text-neutral-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/30">
+                    <option value="">All Semesters</option>
+                    <option value="1">Semester 1</option>
+                    <option value="2">Semester 2</option>
+                </select>
+            </div>
             <button type="button" id="filterClearBtn"
                 class="px-3 py-2 text-xs font-semibold text-neutral-500 hover:text-neutral-800 dark:hover:text-white transition-colors">
                 Clear filters

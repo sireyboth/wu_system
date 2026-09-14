@@ -1,8 +1,8 @@
 /**
  * Reads the student list's filter bar (Major/Batch/Shift/Group/Campus/
- * Status selects) — shared between the list's own query string and the
- * "advance whole filtered group" bulk action, so both always agree on
- * what's currently filtered.
+ * Status/Semester selects) — shared between the list's own query string
+ * and the "advance whole filtered group" bulk action, so both always
+ * agree on what's currently filtered.
  */
 import { getById } from "../app.js";
 
@@ -13,6 +13,7 @@ const FILTER_FIELDS = [
     "group_id",
     "campus_id",
     "status_id",
+    "semester",
 ];
 
 const filterElementId = (field) => `filter_${field}`;

@@ -62,6 +62,7 @@ class StudentController extends Controller
         'group_id',
         'campus_id',
         'status_id',
+        'semester',
     ];
 
     /**
@@ -288,6 +289,7 @@ class StudentController extends Controller
             'filters.group_id'     => 'nullable|integer|exists:groups,id',
             'filters.campus_id'    => 'nullable|integer|exists:campuses,id',
             'filters.status_id'    => 'nullable|integer|exists:statuses,id',
+            'filters.semester'     => 'nullable|integer|in:1,2',
             'changes'              => 'sometimes|array',
             'changes.major_id'     => 'nullable|integer|exists:majors,id',
             'changes.batch_id'     => 'nullable|integer|exists:batches,id',
