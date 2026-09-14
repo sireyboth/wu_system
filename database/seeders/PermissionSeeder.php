@@ -20,6 +20,7 @@ class PermissionSeeder extends Seeder
         'faculty'     => 'Faculty',
         'campus'      => 'Campus',
         'shift'       => 'Shift',
+        'term'        => 'Term',
         'app-status'  => 'Student Status Options',
         'lecturer'    => 'Lecturer',
         'subject'     => 'Subject',
@@ -44,7 +45,7 @@ class PermissionSeeder extends Seeder
     protected const ACTIONS = ['view', 'create', 'edit', 'delete'];
 
     protected const ROLE_MODULES = [
-        'Enrollment Officer'         => ['student', 'batch', 'group', 'major', 'faculty', 'campus', 'shift', 'app-status'],
+        'Enrollment Officer'         => ['student', 'batch', 'group', 'major', 'faculty', 'campus', 'shift', 'app-status', 'term'],
         'Exam Officer'               => ['state-exam', 'lecturer', 'subject'],
         'Score/Certificate Officer'  => ['certificate'],
         'Registrar Office'           => ['retake-term', 'exam-type', 'retake-batch'],

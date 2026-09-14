@@ -111,6 +111,7 @@
     @include('student.partials.studentModal')
     @include('student.partials.preview')
     @include('student.partials.importModal')
+    @include('student.partials.advanceSemesterModal')
 @endsection
 
 @push('scripts')

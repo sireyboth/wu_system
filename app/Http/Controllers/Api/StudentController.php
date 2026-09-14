@@ -151,6 +151,34 @@ class StudentController extends Controller
     }
 
     /**
+     * Dedicated "advance to a new semester" action — a focused form with
+     * just the academic fields (defaults to the student's current values,
+     * see the frontend modal), instead of the full edit-student form.
+     * Goes through the same advanceAcademicHistory() as a normal edit, so
+     * a no-op submission (nothing actually changed) still doesn't create
+     * a redundant history row.
+     */
+    public function advanceSemester(Request $request, Student $student)
+    {
+        $data = $request->validate(array_merge(
+            check_exist('batch_id', 'batches'),
+            check_exist('major_id', 'majors'),
+            check_exist('group_id', 'groups'),
+            check_exist('shift_id', 'shifts'),
+            check_exist('campus_id', 'campuses', required: false),
+            check_exist('status_id', 'statuses'),
+            ['year_level' => 'required|integer|min:1|max:10'],
+        ));
+
+        return execute(function () use ($data, $student) {
+            $student->update($data);
+            $this->advanceAcademicHistory($student);
+
+            return new StudentResource($student->load($this->relationships));
+        });
+    }
+
+    /**
      * Advance a student to a new academic history row when their batch,
      * major, shift, group, campus, status, or year_level actually changed
      * on this update — the previous row is left untouched (just flipped to

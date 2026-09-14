@@ -22,6 +22,18 @@ class Term extends IModel
         'is_active'  => 'boolean',
     ];
 
+    /**
+     * IModel::getNameAttribute() assumes every model has name_kh/name_en
+     * and builds "{name_kh} ({name_en})" from them — Term has its own
+     * plain `name` column instead, so without this override, reading
+     * $term->name silently returns " ()" (both pieces null) rather than
+     * the actual column value.
+     */
+    public function getNameAttribute()
+    {
+        return $this->attributes['name'] ?? null;
+    }
+
     // Scope for current active term
     public function scopeActive(Builder $query)
     {

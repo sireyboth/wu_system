@@ -22,6 +22,7 @@ use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\TermController;
 use App\Http\Controllers\StudentStatusController;
 use App\Http\Controllers\StateExamController;
 use Illuminate\Support\Facades\Route;
@@ -52,6 +53,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('batch', BatchController::class)->only('index')->middleware('can:batch.view');
     Route::resource('group', GroupController::class)->only('index')->middleware('can:group.view');
     Route::resource('campus', CampusController::class)->only('index')->middleware('can:campus.view');
+    Route::resource('term', TermController::class)->only('index')->middleware('can:term.view');
 
     Route::middleware('can:state-exam.view')->group(function () {
         Route::resource('state-exam', StateExamController::class)->only('index');

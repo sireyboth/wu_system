@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\ShiftController;
 use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\SubjectController;
+use App\Http\Controllers\Api\TermController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -186,6 +187,14 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         ->delete('/students-bulk-destroy', [StudentController::class, 'bulkDestroy'])
         ->name('students.bulk-destroy');
 
+    // Dedicated "advance to a new semester" action — a focused form (just
+    // the academic fields) instead of the full edit-student form, but it
+    // goes through the exact same StudentController::advanceAcademicHistory
+    // logic as a normal edit, so history stays consistent either way.
+    Route::middleware('permission:student.edit')
+        ->patch('/students/{student}/advance-semester', [StudentController::class, 'advanceSemester'])
+        ->name('students.advance-semester');
+
     // Flat sibling routes for subjects — same reasoning as students above:
     // registered before api_routes()'s /subjects/{subject} wildcard so
     // "export"/"import" are never swallowed as an id.
@@ -287,6 +296,7 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         'retake-batches'  => RetakeBatchController::class,
         'payment-batches' => PaymentBatchController::class,
         'payment-entries' => PaymentEntryController::class,
+        'terms'           => TermController::class,
         'users'           => UserController::class,
     ], [
         'faculties'       => 'faculty',
@@ -307,8 +317,16 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         'payment-batches' => 'payment-batch',
         'payment-entries' => 'payment-entry',
         // 'exam-states' registered separately above, fully public.
+        'terms'           => 'term',
         'users'           => 'role',
     ]);
+
+    // "Activate" a term (deactivating every other one) — separate from the
+    // generic update() so this is a one-click action in the terms list,
+    // not a full edit-form submission just to flip a checkbox.
+    Route::middleware('permission:term.edit')
+        ->patch('/terms/{term}/activate', [TermController::class, 'activate'])
+        ->name('terms.activate');
 
     // Address API routes
     Route::get('/provinces', [AddressController::class, 'provinces'])->name('provinces.all');
