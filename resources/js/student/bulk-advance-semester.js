@@ -10,6 +10,7 @@ import { fillSelectOptions } from "./form-utils.js";
 import { getById } from "../app.js";
 import { registerModalCloser } from "./ui.js";
 import { getSelection, clearSelection } from "./bulk-select.js";
+import { hasRequiredBulkFilters } from "./filters.js";
 
 const FIELD_IDS = {
     batch_id: "bulk_advance_batch_id",
@@ -83,6 +84,19 @@ export function initBulkAdvanceSemester(ApiService, onAdvanced) {
     getById("bulkAdvanceSemesterBtn")?.addEventListener("click", async () => {
         const selection = getSelection();
         if (selection.count === 0) return;
+
+        // Defense in depth — the button is already disabled by
+        // bulk-select.js's updateToolbar() until this is true, but the
+        // actual mutating request should never fire even if that check
+        // somehow gets bypassed (e.g. stale DOM state).
+        if (!hasRequiredBulkFilters()) {
+            window.Swal?.fire({
+                icon: "warning",
+                title: "Filter by Batch and Campus first",
+                text: "Bulk-advancing requires narrowing the list down to a specific Batch and Campus before it can run.",
+            });
+            return;
+        }
 
         await loadLookupsOnce(ApiService);
         await loadActiveTermLabel(ApiService);

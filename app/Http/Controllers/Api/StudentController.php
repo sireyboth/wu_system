@@ -276,6 +276,14 @@ class StudentController extends Controller
             return no_data('Either "ids" (non-empty array) or "all": true with filters is required.', 422);
         }
 
+        // "All matching filters" can silently touch far more students than
+        // intended if the list isn't narrowed down first — an explicit ids
+        // list doesn't have this risk (each one was picked by hand), so
+        // this only gates the filter-scoped path.
+        if ($all && (empty($validated['filters']['batch_id']) || empty($validated['filters']['campus_id']))) {
+            return no_data('Filter by both Batch and Campus before bulk-advancing by filter.', 422);
+        }
+
         return execute(function () use ($validated, $changes, $all) {
             $query = Student::query();
 

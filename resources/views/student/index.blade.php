@@ -113,8 +113,11 @@
         <div id="bulkActionBar" class="hidden items-center gap-3 px-4 py-3 bg-teal-50 dark:bg-teal-500/10 border border-teal-200 dark:border-teal-500/20 rounded-2xl">
             <span id="bulkSelectedCount" class="text-sm font-bold text-teal-700 dark:text-teal-300">0 selected</span>
             <button type="button" id="bulkSelectAllFilteredBtn" class="text-xs font-medium text-teal-700 dark:text-teal-300 underline hover:no-underline"></button>
-            <button type="button" id="bulkAdvanceSemesterBtn"
-                class="ml-auto inline-flex items-center px-4 py-2 text-sm font-bold text-white bg-teal-600 rounded-xl hover:bg-teal-700 shadow-md shadow-teal-500/20 transition-all active:scale-95">
+            <span id="bulkFilterRequiredHint" class="hidden text-xs text-amber-700 dark:text-amber-400 font-medium">
+                Filter by Batch and Campus to enable bulk advance
+            </span>
+            <button type="button" id="bulkAdvanceSemesterBtn" disabled
+                class="ml-auto inline-flex items-center px-4 py-2 text-sm font-bold text-white bg-teal-600 rounded-xl hover:bg-teal-700 shadow-md shadow-teal-500/20 transition-all active:scale-95 disabled:hover:bg-teal-600 disabled:active:scale-100">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5M9 15.75l2.25 2.25L15 13.5"/>
                 </svg>

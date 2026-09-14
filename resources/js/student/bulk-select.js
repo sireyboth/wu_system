@@ -10,7 +10,7 @@
  * state when the action button is clicked.
  */
 import { getById } from "../app.js";
-import { getActiveFilters } from "./filters.js";
+import { getActiveFilters, hasRequiredBulkFilters } from "./filters.js";
 
 const selectedIds = new Set();
 let selectAllMatchingFilters = false;
@@ -33,6 +33,8 @@ function updateToolbar() {
     const bar = getById("bulkActionBar");
     const countLabel = getById("bulkSelectedCount");
     const selectAllLink = getById("bulkSelectAllFilteredBtn");
+    const advanceBtn = getById("bulkAdvanceSemesterBtn");
+    const filterHint = getById("bulkFilterRequiredHint");
     const { all, count } = getSelection();
 
     if (bar) bar.classList.toggle("hidden", count === 0);
@@ -49,6 +51,17 @@ function updateToolbar() {
         selectAllLink.classList.toggle("hidden", !moreExist);
         selectAllLink.textContent = lastMeta ? `Select all ${lastMeta.total} matching current filters` : "";
     }
+
+    // Bulk-advancing is easy to fire off too broadly by accident — require
+    // Batch + Campus to be filtered down first, so this is always a
+    // deliberate, narrow action rather than "the whole student body."
+    const filtersOk = hasRequiredBulkFilters();
+    if (advanceBtn) {
+        advanceBtn.disabled = !filtersOk;
+        advanceBtn.classList.toggle("opacity-50", !filtersOk);
+        advanceBtn.classList.toggle("cursor-not-allowed", !filtersOk);
+    }
+    if (filterHint) filterHint.classList.toggle("hidden", filtersOk);
 }
 
 function syncCheckboxesToState() {

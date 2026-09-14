@@ -35,6 +35,17 @@ export function hasActiveFilters() {
     return Object.keys(getActiveFilters()).length > 0;
 }
 
+/**
+ * Bulk-advancing many students at once is easy to fire off too broadly by
+ * accident — requiring Batch + Campus to be filtered first forces the
+ * registrar to narrow down to a specific, deliberate group before the
+ * action becomes available at all.
+ */
+export function hasRequiredBulkFilters() {
+    const filters = getActiveFilters();
+    return Boolean(filters.batch_id) && Boolean(filters.campus_id);
+}
+
 export function initFilterBar(onFilterChange) {
     FILTER_FIELDS.forEach((field) => {
         getById(filterElementId(field))?.addEventListener("change", onFilterChange);
