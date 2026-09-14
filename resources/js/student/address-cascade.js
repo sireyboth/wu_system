@@ -140,10 +140,7 @@ async function loadFormLookups(ApiService) {
     if (!statusRes.error) {
         const data = statusRes.data?.data ?? statusRes.data ?? [];
 
-        fillSelectOptions(
-            getById("student-status"),
-            data.filter((item) => item?.shortcut?.toLowerCase() === "student"),
-        );
+        fillSelectOptions(getById("student-status"), data);
     }
 
     const provinceList = provinceRes.data?.data || provinceRes.data || [];
