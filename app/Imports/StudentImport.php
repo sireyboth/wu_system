@@ -223,6 +223,19 @@ class StudentImport implements ToCollection, WithHeadingRow, WithCustomCsvSettin
                 'remark'          => trim((string) ($row['remark'] ?? '')) ?: null,
             ]);
 
+            $student->academicHistories()->create([
+                'batch_id'       => $batchId,
+                'major_id'       => $majorId,
+                'group_id'       => $groupId,
+                'shift_id'       => $shiftId,
+                'campus_id'      => $campusId,
+                'status_id'      => $statusId,
+                'year_level'     => $student->year_level,
+                'term_id'        => \App\Models\Term::active()->value('id'),
+                'effective_date' => now(),
+                'is_current'     => true,
+            ]);
+
             $this->created[] = $student->id;
         } catch (\Throwable $e) {
             $person?->forceDelete();
