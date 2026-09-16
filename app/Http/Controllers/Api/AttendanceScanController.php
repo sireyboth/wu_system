@@ -81,11 +81,20 @@ class AttendanceScanController extends Controller
             'ip_address'        => $request->ip(),
         ]);
 
-        if ($device) {
-            $this->scoreRisk($record, $device);
-        }
+        $rapidSharedDevice = $device && $this->scoreRisk($record, $device);
 
-        return has_data(['status' => 'present'], "You're marked present. Welcome!");
+        // Every other flag (a device that's shared but not in rapid
+        // succession) stays silent — same message either way, so someone
+        // legitimately borrowing a phone on a different day never notices
+        // anything. Only the strongest signal (two different students
+        // checked in from the same device within RAPID_SUCCESSION_SECONDS
+        // — a phone being passed down the row right now) gets a warning,
+        // since that's specific enough that a false positive is unlikely.
+        $message = $rapidSharedDevice
+            ? "You're marked present. Note: you're not allowed to check in for someone else — if we find out, we will contact you or look into it."
+            : "You're marked present. Welcome!";
+
+        return has_data(['status' => 'present'], $message);
     }
 
     /**
@@ -121,8 +130,12 @@ class AttendanceScanController extends Controller
      * one student. Flagging never blocks the scan — the student is still
      * marked present, this just queues the record for a registrar to
      * look at. See attendance schema doc §6/§8.
+     *
+     * Returns whether this specific scan hit the rapid-succession
+     * signal — the caller uses that (and only that) to decide whether to
+     * warn the student directly; every other flag stays silent.
      */
-    private function scoreRisk(AttendanceRecord $record, StudentDevice $device): void
+    private function scoreRisk(AttendanceRecord $record, StudentDevice $device): bool
     {
         $recentOtherScans = AttendanceRecord::where('device_id', $device->id)
             ->where('student_id', '!=', $record->student_id)
@@ -131,7 +144,7 @@ class AttendanceScanController extends Controller
             ->get(['id', 'student_id', 'marked_at']);
 
         if ($recentOtherScans->isEmpty()) {
-            return;
+            return false;
         }
 
         $riskScore = min(100, 50 + $recentOtherScans->count() * 10);
@@ -140,8 +153,10 @@ class AttendanceScanController extends Controller
             'device_first_seen'              => $device->wasRecentlyCreated,
         ];
 
-        $mostRecent = $recentOtherScans->first();
+        $isRapidSuccession = false;
+        $mostRecent        = $recentOtherScans->first();
         if ($mostRecent->marked_at && $record->marked_at->diffInSeconds($mostRecent->marked_at) <= self::RAPID_SUCCESSION_SECONDS) {
+            $isRapidSuccession = true;
             $riskScore = min(100, $riskScore + 30);
             $signals['rapid_successive_scan_seconds'] = $record->marked_at->diffInSeconds($mostRecent->marked_at);
         }
@@ -152,5 +167,7 @@ class AttendanceScanController extends Controller
             'signals'              => $signals,
             'flagged'              => true,
         ]);
+
+        return $isRapidSuccession;
     }
 }

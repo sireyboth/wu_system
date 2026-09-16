@@ -20,6 +20,7 @@ import QRCode from 'qrcode';
         API_QR_TOKEN: (sessionId) => `/api/v1/lecturer-portal/sessions/${sessionId}/qr-token`,
         API_MARK: (sessionId) => `/api/v1/lecturer-portal/sessions/${sessionId}/mark`,
         API_SUBMIT_SESSION: (sessionId) => `/api/v1/lecturer-portal/sessions/${sessionId}/submit`,
+        API_ATTENDANCE_HISTORY: (classId) => `/api/v1/lecturer-portal/classes/${classId}/attendance-history`,
     };
 
     const Toast = typeof Swal !== 'undefined' ? Swal.mixin({
@@ -43,6 +44,14 @@ import QRCode from 'qrcode';
         rosterClassCode: document.getElementById('rosterClassCode'),
         rosterTableBody: document.getElementById('rosterTableBody'),
         rosterSearchInput: document.getElementById('rosterSearchInput'),
+        rosterHistoryBtn: document.getElementById('rosterHistoryBtn'),
+
+        attendanceHistoryModal: document.getElementById('attendanceHistoryModal'),
+        attendanceHistoryModalCard: document.getElementById('attendanceHistoryModalCard'),
+        attendanceHistoryClassCode: document.getElementById('attendanceHistoryClassCode'),
+        attendanceHistoryHead: document.getElementById('attendanceHistoryHead'),
+        attendanceHistoryBody: document.getElementById('attendanceHistoryBody'),
+        attendanceHistorySessionCount: document.getElementById('attendanceHistorySessionCount'),
 
         attendanceModal: document.getElementById('attendanceModal'),
         attendanceModalCard: document.getElementById('attendanceModalCard'),
@@ -61,7 +70,7 @@ import QRCode from 'qrcode';
         attendanceClockDate: document.getElementById('attendanceClockDate'),
     };
 
-    const rosterState = { enrollments: [] };
+    const rosterState = { enrollments: [], classId: null };
     const attendanceState = { classId: null, sessionId: null, qrTimer: null, pollTimer: null, clockTimer: null };
 
     const ApiService = {
@@ -189,6 +198,8 @@ import QRCode from 'qrcode';
         ['homework_max', 'quiz_max', 'assignment_max', 'midterm_max', 'final_max', 'attendance_max'].forEach((field) => {
             DOM.scoreConfigForm.querySelector(`[name="${field}"]`).value = config[field] ?? 0;
         });
+        DOM.scoreConfigForm.querySelector('[name="total_weeks"]').value = config.total_weeks ?? 15;
+        DOM.scoreConfigForm.querySelector('[name="sessions_per_week"]').value = config.sessions_per_week ?? 2;
         recalcScoreTotal();
         toggleModalEl(DOM.scoreConfigModal, DOM.scoreConfigModalCard, true);
     }
@@ -197,7 +208,7 @@ import QRCode from 'qrcode';
         e.preventDefault();
         const classId = DOM.scoreConfigClassId.value;
         const payload = {};
-        ['homework_max', 'quiz_max', 'assignment_max', 'midterm_max', 'final_max', 'attendance_max'].forEach((field) => {
+        ['homework_max', 'quiz_max', 'assignment_max', 'midterm_max', 'final_max', 'attendance_max', 'total_weeks', 'sessions_per_week'].forEach((field) => {
             payload[field] = Number(DOM.scoreConfigForm.querySelector(`[name="${field}"]`).value) || 0;
         });
 
@@ -239,52 +250,59 @@ import QRCode from 'qrcode';
     }
 
     function rowTotal(row) {
-        let total = 0;
+        let total = Number(row.dataset.attendanceScore) || 0;
         row.querySelectorAll('.score-cell').forEach((input) => { total += Number(input.value) || 0; });
         return total;
     }
 
     // Total Point is a live sum of whatever's currently in the five score
-    // cells (saved or not) — Grade Point is a placeholder column until the
-    // grading scale/formula is decided, so it stays a dash for now.
+    // cells (saved or not) plus the auto-computed attendance score — Grade
+    // Point is a placeholder column until the grading scale/formula is
+    // decided, so it stays a dash for now.
     function renderRosterRow(enr) {
+        const attendanceDisplay = enr.attendance_score === null || enr.attendance_score === undefined
+            ? '<span class="text-xs italic text-neutral-400" title="Set your Score Config\'s Total Weeks / Sessions per Week to compute this">—</span>'
+            : enr.attendance_score;
         return `
-            <tr data-enrollment-id="${enr.id}">
+            <tr data-enrollment-id="${enr.id}" data-attendance-score="${enr.attendance_score ?? 0}">
                 <td class="py-3 pr-4 font-medium">${studentLabel(enr)}</td>
                 <td class="py-3 pr-4 text-xs uppercase text-neutral-500">${enr.status}</td>
                 ${SCORE_COMPONENTS.map((c) => scoreCell(enr.id, c, enr)).join('')}
+                <td class="py-3 pr-2 text-center font-semibold text-indigo-600 dark:text-indigo-400">${attendanceDisplay}</td>
                 <td class="py-3 pr-3 text-center font-bold total-point-cell">${rowTotalFromEnrollment(enr)}</td>
                 <td class="py-3 text-center text-neutral-400 grade-point-cell">—</td>
             </tr>`;
     }
 
     function rowTotalFromEnrollment(enr) {
-        return (enr.scores ?? []).reduce((sum, s) => sum + Number(s.points ?? 0), 0);
+        const typed = (enr.scores ?? []).reduce((sum, s) => sum + Number(s.points ?? 0), 0);
+        return typed + Number(enr.attendance_score ?? 0);
     }
 
     function renderRosterRows(enrollments) {
         if (!enrollments.length) {
-            DOM.rosterTableBody.innerHTML = '<tr><td colspan="9" class="py-6 text-center text-neutral-400">No students match your search.</td></tr>';
+            DOM.rosterTableBody.innerHTML = '<tr><td colspan="10" class="py-6 text-center text-neutral-400">No students match your search.</td></tr>';
             return;
         }
         DOM.rosterTableBody.innerHTML = enrollments.map(renderRosterRow).join('');
     }
 
     async function openRoster(classId, code) {
+        rosterState.classId = classId;
         DOM.rosterClassCode.textContent = code;
         if (DOM.rosterSearchInput) DOM.rosterSearchInput.value = '';
-        DOM.rosterTableBody.innerHTML = '<tr><td colspan="9" class="py-6 text-center text-neutral-400">Loading roster...</td></tr>';
+        DOM.rosterTableBody.innerHTML = '<tr><td colspan="10" class="py-6 text-center text-neutral-400">Loading roster...</td></tr>';
         toggleModalEl(DOM.rosterModal, DOM.rosterModalCard, true);
 
         const { error, data } = await ApiService.request(`${CONFIG.API_ROSTER(classId)}?per_page=200`);
         if (error) {
-            DOM.rosterTableBody.innerHTML = `<tr><td colspan="9" class="py-6 text-center text-rose-500">${data?.message || 'Failed to load roster.'}</td></tr>`;
+            DOM.rosterTableBody.innerHTML = `<tr><td colspan="10" class="py-6 text-center text-rose-500">${data?.message || 'Failed to load roster.'}</td></tr>`;
             return;
         }
 
         rosterState.enrollments = data?.data ?? [];
         if (!rosterState.enrollments.length) {
-            DOM.rosterTableBody.innerHTML = '<tr><td colspan="9" class="py-6 text-center text-neutral-400">No students enrolled yet.</td></tr>';
+            DOM.rosterTableBody.innerHTML = '<tr><td colspan="10" class="py-6 text-center text-neutral-400">No students enrolled yet.</td></tr>';
             return;
         }
 
@@ -298,6 +316,65 @@ import QRCode from 'qrcode';
             return;
         }
         renderRosterRows(rosterState.enrollments.filter((enr) => studentLabel(enr).toLowerCase().includes(term)));
+    }
+
+    // ---- Attendance history (students x session dates grid) ----
+
+    function historyStatusBadge(status) {
+        const map = { present: 'bg-emerald-500', absent: 'bg-rose-500', late: 'bg-amber-500', excused: 'bg-sky-500' };
+        const color = map[status] ?? 'bg-neutral-200 dark:bg-white/10';
+        const letter = status ? status.charAt(0).toUpperCase() : '';
+        return `<span class="inline-flex items-center justify-center w-6 h-6 rounded text-[10px] font-bold text-white ${color}" title="${status ?? 'No record'}">${letter}</span>`;
+    }
+
+    function formatHistoryDate(dateStr) {
+        return new Date(`${dateStr}T00:00:00`).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    }
+
+    function renderAttendanceHistory(history) {
+        const sessions = history.sessions ?? [];
+        const students = history.students ?? [];
+
+        DOM.attendanceHistorySessionCount.textContent = `${sessions.length} session${sessions.length === 1 ? '' : 's'} held`;
+
+        if (!sessions.length) {
+            DOM.attendanceHistoryHead.innerHTML = '';
+            DOM.attendanceHistoryBody.innerHTML = '<tr><td class="py-6 px-6 text-center text-neutral-400">No attendance session has been held for this class yet.</td></tr>';
+            return;
+        }
+
+        DOM.attendanceHistoryHead.innerHTML = `
+            <tr>
+                <th class="py-2 pl-6 pr-3 sticky left-0 bg-white dark:bg-neutral-900">Student</th>
+                ${sessions.map((s) => `<th class="py-2 px-2 text-center whitespace-nowrap">${formatHistoryDate(s.date)}${s.status !== 'locked' ? `<span class="block normal-case font-normal text-amber-500">${s.status}</span>` : ''}</th>`).join('')}
+            </tr>`;
+
+        if (!students.length) {
+            DOM.attendanceHistoryBody.innerHTML = `<tr><td colspan="${sessions.length + 1}" class="py-6 px-6 text-center text-neutral-400">No students enrolled.</td></tr>`;
+            return;
+        }
+
+        DOM.attendanceHistoryBody.innerHTML = students.map((student) => `
+            <tr>
+                <td class="py-2 pl-6 pr-3 font-medium whitespace-nowrap sticky left-0 bg-white dark:bg-neutral-900">${student.code ?? ''} — ${student.name}</td>
+                ${sessions.map((s) => `<td class="py-2 px-2 text-center">${historyStatusBadge(student.statuses?.[s.id])}</td>`).join('')}
+            </tr>`).join('');
+    }
+
+    async function openAttendanceHistory(classId, code) {
+        DOM.attendanceHistoryClassCode.textContent = code;
+        DOM.attendanceHistoryHead.innerHTML = '';
+        DOM.attendanceHistoryBody.innerHTML = '<tr><td class="py-6 px-6 text-center text-neutral-400">Loading history...</td></tr>';
+        DOM.attendanceHistorySessionCount.textContent = '';
+        toggleModalEl(DOM.attendanceHistoryModal, DOM.attendanceHistoryModalCard, true);
+
+        const { error, data } = await ApiService.request(CONFIG.API_ATTENDANCE_HISTORY(classId));
+        if (error) {
+            DOM.attendanceHistoryBody.innerHTML = `<tr><td class="py-6 px-6 text-center text-rose-500">${data?.message || 'Failed to load attendance history.'}</td></tr>`;
+            return;
+        }
+
+        renderAttendanceHistory(data?.data ?? { sessions: [], students: [] });
     }
 
     async function saveScoreCell(input) {
@@ -569,7 +646,10 @@ import QRCode from 'qrcode';
 
     window.ScoreConfigModal = { toggle: (open) => toggleModalEl(DOM.scoreConfigModal, DOM.scoreConfigModalCard, open) };
     window.RosterModal = { toggle: (open) => toggleModalEl(DOM.rosterModal, DOM.rosterModalCard, open) };
+    window.AttendanceHistoryModal = { toggle: (open) => toggleModalEl(DOM.attendanceHistoryModal, DOM.attendanceHistoryModalCard, open) };
     window.AttendanceModal = { toggle: (open) => (open ? toggleModalEl(DOM.attendanceModal, DOM.attendanceModalCard, true) : closeAttendance()) };
+
+    DOM.rosterHistoryBtn?.addEventListener('click', () => openAttendanceHistory(rosterState.classId, DOM.rosterClassCode.textContent));
 
     DOM.scoreConfigForm?.addEventListener('submit', handleScoreConfigSubmit);
     DOM.scoreConfigForm?.addEventListener('input', (e) => {

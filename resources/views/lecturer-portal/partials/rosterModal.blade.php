@@ -6,9 +6,15 @@
 
         <div class="px-6 py-4 border-b border-neutral-100 dark:border-white/5 flex items-center justify-between bg-white dark:bg-neutral-900 shrink-0">
             <h3 class="text-lg font-bold text-neutral-900 dark:text-white">Roster — <span id="rosterClassCode" class="font-mono text-indigo-600"></span></h3>
-            <button type="button" onclick="RosterModal.toggle(false)" class="text-neutral-400 hover:text-neutral-600 dark:hover:text-white transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
+            <div class="flex items-center gap-3">
+                <button type="button" id="rosterHistoryBtn" class="text-xs font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+                    Attendance History
+                </button>
+                <button type="button" onclick="RosterModal.toggle(false)" class="text-neutral-400 hover:text-neutral-600 dark:hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
         </div>
 
         <div class="px-6 pt-4 space-y-3 shrink-0">
@@ -33,13 +39,14 @@
                         <th class="pb-2 pr-2 text-center">Quiz</th>
                         <th class="pb-2 pr-2 text-center">Assignment</th>
                         <th class="pb-2 pr-2 text-center">Midterm</th>
-                        <th class="pb-2 pr-3 text-center">Final</th>
+                        <th class="pb-2 pr-2 text-center">Final</th>
+                        <th class="pb-2 pr-3 text-center">Attendance <span class="normal-case font-normal text-neutral-400">(auto)</span></th>
                         <th class="pb-2 pr-3 text-center">Total Point</th>
                         <th class="pb-2 text-center">Grade Point</th>
                     </tr>
                 </thead>
                 <tbody id="rosterTableBody" class="divide-y divide-neutral-100 dark:divide-white/5">
-                    <tr><td colspan="9" class="py-6 text-center text-neutral-400">Loading roster...</td></tr>
+                    <tr><td colspan="10" class="py-6 text-center text-neutral-400">Loading roster...</td></tr>
                 </tbody>
             </table>
         </div>

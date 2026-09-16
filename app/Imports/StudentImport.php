@@ -105,7 +105,15 @@ class StudentImport implements ToCollection, WithHeadingRow, WithCustomCsvSettin
     protected array $campusIndex;
     protected array $statusIndex;
 
-    public function __construct()
+    /**
+     * $termId lets the caller say explicitly which term this batch of
+     * imported students belongs to — a spreadsheet has no term column of
+     * its own, so without this every row would fall back to
+     * Term::resolveDefault()'s guess, which can be wrong (e.g. no active
+     * term actually covers today). Optional so existing callers/tests
+     * that don't pass one still work exactly as before.
+     */
+    public function __construct(protected ?int $termId = null)
     {
         $this->nationalityIndex = $this->indexByName(Nationality::query()->get(['id', 'name_en']));
         $this->batchIndex       = $this->indexByColumn(Batch::query()->get(['id', 'shortcut']), 'shortcut');
@@ -256,7 +264,7 @@ class StudentImport implements ToCollection, WithHeadingRow, WithCustomCsvSettin
                 'status_id'      => $statusId,
                 'year_level'     => $student->year_level,
                 'semester'       => $student->semester,
-                'term_id'        => \App\Models\Term::active()->value('id'),
+                'term_id'        => $this->termId ?? \App\Models\Term::resolveDefault()?->id,
                 'effective_date' => now(),
                 'is_current'     => true,
             ]);

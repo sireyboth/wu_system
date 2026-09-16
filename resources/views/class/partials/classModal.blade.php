@@ -61,10 +61,12 @@
 
             <div id="classLecturerField">
                 <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">Lecturer <span class="normal-case font-normal text-neutral-400">(optional — assigned as Primary)</span></label>
-                <select name="lecturer_id" id="classLecturerSelect"
+                <input type="text" name="lecturer_search" id="classLecturerSearch" list="lecturersDatalist" autocomplete="off"
+                    placeholder="Type to search by code or name..."
                     class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
-                    <option value="">-- none yet --</option>
-                </select>
+                <datalist id="lecturersDatalist"></datalist>
+                <input type="hidden" name="lecturer_id" id="classLecturerId">
+                <p class="text-xs text-rose-500 mt-1 hidden" id="classLecturerHint">Pick a lecturer from the list — typing a name alone doesn't select it.</p>
             </div>
             <p class="text-xs text-neutral-400 hidden" id="classLecturerEditHint">Use the <b>Lecturer</b> button on the class row to reassign — editing here doesn't change it.</p>
 

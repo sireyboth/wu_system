@@ -386,6 +386,24 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         ->post('/classes/{class}/auto-enroll', [ClassSectionController::class, 'autoEnroll'])
         ->name('classes.auto-enroll');
 
+    // Manual add of specific students — the complement to auto-enroll,
+    // for the "just this handful, maybe from another batch" case
+    // (retake, add-subject, borrowed for one elective).
+    Route::middleware('permission:class.view')
+        ->get('/students-search-for-class', [ClassSectionController::class, 'searchStudents'])
+        ->name('classes.students-search');
+    Route::middleware('permission:class.edit')
+        ->post('/classes/{class}/add-student', [ClassSectionController::class, 'addStudent'])
+        ->name('classes.add-student');
+
+    // Read-only attendance-history grid — every session date the class has
+    // held, crossed with every enrolled student's status that day. Lets a
+    // registrar (or the lecturer, via the portal route below) spot a week
+    // that was never taken, not just each student's running total.
+    Route::middleware('permission:class.view')
+        ->get('/classes/{class}/attendance-history', [ClassSectionController::class, 'attendanceHistory'])
+        ->name('classes.attendance-history');
+
     // Registrar approve/reject on a student leave request.
     Route::middleware('permission:student-leave.edit')
         ->patch('/student-leaves/{student_leave}/decide', [StudentLeaveController::class, 'decide'])
@@ -399,6 +417,7 @@ Route::prefix('v1')->middleware('auth')->group(function () {
             Route::get('/classes', [LecturerPortalController::class, 'classes'])->name('classes');
             Route::get('/classes/{class}/score-config', [LecturerPortalController::class, 'scoreConfig'])->name('score-config.show');
             Route::get('/classes/{class}/roster', [LecturerPortalController::class, 'roster'])->name('roster');
+            Route::get('/classes/{class}/attendance-history', [LecturerPortalController::class, 'attendanceHistory'])->name('attendance-history');
         });
         Route::middleware('permission:lecturer-portal.edit')->group(function () {
             Route::put('/classes/{class}/score-config', [LecturerPortalController::class, 'updateScoreConfig'])->name('score-config.update');
@@ -438,12 +457,15 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         });
     });
 
-    // "Activate" a term (deactivating every other one) — separate from the
-    // generic update() so this is a one-click action in the terms list,
-    // not a full edit-form submission just to flip a checkbox.
-    Route::middleware('permission:term.edit')
-        ->patch('/terms/{term}/activate', [TermController::class, 'activate'])
-        ->name('terms.activate');
+    // "Activate"/"Deactivate" a term — separate from the generic update()
+    // so this is a one-click action in the terms list, not a full edit-form
+    // submission just to flip a checkbox. Multiple terms can be active at
+    // once (see Term::resolveDefault()), so neither of these touches any
+    // other term's flag.
+    Route::middleware('permission:term.edit')->group(function () {
+        Route::patch('/terms/{term}/activate', [TermController::class, 'activate'])->name('terms.activate');
+        Route::patch('/terms/{term}/deactivate', [TermController::class, 'deactivate'])->name('terms.deactivate');
+    });
 
     // Address API routes
     Route::get('/provinces', [AddressController::class, 'provinces'])->name('provinces.all');

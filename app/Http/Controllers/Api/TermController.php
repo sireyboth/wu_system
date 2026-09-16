@@ -25,23 +25,15 @@ class TermController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage. Only one term is ever
-     * active — student_academic_histories rows are stamped with whatever
-     * term is active at the moment a student advances, so a brand new
-     * term created as active must be the only one, same reasoning as
-     * update() below.
+     * Store a newly created resource in storage. Multiple terms can be
+     * active at once (different batches genuinely run on different
+     * calendars at the same time), so this no longer deactivates anything
+     * else — see Term::resolveDefault() for how "which term did you mean"
+     * gets picked when a caller doesn't say explicitly.
      */
     public function store(TermRequest $request)
     {
-        return execute(function () use ($request) {
-            $data = $request->validated();
-
-            if ($data['is_active'] ?? false) {
-                Term::query()->update(['is_active' => false]);
-            }
-
-            return $this->save($request);
-        });
+        return $this->save($request);
     }
 
     /**
@@ -57,27 +49,27 @@ class TermController extends Controller
      */
     public function update(TermRequest $request, Term $term)
     {
-        return execute(function () use ($request, $term) {
-            $data = $request->validated();
-
-            if ($data['is_active'] ?? false) {
-                Term::where('id', '!=', $term->id)->update(['is_active' => false]);
-            }
-
-            return $this->release($request, $term);
-        });
+        return $this->release($request, $term);
     }
 
     /**
-     * One-click "make this the active term" — the primary way a registrar
-     * moves the whole school forward a semester, rather than editing the
-     * full term form just to flip a checkbox.
+     * One-click "mark this term active" — flips just this term on, without
+     * touching any other term's active flag. The complement, deactivate(),
+     * turns it back off.
      */
     public function activate(Term $term)
     {
         return execute(function () use ($term) {
-            Term::where('id', '!=', $term->id)->update(['is_active' => false]);
             $term->update(['is_active' => true]);
+
+            return new TermResource($this->reload($term));
+        });
+    }
+
+    public function deactivate(Term $term)
+    {
+        return execute(function () use ($term) {
+            $term->update(['is_active' => false]);
 
             return new TermResource($this->reload($term));
         });

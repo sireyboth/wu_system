@@ -95,7 +95,20 @@ class LecturerPortalController extends Controller
             ->with(['classSection.subject', 'studentAcademicHistory.student.person', 'classScores'])
             ->paginate($request->integer('per_page', 200));
 
+        $studentIds = collect($enrollments->items())->pluck('studentAcademicHistory.student_id');
+        $scores     = \App\Models\ClassScoreConfig::attendanceScoresFor($class->id, $studentIds);
+        foreach ($enrollments as $enrollment) {
+            $enrollment->attendance_score = $scores[$enrollment->studentAcademicHistory->student_id] ?? null;
+        }
+
         return CourseEnrollmentResource::collection($enrollments);
+    }
+
+    public function attendanceHistory(ClassSection $class)
+    {
+        $this->assertOwnsClass($class);
+
+        return has_data(\App\Models\ClassSession::attendanceHistoryFor($class->id));
     }
 
     /**

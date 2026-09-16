@@ -15,16 +15,17 @@
             <input type="hidden" name="class_id" id="autoEnrollClassId">
             <p class="text-xs text-neutral-500 dark:text-neutral-400">Every student whose <b>current</b> academic history matches all filters below gets enrolled. Leave Major blank to pull students from several majors into one class (a mixed-major elective).</p>
 
+            <div>
+                <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">Major <span class="normal-case font-normal text-neutral-400">(check none for any, or check 2-3 to mix them into one class)</span></label>
+                <input type="text" id="autoEnrollMajorFilter" placeholder="Type to filter the list..." autocomplete="off"
+                    class="w-full mb-2 px-4 py-2 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
+                <div id="autoEnrollMajorList" class="max-h-36 overflow-y-auto space-y-1 px-3 py-2 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl"></div>
+            </div>
+
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">Batch</label>
                     <select name="batch_id" id="autoEnrollBatch" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
-                        <option value="">-- any --</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">Major <span class="normal-case font-normal text-neutral-400">(leave blank for mixed-major)</span></label>
-                    <select name="major_id" id="autoEnrollMajor" class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
                         <option value="">-- any --</option>
                     </select>
                 </div>

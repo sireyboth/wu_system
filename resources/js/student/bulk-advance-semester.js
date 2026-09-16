@@ -6,7 +6,7 @@
  * "— No change —" is untouched per-student on the backend.
  */
 import { CONFIG } from "./config.js";
-import { fillSelectOptions } from "./form-utils.js";
+import { fillSelectOptions, loadTermOptions } from "./form-utils.js";
 import { getById } from "../app.js";
 import { registerModalCloser } from "./ui.js";
 import { getSelection, clearSelection } from "./bulk-select.js";
@@ -65,19 +65,6 @@ async function loadLookupsOnce(ApiService) {
     lookupsLoaded = true;
 }
 
-async function loadActiveTermLabel(ApiService) {
-    const { error, data } = await ApiService.request("/api/v1/terms?search=");
-    const banner = getById("bulkAdvanceSemesterActiveTerm");
-    if (!banner) return;
-    if (error) {
-        banner.textContent = "unknown";
-        return;
-    }
-    const terms = data?.data ?? data ?? [];
-    const active = terms.find((t) => t.is_active);
-    banner.textContent = active ? `${active.code} (${active.full_name ?? active.name})` : "no active term set";
-}
-
 export function initBulkAdvanceSemester(ApiService, onAdvanced) {
     registerModalCloser("bulk-advance-semester", () => toggle(false));
 
@@ -99,7 +86,7 @@ export function initBulkAdvanceSemester(ApiService, onAdvanced) {
         }
 
         await loadLookupsOnce(ApiService);
-        await loadActiveTermLabel(ApiService);
+        await loadTermOptions(ApiService, getById("bulkAdvanceSemesterTermId"));
 
         const scopeLabel = getById("bulkAdvanceSemesterScope");
         if (scopeLabel) {
@@ -139,10 +126,11 @@ export function initBulkAdvanceSemester(ApiService, onAdvanced) {
             if (!confirmation?.isConfirmed) return;
         }
 
+        const termId = getById("bulkAdvanceSemesterTermId")?.value || null;
         const selection = getSelection();
         const payload = selection.all
-            ? { all: true, filters: selection.filters, changes }
-            : { ids: selection.ids, changes };
+            ? { all: true, filters: selection.filters, changes, term_id: termId }
+            : { ids: selection.ids, changes, term_id: termId };
 
         submitBtn.disabled = true;
         const { error, status, data } = await ApiService.request(

@@ -22,6 +22,8 @@ class ClassScoreConfigRequest extends IRequest
             'midterm_max'    => 'required|integer|min:0|max:100',
             'final_max'      => 'required|integer|min:0|max:100',
             'attendance_max' => 'required|integer|min:0|max:100',
+            'total_weeks'       => 'nullable|integer|min:1|max:52',
+            'sessions_per_week' => 'nullable|integer|min:1|max:14',
             'remark'         => 'nullable|string|max:500',
         ];
     }

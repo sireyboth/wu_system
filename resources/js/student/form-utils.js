@@ -64,6 +64,46 @@ export function parseNestedFormData(formElement) {
     return root;
 }
 
+// Mirrors Term::resolveDefault() on the backend — picks whichever active
+// term's date range covers today, falling back to the most recently
+// started active term. This is only ever a *default selection*; the
+// backend re-resolves independently if the field is left blank, so this
+// just needs to be a sensible starting point, not the source of truth.
+function pickDefaultTerm(terms) {
+    const today = new Date().toISOString().slice(0, 10);
+    const active = terms.filter((t) => t.is_active);
+    const current = active.find((t) => t.start_date <= today && t.end_date >= today);
+    if (current) return current;
+    const started = active.filter((t) => t.start_date <= today).sort((a, b) => b.start_date.localeCompare(a.start_date));
+    if (started.length) return started[0];
+    const byStart = [...active].sort((a, b) => b.start_date.localeCompare(a.start_date));
+    return byStart[0] ?? null;
+}
+
+/**
+ * Fills a term <select> with every term, active or not, pre-selecting a
+ * sensible default (see pickDefaultTerm) — used by the single and bulk
+ * "Advance Semester" forms so different batches can be filed under
+ * different terms without flipping a global "active" flag back and forth.
+ */
+export async function loadTermOptions(ApiService, element) {
+    if (!element) return;
+
+    const { error, data } = await ApiService.request('/api/v1/terms?per_page=1000');
+    if (error) {
+        element.innerHTML = '<option value="">Could not load terms</option>';
+        return;
+    }
+
+    const terms = data?.data ?? data ?? [];
+    const defaultTerm = pickDefaultTerm(terms);
+
+    element.innerHTML = terms.map((t) => `
+        <option value="${t.id}" ${defaultTerm && t.id === defaultTerm.id ? 'selected' : ''}>
+            ${t.code} — ${t.name ?? t.full_name ?? ''}${t.is_active ? ' (active)' : ''}
+        </option>`).join('');
+}
+
 /**
  * Escapes HTML special characters. Wrap any user-supplied string with this
  * before interpolating into innerHTML (table rows, preview panel, etc.)

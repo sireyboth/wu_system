@@ -31,4 +31,52 @@ class ClassSession extends IModel
     {
         return $this->hasMany(QrToken::class);
     }
+
+    /**
+     * The students-by-dates grid for one class: every session date it has
+     * ever held, crossed with every enrolled student's status that day.
+     * Built for the "which week did I forget to take attendance" question,
+     * which a per-student running total can't answer — a missing date in
+     * `sessions` here IS a missed week, not a zero-attendance day.
+     */
+    public static function attendanceHistoryFor(int $classId): array
+    {
+        $sessions = static::where('class_id', $classId)
+            ->orderBy('session_date')
+            ->get(['id', 'session_date', 'status']);
+
+        $enrollments = CourseEnrollment::where('class_id', $classId)
+            ->with('studentAcademicHistory.student.person')
+            ->get();
+
+        $records = AttendanceRecord::whereIn('class_session_id', $sessions->pluck('id'))
+            ->get(['class_session_id', 'student_id', 'status'])
+            ->groupBy('student_id');
+
+        $students = $enrollments->map(function (CourseEnrollment $enrollment) use ($records) {
+            $student = $enrollment->studentAcademicHistory?->student;
+            $person  = $student?->person;
+            $nameKh  = trim(($person?->first_name_kh ?? '') . ' ' . ($person?->last_name_kh ?? ''));
+            $nameEn  = trim(($person?->first_name ?? '') . ' ' . ($person?->last_name ?? ''));
+
+            $statuses = $records->get($student?->id, collect())
+                ->pluck('status', 'class_session_id');
+
+            return [
+                'course_enrollment_id' => $enrollment->id,
+                'code'                 => $student?->code,
+                'name'                 => $nameKh ?: ($nameEn ?: '—'),
+                'statuses'             => $statuses,
+            ];
+        })->values();
+
+        return [
+            'sessions' => $sessions->map(fn (self $s) => [
+                'id'     => $s->id,
+                'date'   => $s->session_date->format('Y-m-d'),
+                'status' => $s->status,
+            ])->values(),
+            'students' => $students,
+        ];
+    }
 }

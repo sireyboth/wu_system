@@ -19,11 +19,16 @@
         </div>
 
         <div class="px-6 pt-4">
-            <div class="flex items-center gap-2 text-xs px-3 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300">
-                <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
-                Will be recorded under: <span id="bulkAdvanceSemesterActiveTerm" class="font-bold">—</span>
-                <a href="{{ route('term.index') }}" class="ml-auto underline hover:no-underline">Manage terms</a>
+            <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">
+                Record this advance under
+            </label>
+            <div class="flex items-center gap-2">
+                <select id="bulkAdvanceSemesterTermId" name="term_id"
+                    class="w-full px-4 py-2.5 text-sm bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 rounded-xl text-indigo-700 dark:text-indigo-300 font-bold outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
+                </select>
+                <a href="{{ route('term.index') }}" class="text-xs underline hover:no-underline text-neutral-500 dark:text-neutral-400 whitespace-nowrap">Manage terms</a>
             </div>
+            <p class="text-[11px] text-neutral-400 mt-1">Defaults to whichever active term covers today — pick a different one if this batch runs on its own calendar.</p>
         </div>
 
         <form id="bulkAdvanceSemesterForm" class="p-6 space-y-5 bg-white dark:bg-neutral-900">

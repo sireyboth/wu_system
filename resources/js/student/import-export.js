@@ -5,6 +5,7 @@
  */
 import { getById, baseUri } from '../app';
 import { Toast } from './core.js';
+import { loadTermOptions } from './form-utils.js';
 
 const EXPORT_URL = baseUri('students-export');
 const IMPORT_URL = baseUri('students-import');
@@ -23,6 +24,7 @@ function buildImportDom() {
 
         importModal: getById('studentImportModal'),
         importForm: getById('studentImportForm'),
+        importTermId: getById('studentImportTermId'),
         importDropzone: getById('studentImportDropzone'),
         importFileInput: getById('studentImportFile'),
         importFileName: getById('studentImportFileName'),
@@ -151,6 +153,7 @@ export function initStudentImportExport(ApiService, reloadList) {
     dom.importBtn?.addEventListener('click', () => {
         dom.importForm?.reset();
         clearImportFile(dom);
+        loadTermOptions(ApiService, dom.importTermId);
         window.StudentImportModal.toggle(true);
     });
 
@@ -204,6 +207,7 @@ export function initStudentImportExport(ApiService, reloadList) {
 
         const body = new FormData();
         body.append('file', file);
+        if (dom.importTermId?.value) body.append('term_id', dom.importTermId.value);
 
         setImportSubmitting(dom, true);
         try {

@@ -133,27 +133,39 @@ class ClassSectionController extends Controller
     public function autoEnroll(Request $request, ClassSection $class)
     {
         $validated = $request->validate([
-            'filters'            => 'required|array',
-            'filters.batch_id'   => 'nullable|integer|exists:batches,id',
-            'filters.major_id'   => 'nullable|integer|exists:majors,id',
-            'filters.group_id'   => 'nullable|integer|exists:groups,id',
-            'filters.shift_id'   => 'nullable|integer|exists:shifts,id',
-            'filters.campus_id'  => 'nullable|integer|exists:campuses,id',
-            'filters.status_id'  => 'nullable|integer|exists:statuses,id',
-            'filters.semester'   => 'nullable|integer|in:1,2',
-            'filters.year_level' => 'nullable|integer|min:1',
+            'filters'             => 'required|array',
+            'filters.batch_id'    => 'nullable|integer|exists:batches,id',
+            'filters.major_id'    => 'nullable|array',
+            'filters.major_id.*'  => 'integer|exists:majors,id',
+            'filters.group_id'    => 'nullable|integer|exists:groups,id',
+            'filters.shift_id'    => 'nullable|integer|exists:shifts,id',
+            'filters.campus_id'   => 'nullable|integer|exists:campuses,id',
+            'filters.status_id'   => 'nullable|integer|exists:statuses,id',
+            'filters.semester'    => 'nullable|integer|in:1,2',
+            'filters.year_level'  => 'nullable|integer|min:1',
         ]);
 
-        $filters = array_filter($validated['filters'], fn($v) => $v !== null && $v !== '');
-        if (empty($filters)) {
+        // major_id is the one filter that can be several values at once
+        // (mixed-major rostering across 2-3 specific majors) — every other
+        // filter stays single-value, matched with a plain where().
+        $majorIds = array_filter($validated['filters']['major_id'] ?? []);
+        $filters  = array_filter(
+            \Illuminate\Support\Arr::except($validated['filters'], 'major_id'),
+            fn($v) => $v !== null && $v !== ''
+        );
+
+        if (empty($filters) && empty($majorIds)) {
             return no_data('At least one filter is required — enrolling every student in the school into one class is almost certainly a mistake.', 422);
         }
 
-        return execute(function () use ($filters, $class) {
+        return execute(function () use ($filters, $majorIds, $class) {
             $historyIds = Student::query()
-                ->whereHas('currentAcademicHistory', function ($query) use ($filters) {
+                ->whereHas('currentAcademicHistory', function ($query) use ($filters, $majorIds) {
                     foreach ($filters as $field => $value) {
                         $query->where($field, $value);
+                    }
+                    if (! empty($majorIds)) {
+                        $query->whereIn('major_id', $majorIds);
                     }
                 })
                 ->with('currentAcademicHistory:id,student_id')
@@ -182,5 +194,84 @@ class ClassSectionController extends Controller
                 'newly_enrolled'  => $toEnroll->count(),
             ], "{$toEnroll->count()} student(s) enrolled into {$class->code}.");
         });
+    }
+
+    /**
+     * A student search scoped to the `class` permission — Auto-Enroll
+     * covers "a whole batch/major", but not "just these 1-3 specific
+     * students, possibly from a totally different batch" (a retake, an
+     * add-subject case, a student borrowed from another cohort for one
+     * elective). This is the search behind that manual add. Deliberately
+     * not the main /students endpoint — that requires `student.view`,
+     * which a class-managing role (e.g. Exam Officer) doesn't have.
+     */
+    public function searchStudents(Request $request)
+    {
+        $term = trim((string) $request->input('q', ''));
+        if (mb_strlen($term) < 2) {
+            return has_data([]);
+        }
+
+        $students = Student::query()
+            ->whereHas('person', fn($q) => $q
+                ->where('first_name', 'like', "%{$term}%")
+                ->orWhere('last_name', 'like', "%{$term}%")
+                ->orWhere('first_name_kh', 'like', "%{$term}%")
+                ->orWhere('last_name_kh', 'like', "%{$term}%"))
+            ->orWhere('code', 'like', "%{$term}%")
+            ->with(['person', 'major', 'batch', 'shift', 'campus', 'status', 'currentAcademicHistory'])
+            ->limit(15)
+            ->get();
+
+        return has_data($students->map(fn(Student $s) => [
+            'id'                          => $s->id,
+            'code'                        => $s->code,
+            'name'                        => trim(($s->person?->first_name_kh ?? '') . ' ' . ($s->person?->last_name_kh ?? '')) ?: trim(($s->person?->first_name ?? '') . ' ' . ($s->person?->last_name ?? '')),
+            'major'                       => $s->major?->name_en,
+            'batch'                       => $s->batch?->name_en,
+            'shift'                       => $s->shift?->name_en,
+            'campus'                      => $s->campus?->name_en,
+            'status'                      => $s->status?->name_en,
+            'can_attend'                  => (bool) ($s->status?->can_attend ?? false),
+            'year_level'                  => $s->year_level,
+            'semester'                    => $s->semester,
+            'student_academic_history_id' => $s->currentAcademicHistory?->id,
+        ])->filter(fn($s) => $s['student_academic_history_id'])->values());
+    }
+
+    /**
+     * Manually enroll one specific student — no filter, no batch/major
+     * match required. Covers the case Auto-Enroll can't: a handful of
+     * individual students, possibly from a different batch entirely
+     * (retake, add-subject, borrowed for one elective).
+     */
+    public function addStudent(Request $request, ClassSection $class)
+    {
+        $validated = $request->validate([
+            'student_academic_history_id' => 'required|integer|exists:student_academic_histories,id',
+        ]);
+
+        $exists = CourseEnrollment::where('class_id', $class->id)
+            ->where('student_academic_history_id', $validated['student_academic_history_id'])
+            ->exists();
+
+        if ($exists) {
+            return no_data('This student is already enrolled in this class.', 422);
+        }
+
+        return execute(function () use ($validated, $class) {
+            CourseEnrollment::create([
+                'student_academic_history_id' => $validated['student_academic_history_id'],
+                'class_id'                    => $class->id,
+                'status'                      => 'enrolled',
+            ]);
+
+            return has_data(null, 'Student added to the class.');
+        });
+    }
+
+    public function attendanceHistory(ClassSection $class)
+    {
+        return has_data(\App\Models\ClassSession::attendanceHistoryFor($class->id));
     }
 }

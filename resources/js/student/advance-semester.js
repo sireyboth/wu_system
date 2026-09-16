@@ -7,7 +7,7 @@
  * advanceAcademicHistory()).
  */
 import { CONFIG } from './config.js';
-import { fillSelectOptions } from './form-utils.js';
+import { fillSelectOptions, loadTermOptions } from './form-utils.js';
 import { getById } from '../app.js';
 import { registerModalCloser } from './ui.js';
 
@@ -82,19 +82,6 @@ async function loadLookupsOnce(ApiService) {
     lookupsLoaded = true;
 }
 
-async function loadActiveTermLabel(ApiService) {
-    const { error, data } = await ApiService.request('/api/v1/terms?search=');
-    const banner = getById('advanceSemesterActiveTerm');
-    if (!banner) return;
-    if (error) {
-        banner.textContent = 'unknown';
-        return;
-    }
-    const terms = data?.data ?? data ?? [];
-    const active = terms.find((t) => t.is_active);
-    banner.textContent = active ? `${active.code} (${active.full_name ?? active.name})` : 'no active term set';
-}
-
 export function initAdvanceSemester(ApiService, onAdvanced) {
     registerModalCloser('advance-semester', () => toggle(false));
 
@@ -104,7 +91,7 @@ export function initAdvanceSemester(ApiService, onAdvanced) {
 
         const studentId = btn.getAttribute('data-id');
         await loadLookupsOnce(ApiService);
-        await loadActiveTermLabel(ApiService);
+        await loadTermOptions(ApiService, getById('advanceSemesterTermId'));
 
         const { error, data } = await ApiService.request(`${CONFIG.API_BASE}/${studentId}`);
         if (error) return;
@@ -151,6 +138,7 @@ export function initAdvanceSemester(ApiService, onAdvanced) {
             status_id: getById('advance_status_id').value,
             year_level: getById('advance_year_level').value,
             semester: getById('advance_semester').value || null,
+            term_id: getById('advanceSemesterTermId')?.value || null,
         };
 
         const { error, status, data } = await ApiService.request(`${CONFIG.API_BASE}/${studentId}/advance-semester`, {

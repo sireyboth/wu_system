@@ -63,6 +63,7 @@
     @include('class.partials.classModal')
     @include('class.partials.autoEnrollModal')
     @include('class.partials.rosterModal')
+    @include('class.partials.attendanceHistoryModal')
     @include('class.partials.assignLecturerModal')
 @endsection
 

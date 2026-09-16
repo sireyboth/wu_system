@@ -36,6 +36,7 @@
 
     @include('lecturer-portal.partials.scoreConfigModal')
     @include('lecturer-portal.partials.rosterModal')
+    @include('lecturer-portal.partials.attendanceHistoryModal')
     @include('lecturer-portal.partials.attendanceModal')
 @endsection
 

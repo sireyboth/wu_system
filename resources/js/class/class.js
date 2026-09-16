@@ -23,6 +23,7 @@
         API_GROUPS: '/api/v1/groups',
         API_STATUSES: '/api/v1/statuses',
         API_COURSE_ENROLLMENTS: '/api/v1/course-enrollments',
+        API_STUDENT_SEARCH: '/api/v1/students-search-for-class',
         API_CLASS_SCORES: '/api/v1/class-scores',
         API_LECTURERS: '/api/v1/lecturers',
         API_TEACHER_ASSIGNMENTS: '/api/v1/teacher-assignments',
@@ -50,7 +51,10 @@
         termSelect: document.getElementById('classTermSelect'),
         campusSelect: document.getElementById('classCampusSelect'),
         shiftSelect: document.getElementById('classShiftSelect'),
-        lecturerSelect: document.getElementById('classLecturerSelect'),
+        lecturerSearch: document.getElementById('classLecturerSearch'),
+        lecturerDatalist: document.getElementById('lecturersDatalist'),
+        lecturerId: document.getElementById('classLecturerId'),
+        lecturerHint: document.getElementById('classLecturerHint'),
         lecturerField: document.getElementById('classLecturerField'),
         lecturerEditHint: document.getElementById('classLecturerEditHint'),
 
@@ -66,6 +70,20 @@
         rosterClassCode: document.getElementById('rosterClassCode'),
         rosterTableBody: document.getElementById('rosterTableBody'),
         rosterSearchInput: document.getElementById('rosterSearchInput'),
+        rosterAddStudentInput: document.getElementById('rosterAddStudentInput'),
+        rosterAddStudentResults: document.getElementById('rosterAddStudentResults'),
+        rosterAddStudentPreview: document.getElementById('rosterAddStudentPreview'),
+        rosterAddStudentPreviewBody: document.getElementById('rosterAddStudentPreviewBody'),
+        rosterAddStudentConfirm: document.getElementById('rosterAddStudentConfirm'),
+        rosterAddStudentCancel: document.getElementById('rosterAddStudentCancel'),
+        rosterHistoryBtn: document.getElementById('rosterHistoryBtn'),
+
+        attendanceHistoryModal: document.getElementById('attendanceHistoryModal'),
+        attendanceHistoryModalCard: document.getElementById('attendanceHistoryModalCard'),
+        attendanceHistoryClassCode: document.getElementById('attendanceHistoryClassCode'),
+        attendanceHistoryHead: document.getElementById('attendanceHistoryHead'),
+        attendanceHistoryBody: document.getElementById('attendanceHistoryBody'),
+        attendanceHistorySessionCount: document.getElementById('attendanceHistorySessionCount'),
 
         assignLecturerForm: document.getElementById('assignLecturerForm'),
         assignLecturerModal: document.getElementById('assignLecturerModal'),
@@ -76,7 +94,10 @@
         assignLecturerExisting: document.getElementById('assignLecturerExisting'),
     };
 
-    const state = { subjects: [], classes: [], debounceTimer: null, currentClassId: null, editingClassId: null };
+    const state = {
+        subjects: [], lecturers: [], majors: [], classes: [], debounceTimer: null,
+        currentClassId: null, editingClassId: null, searchResults: [], pendingStudent: null,
+    };
     const rosterState = { enrollments: [] };
 
     const ApiService = {
@@ -156,17 +177,21 @@
         fillSelect(DOM.campusSelect, list(campuses));
         fillSelect(DOM.shiftSelect, list(shifts));
         fillSelect(document.getElementById('autoEnrollBatch'), list(batches));
-        fillSelect(document.getElementById('autoEnrollMajor'), list(majors));
+        state.majors = list(majors);
+        renderMajorChecklist(state.majors);
         fillSelect(document.getElementById('autoEnrollShift'), list(shifts));
         fillSelect(document.getElementById('autoEnrollGroup'), list(groups));
         fillSelect(document.getElementById('autoEnrollCampus'), list(campuses));
         fillSelect(document.getElementById('autoEnrollStatus'), list(statuses));
 
-        const lecturerOptionsHtml = list(lecturers)
-            .map((l) => `<option value="${l.id}">${l.code ? `${l.code} — ` : ''}${l.name_kh || l.name_en || l.name}</option>`)
+        state.lecturers = list(lecturers);
+        const lecturerOptionsHtml = state.lecturers
+            .map((l) => `<option value="${l.id}">${lecturerLabel(l)}</option>`)
             .join('');
         DOM.assignLecturerSelect.innerHTML = '<option value="" disabled selected>-- select lecturer --</option>' + lecturerOptionsHtml;
-        DOM.lecturerSelect.innerHTML = '<option value="">-- none yet --</option>' + lecturerOptionsHtml;
+        DOM.lecturerDatalist.innerHTML = state.lecturers
+            .map((l) => `<option value="${lecturerLabel(l)}" data-id="${l.id}"></option>`)
+            .join('');
 
         state.subjects = list(subjects);
         DOM.subjectDatalist.innerHTML = state.subjects
@@ -174,11 +199,22 @@
             .join('');
     }
 
+    function lecturerLabel(l) {
+        return `${l.code ? `${l.code} — ` : ''}${l.name_kh || l.name_en || l.name}`;
+    }
+
     DOM.subjectSearch?.addEventListener('input', () => {
         const typed = DOM.subjectSearch.value;
         const match = state.subjects.find((s) => `${s.code} — ${s.name_en || s.name}` === typed);
         DOM.subjectId.value = match ? match.id : '';
         DOM.subjectHint?.classList.toggle('hidden', Boolean(match) || typed === '');
+    });
+
+    DOM.lecturerSearch?.addEventListener('input', () => {
+        const typed = DOM.lecturerSearch.value;
+        const match = state.lecturers.find((l) => lecturerLabel(l) === typed);
+        DOM.lecturerId.value = match ? match.id : '';
+        DOM.lecturerHint?.classList.toggle('hidden', Boolean(match) || typed === '');
     });
 
     // ---- Classes list ----
@@ -236,6 +272,8 @@
         DOM.classForm.reset();
         DOM.subjectId.value = '';
         DOM.subjectHint?.classList.add('hidden');
+        DOM.lecturerId.value = '';
+        DOM.lecturerHint?.classList.add('hidden');
         state.editingClassId = null;
         if (DOM.classModalTitle) DOM.classModalTitle.textContent = 'Create Class';
         if (DOM.classSubmitBtn) DOM.classSubmitBtn.textContent = 'Save';
@@ -291,7 +329,7 @@
             capacity: DOM.classForm.querySelector('[name="capacity"]').value || null,
         };
         if (!isEdit) {
-            payload.lecturer_id = DOM.lecturerSelect.value || null;
+            payload.lecturer_id = DOM.lecturerId.value || null;
         }
 
         const url = isEdit ? `${CONFIG.API_CLASSES}/${state.editingClassId}` : CONFIG.API_CLASSES;
@@ -335,11 +373,44 @@
 
     // ---- Auto-enroll ----
 
+    function renderMajorChecklist(majors, filterText = '') {
+        const list = document.getElementById('autoEnrollMajorList');
+        if (!list) return;
+        const term = filterText.trim().toLowerCase();
+        const visible = term
+            ? majors.filter((m) => (m.name_kh || m.name_en || m.name || '').toLowerCase().includes(term))
+            : majors;
+
+        if (!visible.length) {
+            list.innerHTML = '<p class="text-xs text-neutral-400 py-1">No majors match.</p>';
+            return;
+        }
+
+        list.innerHTML = visible.map((m) => `
+            <label class="flex items-center gap-2 py-1 text-sm cursor-pointer">
+                <input type="checkbox" name="major_id[]" value="${m.id}" class="rounded border-neutral-300 dark:border-white/20 text-indigo-600 focus:ring-indigo-500/40">
+                <span>${m.name_kh || m.name_en || m.name}</span>
+            </label>`).join('');
+    }
+
+    document.getElementById('autoEnrollMajorFilter')?.addEventListener('input', (e) => {
+        // Re-rendering would wipe out checks made before filtering, so
+        // only toggle visibility of existing rows instead of rebuilding.
+        const term = e.target.value.trim().toLowerCase();
+        document.querySelectorAll('#autoEnrollMajorList label').forEach((label) => {
+            const text = label.textContent.trim().toLowerCase();
+            label.classList.toggle('hidden', Boolean(term) && !text.includes(term));
+        });
+    });
+
     function openAutoEnroll(classId, code) {
         DOM.autoEnrollClassId.value = classId;
         DOM.autoEnrollClassCode.textContent = code;
         DOM.autoEnrollForm.reset();
         DOM.autoEnrollResult.classList.add('hidden');
+        const filterInput = document.getElementById('autoEnrollMajorFilter');
+        if (filterInput) filterInput.value = '';
+        renderMajorChecklist(state.majors);
         toggleModalEl(DOM.autoEnrollModal, DOM.autoEnrollModalCard, true);
     }
 
@@ -347,25 +418,28 @@
         e.preventDefault();
         const classId = DOM.autoEnrollClassId.value;
         const filters = {};
-        ['batch_id', 'major_id', 'shift_id', 'group_id', 'campus_id', 'status_id', 'semester', 'year_level'].forEach((field) => {
+        ['batch_id', 'shift_id', 'group_id', 'campus_id', 'status_id', 'semester', 'year_level'].forEach((field) => {
             const el = DOM.autoEnrollForm.querySelector(`[name="${field}"]`);
             if (el?.value) filters[field] = el.value;
         });
+
+        const majorIds = [...DOM.autoEnrollForm.querySelectorAll('input[name="major_id[]"]:checked')].map((el) => el.value);
+        if (majorIds.length) filters.major_id = majorIds;
 
         const { error, data } = await ApiService.request(`${CONFIG.API_CLASSES}/${classId}/auto-enroll`, {
             method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ filters }),
         });
 
-        DOM.autoEnrollResult.classList.remove('hidden');
         if (error) {
+            DOM.autoEnrollResult.classList.remove('hidden');
             DOM.autoEnrollResult.className = 'px-4 py-3 rounded-xl border text-sm border-rose-300 bg-rose-50 text-rose-700';
             DOM.autoEnrollResult.textContent = data?.message || 'Auto-enroll failed.';
             return;
         }
 
-        DOM.autoEnrollResult.className = 'px-4 py-3 rounded-xl border text-sm border-emerald-300 bg-emerald-50 text-emerald-700';
-        DOM.autoEnrollResult.textContent = data.message;
+        Toast.fire({ icon: 'success', title: data.message });
         loadClasses(DOM.searchInput?.value || '');
+        toggleModalEl(DOM.autoEnrollModal, DOM.autoEnrollModalCard, false);
     }
 
     // ---- Assign lecturer ----
@@ -455,24 +529,32 @@
     }
 
     function rowTotal(row) {
-        let total = 0;
+        let total = Number(row.dataset.attendanceScore) || 0;
         row.querySelectorAll('.score-cell').forEach((input) => { total += Number(input.value) || 0; });
         return total;
     }
 
     function rowTotalFromEnrollment(enr) {
-        return (enr.scores ?? []).reduce((sum, s) => sum + Number(s.points ?? 0), 0);
+        const typed = (enr.scores ?? []).reduce((sum, s) => sum + Number(s.points ?? 0), 0);
+        return typed + Number(enr.attendance_score ?? 0);
     }
 
-    // Total Point is a live sum of the five score cells (saved or not) —
-    // Grade Point is a placeholder column until the grading scale/formula
-    // is decided, so it stays a dash for now.
+    // Total Point = the five typed-in cells (saved or not) + the
+    // Attendance score, which is never typed in — it's computed live from
+    // (Present + Excused) ÷ (Weeks × Sessions/Week) × the lecturer's own
+    // attendance_max (set in Score Config). Grade Point is a placeholder
+    // column until the grading scale/formula is decided.
     function renderRosterRow(enr) {
+        const attendanceDisplay = enr.attendance_score === null || enr.attendance_score === undefined
+            ? '<span class="text-xs italic text-neutral-400" title="Set this class\'s Score Config to compute this">—</span>'
+            : enr.attendance_score;
+
         return `
-            <tr data-enrollment-id="${enr.id}">
+            <tr data-enrollment-id="${enr.id}" data-attendance-score="${enr.attendance_score ?? 0}">
                 <td class="py-3 pr-4 font-medium">${studentLabel(enr)}</td>
                 <td class="py-3 pr-4 text-xs uppercase text-neutral-500">${enr.status}</td>
                 ${SCORE_COMPONENTS.map((c) => scoreCell(enr.id, c, enr)).join('')}
+                <td class="py-3 pr-2 text-center font-semibold text-indigo-600 dark:text-indigo-400">${attendanceDisplay}</td>
                 <td class="py-3 pr-3 text-center font-bold total-point-cell">${rowTotalFromEnrollment(enr)}</td>
                 <td class="py-3 text-center text-neutral-400 grade-point-cell">—</td>
             </tr>`;
@@ -480,7 +562,7 @@
 
     function renderRosterRows(enrollments) {
         if (!enrollments.length) {
-            DOM.rosterTableBody.innerHTML = '<tr><td colspan="9" class="py-6 text-center text-neutral-400">No students match your search.</td></tr>';
+            DOM.rosterTableBody.innerHTML = '<tr><td colspan="10" class="py-6 text-center text-neutral-400">No students match your search.</td></tr>';
             return;
         }
         DOM.rosterTableBody.innerHTML = enrollments.map(renderRosterRow).join('');
@@ -490,22 +572,106 @@
         state.currentClassId = classId;
         DOM.rosterClassCode.textContent = code;
         if (DOM.rosterSearchInput) DOM.rosterSearchInput.value = '';
-        DOM.rosterTableBody.innerHTML = '<tr><td colspan="9" class="py-6 text-center text-neutral-400">Loading roster...</td></tr>';
+        if (DOM.rosterAddStudentInput) DOM.rosterAddStudentInput.value = '';
+        DOM.rosterAddStudentResults?.classList.add('hidden');
+        DOM.rosterAddStudentPreview?.classList.add('hidden');
+        state.pendingStudent = null;
+        DOM.rosterTableBody.innerHTML = '<tr><td colspan="10" class="py-6 text-center text-neutral-400">Loading roster...</td></tr>';
         toggleModalEl(DOM.rosterModal, DOM.rosterModalCard, true);
 
         const { error, data } = await ApiService.request(`${CONFIG.API_COURSE_ENROLLMENTS}?class_id=${classId}&per_page=200`);
         if (error) {
-            DOM.rosterTableBody.innerHTML = '<tr><td colspan="9" class="py-6 text-center text-rose-500">Failed to load roster.</td></tr>';
+            DOM.rosterTableBody.innerHTML = '<tr><td colspan="10" class="py-6 text-center text-rose-500">Failed to load roster.</td></tr>';
             return;
         }
 
         rosterState.enrollments = data?.data ?? [];
         if (!rosterState.enrollments.length) {
-            DOM.rosterTableBody.innerHTML = '<tr><td colspan="9" class="py-6 text-center text-neutral-400">No students enrolled yet — use Auto-Enroll.</td></tr>';
+            DOM.rosterTableBody.innerHTML = '<tr><td colspan="10" class="py-6 text-center text-neutral-400">No students enrolled yet — use Auto-Enroll.</td></tr>';
             return;
         }
 
         renderRosterRows(rosterState.enrollments);
+    }
+
+    let studentSearchTimer = null;
+
+    function searchStudentsForClass(term) {
+        clearTimeout(studentSearchTimer);
+        if (term.trim().length < 2) {
+            DOM.rosterAddStudentResults?.classList.add('hidden');
+            return;
+        }
+        studentSearchTimer = setTimeout(async () => {
+            const { error, data } = await ApiService.request(`${CONFIG.API_STUDENT_SEARCH}?q=${encodeURIComponent(term)}`);
+            if (error) return;
+            renderStudentSearchResults(data?.data ?? []);
+        }, 300);
+    }
+
+    function renderStudentSearchResults(students) {
+        if (!DOM.rosterAddStudentResults) return;
+        state.searchResults = students;
+
+        if (!students.length) {
+            DOM.rosterAddStudentResults.innerHTML = '<p class="px-3 py-2.5 text-xs text-neutral-400">No matching students.</p>';
+            DOM.rosterAddStudentResults.classList.remove('hidden');
+            return;
+        }
+
+        DOM.rosterAddStudentResults.innerHTML = students.map((s) => `
+            <button type="button" data-action="preview-student" data-history-id="${s.student_academic_history_id}"
+                class="w-full text-left px-3 py-2.5 text-sm hover:bg-indigo-50 dark:hover:bg-indigo-500/10 border-b border-neutral-100 dark:border-white/5 last:border-0">
+                <span class="font-medium">${s.code} — ${s.name || '—'}</span>
+                <span class="block text-xs text-neutral-400">${s.major ?? ''}${s.major && s.batch ? ' · ' : ''}${s.batch ?? ''}</span>
+            </button>`).join('');
+        DOM.rosterAddStudentResults.classList.remove('hidden');
+    }
+
+    function previewStudent(historyId) {
+        const student = (state.searchResults ?? []).find((s) => String(s.student_academic_history_id) === String(historyId));
+        if (!student) return;
+
+        DOM.rosterAddStudentResults?.classList.add('hidden');
+        state.pendingStudent = student;
+
+        const eligibilityNote = student.can_attend
+            ? ''
+            : `<p class="text-rose-600 dark:text-rose-400 font-semibold mt-1">⚠ Status "${student.status ?? 'unknown'}" — not eligible to scan attendance, only to be rostered.</p>`;
+
+        DOM.rosterAddStudentPreviewBody.innerHTML = `
+            <p class="font-semibold text-neutral-900 dark:text-white">${student.code} — ${student.name || '—'}</p>
+            <p>${student.major ?? '—'} · Batch: ${student.batch ?? '—'} · Shift: ${student.shift ?? '—'}</p>
+            <p>Campus: ${student.campus ?? '—'} · Year ${student.year_level ?? '—'}, Semester ${student.semester ?? '—'} · Status: ${student.status ?? '—'}</p>
+            ${eligibilityNote}
+        `;
+        DOM.rosterAddStudentPreview.classList.remove('hidden');
+    }
+
+    function cancelStudentPreview() {
+        state.pendingStudent = null;
+        DOM.rosterAddStudentPreview.classList.add('hidden');
+        DOM.rosterAddStudentInput.value = '';
+    }
+
+    async function addStudentToClass(historyId, code) {
+        const { error, data } = await ApiService.request(`${CONFIG.API_CLASSES}/${state.currentClassId}/add-student`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ student_academic_history_id: historyId }),
+        });
+
+        if (error) {
+            Toast.fire({ icon: 'error', title: data?.message || 'Failed to add student.' });
+            return;
+        }
+
+        DOM.rosterAddStudentPreview.classList.add('hidden');
+        state.pendingStudent = null;
+        Toast.fire({ icon: 'success', title: `${code} added to the class.` });
+        DOM.rosterAddStudentInput.value = '';
+        DOM.rosterAddStudentResults.classList.add('hidden');
+        openRoster(state.currentClassId, DOM.rosterClassCode.textContent);
+        loadClasses(DOM.searchInput?.value || '');
     }
 
     function filterRoster(keyword) {
@@ -552,6 +718,65 @@
         Toast.fire({ icon: 'success', title: `${component} saved.` });
     }
 
+    // ---- Attendance history (students x session dates grid) ----
+
+    function historyStatusBadge(status) {
+        const map = { present: 'bg-emerald-500', absent: 'bg-rose-500', late: 'bg-amber-500', excused: 'bg-sky-500' };
+        const color = map[status] ?? 'bg-neutral-200 dark:bg-white/10';
+        const letter = status ? status.charAt(0).toUpperCase() : '';
+        return `<span class="inline-flex items-center justify-center w-6 h-6 rounded text-[10px] font-bold text-white ${color}" title="${status ?? 'No record'}">${letter}</span>`;
+    }
+
+    function formatHistoryDate(dateStr) {
+        return new Date(`${dateStr}T00:00:00`).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    }
+
+    function renderAttendanceHistory(history) {
+        const sessions = history.sessions ?? [];
+        const students = history.students ?? [];
+
+        DOM.attendanceHistorySessionCount.textContent = `${sessions.length} session${sessions.length === 1 ? '' : 's'} held`;
+
+        if (!sessions.length) {
+            DOM.attendanceHistoryHead.innerHTML = '';
+            DOM.attendanceHistoryBody.innerHTML = '<tr><td class="py-6 px-6 text-center text-neutral-400">No attendance session has been held for this class yet.</td></tr>';
+            return;
+        }
+
+        DOM.attendanceHistoryHead.innerHTML = `
+            <tr>
+                <th class="py-2 pl-6 pr-3 sticky left-0 bg-white dark:bg-neutral-900">Student</th>
+                ${sessions.map((s) => `<th class="py-2 px-2 text-center whitespace-nowrap">${formatHistoryDate(s.date)}${s.status !== 'locked' ? `<span class="block normal-case font-normal text-amber-500">${s.status}</span>` : ''}</th>`).join('')}
+            </tr>`;
+
+        if (!students.length) {
+            DOM.attendanceHistoryBody.innerHTML = `<tr><td colspan="${sessions.length + 1}" class="py-6 px-6 text-center text-neutral-400">No students enrolled.</td></tr>`;
+            return;
+        }
+
+        DOM.attendanceHistoryBody.innerHTML = students.map((student) => `
+            <tr>
+                <td class="py-2 pl-6 pr-3 font-medium whitespace-nowrap sticky left-0 bg-white dark:bg-neutral-900">${student.code ?? ''} — ${student.name}</td>
+                ${sessions.map((s) => `<td class="py-2 px-2 text-center">${historyStatusBadge(student.statuses?.[s.id])}</td>`).join('')}
+            </tr>`).join('');
+    }
+
+    async function openAttendanceHistory(classId, code) {
+        DOM.attendanceHistoryClassCode.textContent = code;
+        DOM.attendanceHistoryHead.innerHTML = '';
+        DOM.attendanceHistoryBody.innerHTML = '<tr><td class="py-6 px-6 text-center text-neutral-400">Loading history...</td></tr>';
+        DOM.attendanceHistorySessionCount.textContent = '';
+        toggleModalEl(DOM.attendanceHistoryModal, DOM.attendanceHistoryModalCard, true);
+
+        const { error, data } = await ApiService.request(`${CONFIG.API_CLASSES}/${classId}/attendance-history`);
+        if (error) {
+            DOM.attendanceHistoryBody.innerHTML = `<tr><td class="py-6 px-6 text-center text-rose-500">${data?.message || 'Failed to load attendance history.'}</td></tr>`;
+            return;
+        }
+
+        renderAttendanceHistory(data?.data ?? { sessions: [], students: [] });
+    }
+
     // ---- Wiring ----
 
     window.ClassModal = {
@@ -562,6 +787,7 @@
     };
     window.AutoEnrollModal = { toggle: (open) => toggleModalEl(DOM.autoEnrollModal, DOM.autoEnrollModalCard, open) };
     window.RosterModal = { toggle: (open) => toggleModalEl(DOM.rosterModal, DOM.rosterModalCard, open) };
+    window.AttendanceHistoryModal = { toggle: (open) => toggleModalEl(DOM.attendanceHistoryModal, DOM.attendanceHistoryModalCard, open) };
     window.AssignLecturerModal = { toggle: (open) => toggleModalEl(DOM.assignLecturerModal, DOM.assignLecturerModalCard, open) };
 
     DOM.classForm?.addEventListener('submit', handleClassSubmit);
@@ -600,6 +826,24 @@
     });
 
     DOM.rosterSearchInput?.addEventListener('input', (e) => filterRoster(e.target.value));
+
+    DOM.rosterAddStudentInput?.addEventListener('input', (e) => searchStudentsForClass(e.target.value));
+    DOM.rosterAddStudentResults?.addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-action="preview-student"]');
+        if (!btn) return;
+        previewStudent(btn.dataset.historyId);
+    });
+    DOM.rosterAddStudentConfirm?.addEventListener('click', () => {
+        if (!state.pendingStudent) return;
+        addStudentToClass(state.pendingStudent.student_academic_history_id, state.pendingStudent.code);
+    });
+    DOM.rosterAddStudentCancel?.addEventListener('click', cancelStudentPreview);
+    DOM.rosterHistoryBtn?.addEventListener('click', () => openAttendanceHistory(state.currentClassId, DOM.rosterClassCode.textContent));
+    document.addEventListener('click', (e) => {
+        if (!DOM.rosterAddStudentInput?.contains(e.target) && !DOM.rosterAddStudentResults?.contains(e.target)) {
+            DOM.rosterAddStudentResults?.classList.add('hidden');
+        }
+    });
 
     DOM.searchInput?.addEventListener('input', (e) => {
         clearTimeout(state.debounceTimer);

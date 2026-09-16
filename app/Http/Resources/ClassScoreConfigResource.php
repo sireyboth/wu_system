@@ -17,6 +17,8 @@ class ClassScoreConfigResource extends IResource
             'midterm_max'    => $this->midterm_max,
             'final_max'      => $this->final_max,
             'attendance_max' => $this->attendance_max,
+            'total_weeks'       => $this->total_weeks,
+            'sessions_per_week' => $this->sessions_per_week,
             'total_max'      => $this->totalMax(),
             'set_by'         => $this->setter?->name,
         ], false);

@@ -31,6 +31,20 @@
                 <span id="scoreConfigTotalValue">0 / 100</span>
             </div>
 
+            <div class="grid grid-cols-2 gap-4 pt-2 border-t border-neutral-100 dark:border-white/5">
+                <div>
+                    <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">Total Weeks</label>
+                    <input type="number" min="1" max="52" name="total_weeks" value="15"
+                        class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">Sessions / Week</label>
+                    <input type="number" min="1" max="14" name="sessions_per_week" value="2"
+                        class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
+                </div>
+                <p class="col-span-2 text-xs text-neutral-400">Used to work out each student's Attendance score: (Present + Excused) ÷ (Weeks × Sessions/Week) × Attendance points above.</p>
+            </div>
+
             <div class="flex justify-end items-center gap-3 pt-4 border-t border-neutral-100 dark:border-white/5 bg-white dark:bg-neutral-900">
                 <button type="button" onclick="ScoreConfigModal.toggle(false)"
                     class="px-4 py-2 text-sm font-medium text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-white/5 rounded-xl transition-all duration-200">

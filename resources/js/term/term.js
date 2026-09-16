@@ -1,9 +1,12 @@
 /**
- * Term Management module — academic year/semester records, exactly one of
- * which is ever "active" at a time. The active term is what every new
- * student_academic_histories row (see student advance-semester) gets
- * stamped with, so "activate" here is really "move the whole school
- * forward a semester."
+ * Term Management module — academic year/semester records. Any number can
+ * be active at once (different batches genuinely run on different
+ * calendars at the same time — e.g. one batch's semester starts in
+ * September, another's in October). "Active" just marks a term as
+ * currently in use; when something needs a default term with no other
+ * context (Excel import, an advance-semester form nobody filled the term
+ * picker on), the backend picks whichever active term's date range covers
+ * today — see Term::resolveDefault().
  */
 (() => {
     'use strict';
@@ -104,23 +107,22 @@
     }
 
     async function handleActivateAction(id) {
-        const confirmation = await Swal.fire({
-            title: 'Make this the active term?',
-            text: 'Every other term will be deactivated. New student advances will be recorded under this term from now on.',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#4f46e5',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Yes, activate it',
-        });
-        if (!confirmation.isConfirmed) return;
-
         const { error } = await ApiService.request(`${CONFIG.API_BASE}/${id}/activate`, { method: 'PATCH' });
         if (!error) {
-            Toast.fire({ icon: 'success', title: 'Active term updated' });
+            Toast.fire({ icon: 'success', title: 'Term marked active' });
             loadTerms(DOM.searchInput?.value || '');
         } else {
             Toast.fire({ icon: 'error', title: 'Could not activate this term' });
+        }
+    }
+
+    async function handleDeactivateAction(id) {
+        const { error } = await ApiService.request(`${CONFIG.API_BASE}/${id}/deactivate`, { method: 'PATCH' });
+        if (!error) {
+            Toast.fire({ icon: 'success', title: 'Term deactivated' });
+            loadTerms(DOM.searchInput?.value || '');
+        } else {
+            Toast.fire({ icon: 'error', title: 'Could not deactivate this term' });
         }
     }
 
@@ -207,7 +209,10 @@
                     <td class="block md:table-cell px-0 md:px-6 py-1.5 md:py-4">${activeBadge}</td>
                     <td class="block md:table-cell px-0 pt-4 pb-1 md:p-6 text-right border-t border-neutral-100 dark:border-white/5 mt-3 md:mt-0 md:border-0">
                         <div class="flex justify-end gap-2">
-                            ${term.is_active ? '' : `
+                            ${term.is_active ? `
+                            <button data-action="deactivate" data-id="${term.id}" class="p-2 text-neutral-500 hover:bg-neutral-100 dark:hover:bg-white/10 rounded-lg transition-colors" title="Deactivate">
+                                <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>` : `
                             <button data-action="activate" data-id="${term.id}" class="p-2 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-lg transition-colors" title="Make active">
                                 <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             </button>`}
@@ -274,6 +279,7 @@
             if (action === 'edit') handleEditAction(id);
             if (action === 'delete') handleDeleteAction(id);
             if (action === 'activate') handleActivateAction(id);
+            if (action === 'deactivate') handleDeactivateAction(id);
         });
     }
 

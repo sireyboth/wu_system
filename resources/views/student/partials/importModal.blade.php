@@ -10,6 +10,14 @@
     </p>
 
     <div>
+        <label class="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5">ឆមាស (Term)</label>
+        <select id="studentImportTermId" name="term_id"
+            class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
+        </select>
+        <p class="text-[11px] text-neutral-400 mt-1">Every student created from this file gets recorded under this term. Defaults to whichever active term covers today — pick a different one if this batch belongs elsewhere.</p>
+    </div>
+
+    <div>
         <label class="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5">ឯកសារ (File)</label>
 
         <div id="studentImportDropzone" tabindex="0"

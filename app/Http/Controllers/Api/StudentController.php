@@ -108,10 +108,11 @@ class StudentController extends Controller
     public function importFile(Request $request)
     {
         $validated = $request->validate([
-            'file' => 'required|file|mimes:xlsx,xls,csv',
+            'file'    => 'required|file|mimes:xlsx,xls,csv',
+            'term_id' => 'nullable|integer|exists:terms,id',
         ]);
 
-        $import = new StudentImport();
+        $import = new StudentImport($validated['term_id'] ?? null);
 
         try {
             Excel::import($import, $validated['file']);
@@ -202,15 +203,19 @@ class StudentController extends Controller
             check_exist('shift_id', 'shifts'),
             check_exist('campus_id', 'campuses', required: false),
             check_exist('status_id', 'statuses'),
+            check_exist('term_id', 'terms', required: false),
             [
                 'year_level' => 'required|integer|min:1|max:10',
                 'semester'   => 'nullable|integer|in:1,2',
             ],
         ));
 
-        return execute(function () use ($data, $student) {
+        $termId = $data['term_id'] ?? null;
+        unset($data['term_id']);
+
+        return execute(function () use ($data, $student, $termId) {
             $student->update($data);
-            $this->advanceAcademicHistory($student, forTermChangeToo: true);
+            $this->advanceAcademicHistory($student, forTermChangeToo: true, termId: $termId);
 
             return new StudentResource($student->load($this->relationships));
         });
@@ -224,34 +229,38 @@ class StudentController extends Controller
      * at the time.
      *
      * $forTermChangeToo additionally advances when NONE of those fields
-     * changed but the active Term has moved on since the student's current
-     * snapshot — e.g. Year 1 Semester 1 -> Year 1 Semester 2 touches
-     * nothing on the student themselves, only which term is now active, so
-     * a field-only diff would see this as a no-op. Only the two dedicated
-     * "advance semester" actions opt into this; a plain profile edit
-     * (fixing a phone number, say) must never silently advance a student
-     * just because time has passed and the active term changed underneath
-     * them.
+     * changed but the resolved Term has moved on since the student's
+     * current snapshot — e.g. Year 1 Semester 1 -> Year 1 Semester 2
+     * touches nothing on the student themselves, only which term applies,
+     * so a field-only diff would see this as a no-op. Only the two
+     * dedicated "advance semester" actions opt into this; a plain profile
+     * edit (fixing a phone number, say) must never silently advance a
+     * student just because time has passed underneath them.
+     *
+     * $termId lets the caller say explicitly which term this advance is
+     * for — needed now that multiple terms can be active at once (e.g.
+     * one batch's calendar vs. another's). When omitted, falls back to
+     * Term::resolveDefault()'s best guess.
      */
-    private function advanceAcademicHistory(Student $student, bool $forTermChangeToo = false): void
+    private function advanceAcademicHistory(Student $student, bool $forTermChangeToo = false, ?int $termId = null): void
     {
         $current = $student->currentAcademicHistory;
-        $activeTermId = Term::active()->value('id');
-        $termAdvanced = $forTermChangeToo && $activeTermId && (int) $current?->term_id !== (int) $activeTermId;
+        $resolvedTermId = $termId ?? Term::resolveDefault()?->id;
+        $termAdvanced = $forTermChangeToo && $resolvedTermId && (int) $current?->term_id !== (int) $resolvedTermId;
 
         if (! $student->wasChanged(self::ACADEMIC_FIELDS) && ! $termAdvanced) {
             return;
         }
 
         $current?->update(['is_current' => false]);
-        $student->academicHistories()->create($this->academicSnapshot($student) + ['is_current' => true]);
+        $student->academicHistories()->create($this->academicSnapshot($student, $resolvedTermId) + ['is_current' => true]);
     }
 
-    private function academicSnapshot(Student $student): array
+    private function academicSnapshot(Student $student, ?int $termId = null): array
     {
         return [
             ...$student->only(self::ACADEMIC_FIELDS),
-            'term_id'        => Term::active()->value('id'),
+            'term_id'        => $termId ?? Term::resolveDefault()?->id,
             'effective_date' => now(),
         ];
     }
@@ -299,6 +308,7 @@ class StudentController extends Controller
             'changes.status_id'    => 'nullable|integer|exists:statuses,id',
             'changes.year_level'   => 'nullable|integer|min:1|max:10',
             'changes.semester'     => 'nullable|integer|in:1,2',
+            'term_id'              => 'nullable|integer|exists:terms,id',
         ]);
 
         // Empty is valid on its own — "advance everyone in this filtered
@@ -325,7 +335,9 @@ class StudentController extends Controller
             return no_data('Filter by both Batch and Campus before bulk-advancing by filter.', 422);
         }
 
-        return execute(function () use ($validated, $changes, $all) {
+        $termId = $validated['term_id'] ?? null;
+
+        return execute(function () use ($validated, $changes, $all, $termId) {
             $query = Student::query();
 
             if (! $all) {
@@ -342,9 +354,9 @@ class StudentController extends Controller
             }
 
             $count = 0;
-            $query->each(function (Student $student) use ($changes, &$count) {
+            $query->each(function (Student $student) use ($changes, $termId, &$count) {
                 $student->update($changes);
-                $this->advanceAcademicHistory($student, forTermChangeToo: true);
+                $this->advanceAcademicHistory($student, forTermChangeToo: true, termId: $termId);
                 $count++;
             });
 

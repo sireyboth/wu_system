@@ -58,7 +58,7 @@
                 <input type="checkbox" name="is_active" value="1"
                     class="w-4 h-4 rounded border-neutral-300 dark:border-white/20 text-indigo-600 focus:ring-4 focus:ring-indigo-500/10">
                 <span class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">
-                    Make this the active term (deactivates every other term)
+                    Mark this term active (other terms stay active too — e.g. for a different batch's calendar)
                 </span>
             </label>
 
