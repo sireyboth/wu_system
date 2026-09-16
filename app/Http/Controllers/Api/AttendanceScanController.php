@@ -29,6 +29,8 @@ class AttendanceScanController extends Controller
             'token'        => 'required|string',
             'student_code' => 'required|string',
             'device_id'    => 'nullable|string|max:255',
+            'latitude'     => 'nullable|numeric|between:-90,90',
+            'longitude'    => 'nullable|numeric|between:-180,180',
         ]);
 
         $qrToken = QrToken::where('token_hash', hash('sha256', $validated['token']))->first();
@@ -37,9 +39,25 @@ class AttendanceScanController extends Controller
             return no_data('This QR code has expired — ask your lecturer to refresh it and scan again.', 422);
         }
 
-        $session = ClassSession::find($qrToken->class_session_id);
+        $session = ClassSession::with('classSection.campus')->find($qrToken->class_session_id);
         if (! $session || $session->status !== 'open') {
             return no_data('This attendance session is no longer open.', 422);
+        }
+
+        // Geofence — only enforced for a campus that actually has one
+        // configured (see Campus::hasGeofence()). A campus with no
+        // coordinates set allows scanning from anywhere, same as before
+        // this feature existed.
+        $campus = $session->classSection?->campus;
+        if ($campus && $campus->hasGeofence()) {
+            if (! isset($validated['latitude'], $validated['longitude'])) {
+                return no_data('This class requires your location to check in. Please allow location access and try again.', 422);
+            }
+
+            $distance = $campus->distanceInMetersFrom($validated['latitude'], $validated['longitude']);
+            if ($distance > $campus->attendance_radius_meters) {
+                return no_data("You're too far from campus to check in for this class. Please make sure you're on campus and try again.", 422);
+            }
         }
 
         $student = Student::where('code', $validated['student_code'])->first();

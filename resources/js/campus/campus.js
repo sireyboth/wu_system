@@ -21,7 +21,12 @@
         modal: document.getElementById('campusModal'),
         modalCard: document.getElementById('modalCard'),
         modalTitle: document.getElementById('modalTitle'),
-        submitBtn: document.getElementById('addcampusForm')?.querySelector('button[type="submit"]')
+        submitBtn: document.getElementById('addcampusForm')?.querySelector('button[type="submit"]'),
+        useMyLocationBtn: document.getElementById('campusUseMyLocationBtn'),
+        latitude: document.getElementById('campusLatitude'),
+        longitude: document.getElementById('campusLongitude'),
+        radius: document.getElementById('campusRadius'),
+        locationStatus: document.getElementById('campusLocationStatus'),
     };
 
     // Third-party instance verification
@@ -112,7 +117,7 @@ const ApiService = {
         if (DOM.submitBtn) DOM.submitBtn.textContent = 'ធ្វើបច្ចុប្បន្នភាព';
 
         if (DOM.form) {
-            ['name_kh', 'name_en', 'shortcut', 'remark'].forEach(field => {
+            ['name_kh', 'name_en', 'shortcut', 'remark', 'latitude', 'longitude', 'attendance_radius_meters'].forEach(field => {
                 const element = DOM.form.querySelector(`[name="${field}"]`);
                 if (element) element.value = payload[field] ?? '';
             });
@@ -235,7 +240,10 @@ function renderTable(campuss) {
                             </svg>
                         </div>
                         <div>
-                            <div class="font-semibold text-neutral-900 dark:text-white">${nameEnglish}</div>
+                            <div class="font-semibold text-neutral-900 dark:text-white flex items-center gap-1.5">
+                                ${nameEnglish}
+                                ${campus.has_geofence ? `<span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" title="Attendance geofence: ${campus.attendance_radius_meters}m radius"><svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 20s6-5.686 6-10A6 6 0 0 0 4 10c0 4.314 6 10 6 10z"/></svg>${campus.attendance_radius_meters}m</span>` : ''}
+                            </div>
                             <div class="text-xs text-neutral-400 font-mono">${campus.shortcut ?? 'No Code'}</div>
                         </div>
                     </div>
@@ -322,6 +330,7 @@ function renderTable(campuss) {
 
         if (DOM.modalTitle) DOM.modalTitle.textContent = 'បន្ថែមសាស្ត្រាចារ្យថ្មី';
         if (DOM.submitBtn) DOM.submitBtn.textContent = 'រក្សាទុក';
+        if (DOM.locationStatus) { DOM.locationStatus.textContent = ''; DOM.locationStatus.className = 'text-[11px] hidden'; }
 
         document.querySelectorAll('.smart-hint').forEach(hint => {
             hint.classList.add('opacity-0', 'scale-95', 'translate-y-1');
@@ -343,6 +352,37 @@ function renderTable(campuss) {
 
         // Form Submit
         DOM.form?.addEventListener('submit', handleFormSubmit);
+
+        // "Use my current location" — reads the browser's own GPS via the
+        // Geolocation API, so whoever is standing at the campus can set
+        // its coordinates without knowing them by heart.
+        DOM.useMyLocationBtn?.addEventListener('click', () => {
+            if (!navigator.geolocation) {
+                DOM.locationStatus.textContent = 'Your browser does not support location access.';
+                DOM.locationStatus.className = 'text-[11px] text-rose-500';
+                return;
+            }
+
+            DOM.locationStatus.textContent = 'Locating…';
+            DOM.locationStatus.className = 'text-[11px] text-neutral-400';
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    DOM.latitude.value = position.coords.latitude.toFixed(7);
+                    DOM.longitude.value = position.coords.longitude.toFixed(7);
+                    if (!DOM.radius.value) DOM.radius.value = 150;
+                    DOM.locationStatus.textContent = `Location set (accurate to ~${Math.round(position.coords.accuracy)}m).`;
+                    DOM.locationStatus.className = 'text-[11px] text-emerald-600 dark:text-emerald-400';
+                },
+                (err) => {
+                    DOM.locationStatus.textContent = err.code === err.PERMISSION_DENIED
+                        ? 'Location access was denied — allow it in your browser, or type coordinates in by hand.'
+                        : 'Could not get your location. Try again, or type coordinates in by hand.';
+                    DOM.locationStatus.className = 'text-[11px] text-rose-500';
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        });
 
         // Modern Event Delegation: Intercept Action Buttons without explicit tag onClick attributes
         DOM.tableBody?.addEventListener('click', (e) => {

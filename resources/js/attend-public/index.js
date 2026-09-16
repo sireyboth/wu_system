@@ -31,6 +31,24 @@
         }
     }
 
+    // Only some campuses require a location at all (see Campus::hasGeofence()
+    // server-side) — so this never blocks the scan itself here. If the
+    // browser can't or won't give a position, we just submit without one;
+    // the backend decides whether that's actually required for this class.
+    function getLocation() {
+        return new Promise((resolve) => {
+            if (!navigator.geolocation) {
+                resolve(null);
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(
+                (position) => resolve({ latitude: position.coords.latitude, longitude: position.coords.longitude }),
+                () => resolve(null),
+                { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 }
+            );
+        });
+    }
+
     function showResult(success, message) {
         DOM.result.classList.remove('hidden');
         DOM.result.className = success
@@ -54,11 +72,18 @@
 
         DOM.submitBtn.disabled = true;
         try {
+            const location = await getLocation();
             const response = await fetch('/api/v1/attend/scan', {
                 method: 'POST',
                 credentials: 'same-origin',
                 headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-                body: JSON.stringify({ token, student_code: code, device_id: getDeviceId() }),
+                body: JSON.stringify({
+                    token,
+                    student_code: code,
+                    device_id: getDeviceId(),
+                    latitude: location?.latitude ?? null,
+                    longitude: location?.longitude ?? null,
+                }),
             });
             const json = await response.json().catch(() => null);
             showResult(response.ok, json?.message || (response.ok ? 'Marked present.' : 'Something went wrong.'));

@@ -45,6 +45,37 @@
                 <div class="smart-hint pointer-events-none absolute right-3 -top-2 opacity-0 scale-95 translate-y-1 bg-indigo-600 text-white text-[11px] px-2.5 py-1 rounded-md shadow-md transition-all duration-200 font-medium"></div>
             </div>
 
+            <!-- Attendance Geofence -->
+            <div class="border border-neutral-200 dark:border-white/10 rounded-xl p-4 space-y-3">
+                <div class="flex items-center justify-between">
+                    <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">ទីតាំង — ព្រំដែនវត្តមាន (Location — Attendance Geofence)</label>
+                    <button type="button" id="campusUseMyLocationBtn"
+                        class="text-xs font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 flex items-center gap-1 shrink-0">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        Use my current location
+                    </button>
+                </div>
+                <p class="text-[11px] text-neutral-400">Optional — leave blank to allow scanning from anywhere. Stand at the campus and click the button above, or type coordinates in by hand.</p>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] text-neutral-400 mb-1">Latitude</label>
+                        <input type="number" step="any" name="latitude" id="campusLatitude" placeholder="e.g. 11.5564"
+                            class="w-full px-3 py-2 text-sm font-mono bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-lg text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-neutral-400 mb-1">Longitude</label>
+                        <input type="number" step="any" name="longitude" id="campusLongitude" placeholder="e.g. 104.9282"
+                            class="w-full px-3 py-2 text-sm font-mono bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-lg text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[11px] text-neutral-400 mb-1">Allowed radius (meters)</label>
+                    <input type="number" step="1" min="10" max="5000" name="attendance_radius_meters" id="campusRadius" placeholder="e.g. 150"
+                        class="w-full px-3 py-2 text-sm font-mono bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-lg text-neutral-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
+                </div>
+                <p id="campusLocationStatus" class="text-[11px] hidden"></p>
+            </div>
+
             <!-- Input Row: Remark -->
             <div class="relative group">
                 <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">សម្គាល់ (Remarks)</label>
