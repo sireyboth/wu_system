@@ -87,7 +87,10 @@
                         <li id="sidebarNoResults" class="hidden px-3 py-6 text-xs text-center text-neutral-400">
                             រកមិនឃើញម៉ឺនុយត្រូវគ្នា (No matching menu items)
                         </li>
-                        <x-sidebar-link route="dashboard">
+                        {{-- Points at whichever page is "home" for this user (see
+                             User::homeRouteName()) — a Lecturer's Home is their
+                             own portal, not the full-school Dashboard. --}}
+                        <x-sidebar-link :route="auth()->user()->homeRouteName()">
                             <x-slot name="icon">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     stroke-width="2">
@@ -97,6 +100,23 @@
                             </x-slot>
                             ទំព័រដើម
                         </x-sidebar-link>
+
+                        {{-- Standalone, not nested in the Academics group below — a
+                             Lecturer typically has no other permission in that
+                             group, and this must never depend on any of them to
+                             show up. --}}
+                        @can('lecturer-portal.view')
+                            <x-sidebar-link route="lecturer-portal.index">
+                                <x-slot name="icon">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M12 14l9-5-9-5-9 5 9 5Zm0 0l6.16-3.422a12.083 12.083 0 0 1 .665 6.479A11.952 11.952 0 0 0 12 20.055a11.952 11.952 0 0 0-6.824-2.998 12.078 12.078 0 0 1 .665-6.479L12 14Zm-4 6v-7.5l4-2.222" />
+                                    </svg>
+                                </x-slot>
+                                ថ្នាក់រៀនរបស់ខ្ញុំ (My Classes)
+                            </x-sidebar-link>
+                        @endcan
 
                         @can('alert.view')
                         <li class="pt-4 pb-1" data-sidebar-section>
@@ -336,10 +356,10 @@
                         @endcan
 
                         @php
-                            $academicRoutes = ['faculty.*', 'major.*', 'subject.*', 'batch.*', 'shift.*', 'group.*', 'campus.*', 'app-status.*'];
+                            $academicRoutes = ['faculty.*', 'major.*', 'subject.*', 'batch.*', 'shift.*', 'group.*', 'campus.*', 'app-status.*', 'term.*', 'class.*', 'attendance-review.*'];
                         @endphp
                         @canany(['faculty.view', 'major.view', 'subject.view', 'batch.view', 'shift.view', 'group.view',
-                            'app-status.view', 'campus.view'])
+                            'app-status.view', 'campus.view', 'term.view', 'class.view', 'attendance-review.view'])
                             <li class="pt-4 pb-1" data-sidebar-section>
                                 <span
                                     class="px-3 text-xs font-semibold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Academics</span>
@@ -490,19 +510,6 @@
                                                 </svg>
                                             </x-slot>
                                             ថ្នាក់រៀន (Class)
-                                        </x-sidebar-link>
-                                    @endcan
-
-                                    @can('lecturer-portal.view')
-                                        <x-sidebar-link route="lecturer-portal.index">
-                                            <x-slot name="icon">
-                                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                                    stroke-width="2">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        d="M12 14l9-5-9-5-9 5 9 5Zm0 0l6.16-3.422a12.083 12.083 0 0 1 .665 6.479A11.952 11.952 0 0 0 12 20.055a11.952 11.952 0 0 0-6.824-2.998 12.078 12.078 0 0 1 .665-6.479L12 14Zm-4 6v-7.5l4-2.222" />
-                                                </svg>
-                                            </x-slot>
-                                            ថ្នាក់រៀនរបស់ខ្ញុំ (My Classes)
                                         </x-sidebar-link>
                                     @endcan
 

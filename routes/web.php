@@ -28,7 +28,7 @@ use App\Http\Controllers\StudentStatusController;
 use App\Http\Controllers\StateExamController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn() => redirect()->route('dashboard'));
+Route::get('/', fn() => redirect()->route(auth()->check() ? auth()->user()->homeRouteName() : 'dashboard'));
 
 // Public — on-site exam staff, no login required.
 Route::prefix('state-exam/attendance')->name('state-exam.attendance.')->group(function () {
