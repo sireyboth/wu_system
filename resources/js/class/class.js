@@ -746,7 +746,7 @@
         DOM.attendanceHistoryHead.innerHTML = `
             <tr>
                 <th class="py-2 pl-6 pr-3 sticky left-0 bg-white dark:bg-neutral-900">Student</th>
-                ${sessions.map((s) => `<th class="py-2 px-2 text-center whitespace-nowrap">${formatHistoryDate(s.date)}${s.status !== 'locked' ? `<span class="block normal-case font-normal text-amber-500">${s.status}</span>` : ''}</th>`).join('')}
+                ${sessions.map((s) => `<th class="py-2 px-2 text-center whitespace-nowrap">${formatHistoryDate(s.date)}${s.session_number > 1 ? ` · S${s.session_number}` : ''}${s.status !== 'locked' ? `<span class="block normal-case font-normal text-amber-500">${s.status}</span>` : ''}</th>`).join('')}
             </tr>`;
 
         if (!students.length) {

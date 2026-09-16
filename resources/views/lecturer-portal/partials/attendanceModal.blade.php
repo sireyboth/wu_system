@@ -84,6 +84,9 @@
                                 class="px-5 py-3 text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl shrink-0 shadow-sm shadow-rose-500/20 transition-all active:scale-95">
                                 End &amp; Lock Session
                             </button>
+                            <button id="attendanceStartNextBtn" type="button" class="hidden px-5 py-3 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shrink-0 shadow-sm shadow-indigo-500/20 transition-all active:scale-95">
+                                Start Session 2
+                            </button>
                         </div>
                         <div class="bg-white dark:bg-neutral-900 divide-y divide-neutral-100 dark:divide-white/5 border border-neutral-200/80 dark:border-white/10 rounded-2xl shadow-sm overflow-hidden">
                             <div id="attendanceRosterList"></div>

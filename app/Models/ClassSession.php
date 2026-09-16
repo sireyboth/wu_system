@@ -3,7 +3,7 @@ namespace App\Models;
 
 class ClassSession extends IModel
 {
-    protected $fillable = ['class_id', 'session_date', 'started_at', 'ended_at', 'locked_at', 'status', 'remark'];
+    protected $fillable = ['class_id', 'session_date', 'session_number', 'started_at', 'ended_at', 'locked_at', 'status', 'remark'];
 
     protected $casts = [
         'session_date' => 'date:Y-m-d',
@@ -43,7 +43,8 @@ class ClassSession extends IModel
     {
         $sessions = static::where('class_id', $classId)
             ->orderBy('session_date')
-            ->get(['id', 'session_date', 'status']);
+            ->orderBy('session_number')
+            ->get(['id', 'session_date', 'session_number', 'status']);
 
         $enrollments = CourseEnrollment::where('class_id', $classId)
             ->with('studentAcademicHistory.student.person')
@@ -72,9 +73,10 @@ class ClassSession extends IModel
 
         return [
             'sessions' => $sessions->map(fn (self $s) => [
-                'id'     => $s->id,
-                'date'   => $s->session_date->format('Y-m-d'),
-                'status' => $s->status,
+                'id'             => $s->id,
+                'date'           => $s->session_date->format('Y-m-d'),
+                'session_number' => $s->session_number,
+                'status'         => $s->status,
             ])->values(),
             'students' => $students,
         ];

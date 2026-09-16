@@ -60,6 +60,7 @@ import QRCode from 'qrcode';
         attendanceLive: document.getElementById('attendanceLive'),
         attendanceStartBtn: document.getElementById('attendanceStartBtn'),
         attendanceSubmitBtn: document.getElementById('attendanceSubmitBtn'),
+        attendanceStartNextBtn: document.getElementById('attendanceStartNextBtn'),
         attendanceQrImg: document.getElementById('attendanceQrImg'),
         attendanceTestLink: document.getElementById('attendanceTestLink'),
         attendanceSessionStatus: document.getElementById('attendanceSessionStatus'),
@@ -346,7 +347,7 @@ import QRCode from 'qrcode';
         DOM.attendanceHistoryHead.innerHTML = `
             <tr>
                 <th class="py-2 pl-6 pr-3 sticky left-0 bg-white dark:bg-neutral-900">Student</th>
-                ${sessions.map((s) => `<th class="py-2 px-2 text-center whitespace-nowrap">${formatHistoryDate(s.date)}${s.status !== 'locked' ? `<span class="block normal-case font-normal text-amber-500">${s.status}</span>` : ''}</th>`).join('')}
+                ${sessions.map((s) => `<th class="py-2 px-2 text-center whitespace-nowrap">${formatHistoryDate(s.date)}${s.session_number > 1 ? ` · S${s.session_number}` : ''}${s.status !== 'locked' ? `<span class="block normal-case font-normal text-amber-500">${s.status}</span>` : ''}</th>`).join('')}
             </tr>`;
 
         if (!students.length) {
@@ -452,9 +453,9 @@ import QRCode from 'qrcode';
         toggleModalEl(DOM.attendanceModal, DOM.attendanceModalCard, false);
     }
 
-    async function startSession() {
+    async function startSession(newSession = false) {
         const { error, data } = await ApiService.request(CONFIG.API_START_SESSION(attendanceState.classId), {
-            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}),
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ new_session: newSession }),
         });
         if (error) {
             Toast.fire({ icon: 'error', title: data?.message || 'Failed to start session.' });
@@ -464,8 +465,16 @@ import QRCode from 'qrcode';
         DOM.attendanceNoSession.classList.add('hidden');
         DOM.attendanceLive.classList.remove('hidden');
         renderSessionRoster(data.data);
-        refreshQrToken();
-        pollSession();
+        if (data.data.status === 'open') {
+            refreshQrToken();
+            pollSession();
+        }
+    }
+
+    function startNextSession() {
+        stopAttendanceTimers();
+        attendanceState.clockTimer = setInterval(tickClock, 1000);
+        startSession(true);
     }
 
     async function refreshQrToken() {
@@ -510,9 +519,19 @@ import QRCode from 'qrcode';
 
     function renderSessionRoster(session) {
         const isOpen = session.status === 'open';
-        DOM.attendanceSessionStatus.textContent = isOpen ? 'Scanning live' : `Session ${session.status}`;
+        const sessionLabel = session.session_number > 1 ? `Session ${session.session_number} — ` : '';
+        DOM.attendanceSessionStatus.textContent = isOpen ? `${sessionLabel}Scanning live` : `${sessionLabel}Session ${session.status}`;
         DOM.attendanceCount.textContent = `${session.present_count} / ${session.total} present`;
         DOM.attendanceSubmitBtn.classList.toggle('hidden', !isOpen);
+        // A real teaching day has at most MAX_SESSIONS_PER_DAY sessions
+        // (see ClassSessionController) — once that many are locked, there's
+        // no legitimate next one to start, so the button just disappears
+        // instead of offering a Session 3 that doesn't exist.
+        const atSessionCap = (session.session_number ?? 1) >= 2;
+        if (DOM.attendanceStartNextBtn) {
+            DOM.attendanceStartNextBtn.classList.toggle('hidden', isOpen || atSessionCap);
+            DOM.attendanceStartNextBtn.textContent = `Start Session ${(session.session_number ?? 1) + 1}`;
+        }
         DOM.attendanceQrImg.closest('#attendanceQrWrap')?.classList.toggle('opacity-30', !isOpen);
         DOM.attendanceTestLink?.closest('div')?.classList.toggle('hidden', !isOpen);
         if (DOM.attendanceStatusDot) {
@@ -666,8 +685,9 @@ import QRCode from 'qrcode';
         if (btn.dataset.action === 'attendance') openAttendance(id, code);
     });
 
-    DOM.attendanceStartBtn?.addEventListener('click', startSession);
+    DOM.attendanceStartBtn?.addEventListener('click', () => startSession());
     DOM.attendanceSubmitBtn?.addEventListener('click', submitSession);
+    DOM.attendanceStartNextBtn?.addEventListener('click', startNextSession);
     DOM.attendanceRosterList?.addEventListener('change', (e) => {
         const select = e.target.closest('select[data-action="manual-mark"]');
         if (!select || !select.value) return;

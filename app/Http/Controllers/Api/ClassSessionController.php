@@ -33,6 +33,9 @@ class ClassSessionController extends Controller
     private const ROTATION_INTERVAL_SECONDS = 8;
     private const TOKEN_VALIDITY_SECONDS    = 45;
 
+    /** A real teaching day has at most this many separate attendance checks (e.g. one before a break, one after). */
+    private const MAX_SESSIONS_PER_DAY = 2;
+
     private function assertOwnsClass(ClassSection $class): void
     {
         if (auth()->user()->hasRole('Admin')) {
@@ -64,30 +67,48 @@ class ClassSessionController extends Controller
     {
         $this->assertOwnsClass($class);
 
-        $validated = $request->validate(['session_date' => 'nullable|date']);
-        $date = $validated['session_date'] ?? now()->toDateString();
+        $validated = $request->validate([
+            'session_date' => 'nullable|date',
+            // Explicit opt-in only — a class can meet more than once on the
+            // same date (e.g. one 3-hour block split by a break into two
+            // attendance checks). Just reopening the Attendance modal must
+            // never silently spawn a new session on top of a locked one;
+            // the lecturer has to deliberately ask for the next one.
+            'new_session'  => 'nullable|boolean',
+        ]);
+        $date     = $validated['session_date'] ?? now()->toDateString();
+        $forceNew = $validated['new_session'] ?? false;
 
-        return execute(function () use ($class, $date) {
+        return execute(function () use ($class, $date, $forceNew) {
             // Explicit find-then-create rather than firstOrCreate() — this
             // is hit twice in a row from the UI (open modal, then poll),
             // and a plain firstOrCreate() intermittently missed the
             // just-created row under SQLite's date-cast serialization,
-            // tripping the (class_id, session_date) unique constraint.
-            $session = ClassSession::where('class_id', $class->id)
+            // tripping the unique constraint.
+            $latest = ClassSession::where('class_id', $class->id)
                 ->whereDate('session_date', $date)
+                ->orderByDesc('session_number')
                 ->first();
-            $wasCreated = ! $session;
 
-            if (! $session) {
-                $session = ClassSession::create([
-                    'class_id'     => $class->id,
-                    'session_date' => $date,
-                    'started_at'   => now(),
-                    'status'       => 'open',
-                ]);
+            if ($forceNew && $latest && $latest->session_number >= self::MAX_SESSIONS_PER_DAY) {
+                return no_data('This class already has ' . self::MAX_SESSIONS_PER_DAY . ' sessions today — that\'s the most a single day allows.', 422);
             }
 
-            if ($wasCreated) {
+            // Only actually start a new one if there's none yet today, or
+            // the lecturer explicitly asked for the next one AND the
+            // current latest is locked (asking again on an already-open
+            // session just resumes it, same as before).
+            $shouldCreateNew = ! $latest || ($forceNew && $latest->status === 'locked');
+
+            if ($shouldCreateNew) {
+                $session = ClassSession::create([
+                    'class_id'       => $class->id,
+                    'session_date'   => $date,
+                    'session_number' => $latest ? $latest->session_number + 1 : 1,
+                    'started_at'     => now(),
+                    'status'         => 'open',
+                ]);
+
                 $enrollmentIds = $class->courseEnrollments()->where('status', 'enrolled')->pluck('id');
                 foreach ($enrollmentIds as $enrollmentId) {
                     SessionRoster::create([
@@ -95,9 +116,14 @@ class ClassSessionController extends Controller
                         'course_enrollment_id' => $enrollmentId,
                     ]);
                 }
+
+                $message = $latest ? "Session {$session->session_number} started." : 'Session started.';
+            } else {
+                $session = $latest;
+                $message = 'Session resumed.';
             }
 
-            return has_data($this->sessionPayload($session->fresh()), $wasCreated ? 'Session started.' : 'Session resumed.');
+            return has_data($this->sessionPayload($session->fresh()), $message);
         });
     }
 
@@ -133,10 +159,11 @@ class ClassSessionController extends Controller
             });
 
         return [
-            'id'            => $session->id,
-            'class_id'      => $session->class_id,
-            'session_date'  => $session->session_date->format('Y-m-d'),
-            'status'        => $session->status,
+            'id'             => $session->id,
+            'class_id'       => $session->class_id,
+            'session_date'   => $session->session_date->format('Y-m-d'),
+            'session_number' => $session->session_number,
+            'status'         => $session->status,
             'started_at'    => $session->started_at?->format('Y-m-d H:i:s'),
             'locked_at'     => $session->locked_at?->format('Y-m-d H:i:s'),
             'total'         => $rosters->count(),
