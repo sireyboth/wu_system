@@ -185,7 +185,7 @@
                                                     d="M5 10v5c0 1.5 3.1 3 7 3s7-1.5 7-3v-5" />
                                             </svg>
                                         </x-slot>
-                                        បន្ទប់ប្រឡង (Exam Rooms)
+                                        គ្រប់គ្រងប្រឡង (Exam Mgt)
                                     </x-sidebar-link>
 
                                     <x-sidebar-link route="state-exam.report" :exact="true">

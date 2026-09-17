@@ -21,6 +21,7 @@ export const state = {
     examTerms: [],      // every exam term (any category, active or not) — admin sees all
     examCategories: [], // manageable list: State Exam, Scholarship, etc.
     termFilterId: '',   // '' = all terms, on the exam-rooms table
+    editingTermId: null, // set while the Exam Term modal is editing an existing term (separate from isEditMode/editingId, which are the room modal's)
 };
 
 /**
@@ -51,10 +52,12 @@ export function buildDom() {
         // Exam Term select inside the room create/edit modal
         roomExamTermSelect: document.getElementById('roomExamTermSelect'),
 
-        // "+ New Exam Term" modal
+        // "+ New Exam Term" / edit modal
         newExamTermBtn: document.getElementById('newExamTermBtn'),
+        editExamTermBtn: document.getElementById('editExamTermBtn'),
         examTermModal: document.getElementById('examTermModal'),
         examTermModalCard: document.getElementById('examTermModalCard'),
+        examTermModalTitle: document.getElementById('examTermModalTitle'),
         examTermForm: document.getElementById('examTermForm'),
         examTermCategorySelect: document.getElementById('examTermCategorySelect'),
         addCategoryBtn: document.getElementById('addCategoryBtn'),

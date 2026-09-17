@@ -114,14 +114,50 @@ function collectSlots(dom) {
         .filter(Boolean);
 }
 
-export function openExamTermModal(dom) {
+/**
+ * Opens the modal. Pass an existing term to edit it (fields pre-filled,
+ * submit does a PUT); omit it to create a new one (submit does a POST).
+ */
+export function openExamTermModal(dom, term = null) {
     dom.examTermForm?.reset();
     resetSlotRows(dom);
-    if (dom.examTermActiveInput) dom.examTermActiveInput.checked = true;
+    state.editingTermId = term?.id ?? null;
+
+    if (term) {
+        if (dom.examTermModalTitle) dom.examTermModalTitle.textContent = 'កែប្រែការប្រឡង (Edit Exam Term)';
+        if (dom.examTermSubmitBtn) dom.examTermSubmitBtn.textContent = 'រក្សាទុក (Save)';
+        if (dom.examTermCategorySelect) dom.examTermCategorySelect.value = term.exam_category_id ?? term.category?.id ?? '';
+        if (dom.examTermCampusSelect) dom.examTermCampusSelect.value = term.campus_id ?? term.campus?.id ?? '';
+        if (dom.examTermTitleInput) dom.examTermTitleInput.value = term.title ?? '';
+        if (dom.examTermDateInput) dom.examTermDateInput.value = term.exam_date ?? '';
+        if (dom.examTermActiveInput) dom.examTermActiveInput.checked = !!term.is_active;
+
+        const slots = term.time_slots ?? [];
+        if (slots.length && dom.examTermSlotsContainer) {
+            dom.examTermSlotsContainer.innerHTML = '';
+            slots.forEach((slot) => addSlotRow(dom, slot));
+        }
+    } else {
+        if (dom.examTermModalTitle) dom.examTermModalTitle.textContent = 'បង្កើតការប្រឡងថ្មី (New Exam Term)';
+        if (dom.examTermSubmitBtn) dom.examTermSubmitBtn.textContent = 'បង្កើត (Create)';
+        if (dom.examTermActiveInput) dom.examTermActiveInput.checked = true;
+    }
+
     openModal(dom.examTermModal, dom.examTermModalCard);
 }
 
+/** Opens the modal in edit mode for whichever term is currently selected in the term filter dropdown. */
+export function openExamTermModalForSelected(dom) {
+    const term = findTerm(dom.termFilterSelect?.value);
+    if (!term) {
+        Toast.fire({ icon: 'warning', title: 'Select an exam term above first.' });
+        return;
+    }
+    openExamTermModal(dom, term);
+}
+
 export function closeExamTermModal(dom) {
+    state.editingTermId = null;
     closeModal(dom.examTermModal, dom.examTermModalCard);
 }
 
@@ -142,9 +178,13 @@ export async function submitExamTermForm(dom, ApiService, onDone) {
         return;
     }
 
+    const isEditing = !!state.editingTermId;
+    const url = isEditing ? `${CONFIG.EXAM_TERMS_API}/${state.editingTermId}` : CONFIG.EXAM_TERMS_API;
+    const method = isEditing ? 'PUT' : 'POST';
+
     if (dom.examTermSubmitBtn) dom.examTermSubmitBtn.disabled = true;
-    const { error, data } = await ApiService.request(CONFIG.EXAM_TERMS_API, {
-        method: 'POST',
+    const { error, data } = await ApiService.request(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
     });
@@ -152,11 +192,11 @@ export async function submitExamTermForm(dom, ApiService, onDone) {
 
     if (error) {
         const firstError = data?.errors ? Object.values(data.errors)[0]?.[0] : null;
-        Toast.fire({ icon: 'error', title: firstError || data?.message || 'Could not create exam term.' });
+        Toast.fire({ icon: 'error', title: firstError || data?.message || `Could not ${isEditing ? 'update' : 'create'} exam term.` });
         return;
     }
 
-    Toast.fire({ icon: 'success', title: 'Exam term created.' });
+    Toast.fire({ icon: 'success', title: isEditing ? 'Exam term updated.' : 'Exam term created.' });
     closeExamTermModal(dom);
     await loadExamTermLookups(dom, ApiService);
     // Pre-select the freshly created term on the room modal, since that's
@@ -201,6 +241,7 @@ export async function addCategoryInline(dom, ApiService) {
 
 export function bindExamTermEvents(dom, ApiService) {
     dom.newExamTermBtn?.addEventListener('click', () => openExamTermModal(dom));
+    dom.editExamTermBtn?.addEventListener('click', () => openExamTermModalForSelected(dom));
     dom.examTermForm?.addEventListener('submit', (e) => {
         e.preventDefault();
         submitExamTermForm(dom, ApiService);

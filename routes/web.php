@@ -67,8 +67,11 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('term', TermController::class)->only('index')->middleware('can:term.view');
 
     Route::middleware('can:state-exam.view')->group(function () {
-        Route::resource('state-exam', StateExamController::class)->only('index');
-        Route::get('state-exam/report', [StateExamController::class, 'report'])->name('state-exam.report');
+        // URL path is 'exam-management' (nicer for admins); route names/permission
+        // key stay 'state-exam.*' so nothing else (blade route() calls, role
+        // permissions in the DB) needs to change.
+        Route::resource('exam-management', StateExamController::class)->only('index')->names(['index' => 'state-exam.index']);
+        Route::get('exam-management/report', [StateExamController::class, 'report'])->name('state-exam.report');
         Route::get('/exam-schedule', ExamScheduleController::class)->name('exam.schedule');
     });
 
