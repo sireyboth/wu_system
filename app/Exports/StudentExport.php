@@ -4,16 +4,23 @@ namespace App\Exports;
 use App\Models\Student;
 
 /**
- * Same column set as StudentImport expects — exporting the current list
- * and re-importing it (after edits/additions) round-trips cleanly, since
- * the headings here are exactly what the importer's WithHeadingRow keys
- * resolve to (see that class's docblock).
+ * Columns 1-27 (No..Remark) are exactly what StudentImport expects — export
+ * the current list, edit/append rows, re-import round-trips cleanly (see
+ * that class's docblock). Everything after Remark is export-only — every
+ * other field captured on the create/edit student form (entrance/exit exam,
+ * guardian details, current + birth address) but not part of the flat
+ * import round-trip. StudentImport reads columns by heading key and simply
+ * ignores ones it doesn't recognize, so appending here is safe.
  */
 class StudentExport extends IExport
 {
     protected string $model = Student::class;
 
-    protected array $relationships = ['person.nationality', 'batch', 'major', 'group', 'shift', 'campus', 'status'];
+    protected array $relationships = [
+        'person.nationality', 'batch', 'major', 'group', 'shift', 'campus', 'status',
+        'guardians', 'person.addresses.province', 'person.addresses.district',
+        'person.addresses.commune', 'person.addresses.village',
+    ];
 
     protected array $headings = [
         'No', 'Code', 'First Name', 'Last Name', 'First Name Kh', 'Last Name Kh',
@@ -21,6 +28,9 @@ class StudentExport extends IExport
         'Batch', 'Major', 'Group', 'Shift', 'Campus', 'Status',
         'Year Level', 'Semester', 'Payment As', 'Admission Date', 'From School',
         'Degree Type', 'Intake', 'Scholarship', 'Bacc 2 Code', 'Remark',
+        'Entrance Exam', 'Exit Exam',
+        'Guardian Name', 'Guardian Relationship', 'Guardian Job', 'Guardian Phone', 'Guardian Address',
+        'Current Address', 'Birth Address',
     ];
 
     public function __construct(protected array $filters = [])
@@ -53,6 +63,25 @@ class StudentExport extends IExport
         $phones = is_array($person?->phones) ? implode(', ', $person->phones) : null;
         $degreeType = $data->degree_type;
 
+        $guardian = $data->guardians->first();
+        $guardianPhones = $data->guardians
+            ->flatMap(fn($g) => is_array($g->phones) ? $g->phones : [])
+            ->filter()
+            ->unique()
+            ->implode(', ');
+        $guardianAddress = is_array($guardian?->addresses) ? implode(', ', array_filter($guardian->addresses)) : null;
+
+        $formatAddress = fn($address) => $address ? implode(', ', array_filter([
+            $address->house_no,
+            $address->street,
+            $address->village?->name_en,
+            $address->commune?->name_en,
+            $address->district?->name_en,
+            $address->province?->name_en,
+        ])) : null;
+        $currentAddress = $formatAddress($person?->addresses?->firstWhere('type', 'current'));
+        $birthAddress   = $formatAddress($person?->addresses?->firstWhere('type', 'birth'));
+
         return [
             $this->numRow,
             $data->code,
@@ -81,6 +110,15 @@ class StudentExport extends IExport
             $data->scholarship,
             $data->bacc_2_code,
             $data->remark,
+            $data->entrance_exam,
+            $data->exit_exam,
+            $guardian?->name_en ?: $guardian?->name_kh,
+            $guardian?->relationship,
+            $guardian?->job,
+            $guardianPhones ?: null,
+            $guardianAddress,
+            $currentAddress,
+            $birthAddress,
         ];
     }
 }

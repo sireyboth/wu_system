@@ -10,6 +10,11 @@ import QRCode from 'qrcode';
 (() => {
     'use strict';
 
+    // Matches the <img> tag's own default `src` in attendanceModal.blade.php
+    // — used to fall back to the same placeholder whenever a fetch fails or
+    // returns no token, instead of leaving a broken/stale image showing.
+    const QR_PLACEHOLDER_SRC = 'data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20200%20200%22%3E%3Crect%20width%3D%22200%22%20height%3D%22200%22%20fill%3D%22%23f4f4f5%22/%3E%3Cg%20stroke%3D%22%23a1a1aa%22%20stroke-width%3D%226%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20fill%3D%22none%22%3E%3Crect%20x%3D%2236%22%20y%3D%2236%22%20width%3D%2242%22%20height%3D%2242%22%20rx%3D%226%22/%3E%3Crect%20x%3D%22122%22%20y%3D%2236%22%20width%3D%2242%22%20height%3D%2242%22%20rx%3D%226%22/%3E%3Crect%20x%3D%2236%22%20y%3D%22122%22%20width%3D%2242%22%20height%3D%2242%22%20rx%3D%226%22/%3E%3Cpath%20d%3D%22M122%20132h42M143%20111v42%22/%3E%3C/g%3E%3Ctext%20x%3D%22100%22%20y%3D%22182%22%20font-family%3D%22sans-serif%22%20font-size%3D%2215%22%20fill%3D%22%23a1a1aa%22%20text-anchor%3D%22middle%22%3ENo%20QR%20yet%3C/text%3E%3C/svg%3E';
+
     const CONFIG = {
         API_CLASSES: '/api/v1/lecturer-portal/classes',
         API_SCORE_CONFIG: (classId) => `/api/v1/lecturer-portal/classes/${classId}/score-config`,
@@ -566,7 +571,10 @@ import QRCode from 'qrcode';
         if (error) {
             // A closed/locked session (or any other rejection) means there's
             // nothing left to rotate — stop polling instead of retrying
-            // every few seconds forever.
+            // every few seconds forever. Fall back to the placeholder so a
+            // stale QR (or the raw broken-image icon) never lingers.
+            DOM.attendanceQrImg.src = QR_PLACEHOLDER_SRC;
+            delete DOM.attendanceQrImg.dataset.token;
             return;
         }
 
@@ -579,6 +587,9 @@ import QRCode from 'qrcode';
             // not a separate secret.
             DOM.attendanceQrImg.dataset.token = data.data.token;
             if (DOM.attendanceTestLink) DOM.attendanceTestLink.href = attendUrl;
+        } else {
+            DOM.attendanceQrImg.src = QR_PLACEHOLDER_SRC;
+            delete DOM.attendanceQrImg.dataset.token;
         }
 
         const secondsRemaining = Math.max(1, data?.data?.seconds_remaining ?? 5);

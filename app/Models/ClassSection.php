@@ -9,7 +9,13 @@ class ClassSection extends IModel
 {
     protected $table = 'classes';
 
-    protected $fillable = ['subject_id', 'term_id', 'campus_id', 'shift_id', 'capacity', 'code', 'remark'];
+    protected $fillable = [
+        'subject_id', 'term_id', 'campus_id', 'shift_id', 'capacity', 'code', 'remark',
+        // Descriptive-only — see the migration that added these, none of
+        // this drives enrollment or scheduling (that stays course_enrollments
+        // / class_schedules). majors() below is a many-to-many, not fillable.
+        'batch_id', 'room_number', 'time_slot',
+    ];
 
     public function subject()
     {
@@ -29,6 +35,19 @@ class ClassSection extends IModel
     public function shift()
     {
         return $this->belongsTo(Shift::class);
+    }
+
+    public function majors()
+    {
+        // Explicit FK names — Laravel would otherwise infer 'class_section_id'
+        // from the model name, but the pivot column (and every other FK
+        // pointing at this table) is 'class_id', matching `classes`.
+        return $this->belongsToMany(Major::class, 'class_major', 'class_id', 'major_id');
+    }
+
+    public function batch()
+    {
+        return $this->belongsTo(Batch::class);
     }
 
     public function schedules()

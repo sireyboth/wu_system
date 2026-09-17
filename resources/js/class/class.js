@@ -51,6 +51,10 @@
         termSelect: document.getElementById('classTermSelect'),
         campusSelect: document.getElementById('classCampusSelect'),
         shiftSelect: document.getElementById('classShiftSelect'),
+        majorChecklist: document.getElementById('classMajorChecklist'),
+        facultyDisplay: document.getElementById('classFacultyDisplay'),
+        batchSelect: document.getElementById('classBatchSelect'),
+        timeSlotSelect: document.getElementById('classTimeSlotSelect'),
         lecturerSearch: document.getElementById('classLecturerSearch'),
         lecturerDatalist: document.getElementById('lecturersDatalist'),
         lecturerId: document.getElementById('classLecturerId'),
@@ -96,7 +100,7 @@
     };
 
     const state = {
-        subjects: [], lecturers: [], majors: [], classes: [], debounceTimer: null,
+        subjects: [], lecturers: [], majors: [], batches: [], classes: [], debounceTimer: null,
         currentClassId: null, editingClassId: null, searchResults: [], pendingStudent: null,
     };
     const rosterState = { enrollments: [] };
@@ -152,9 +156,16 @@
         }
     }
 
-    function fillSelect(el, items, placeholder = '-- any --') {
+    // requiredPlaceholder (disabled+selected, no blank/"any" option) is used
+    // for fields that must have a real value picked, like Campus/Shift/Batch
+    // on the Create Class form; plain `placeholder` (a selectable blank) is
+    // for genuinely optional filters, like the Auto-Enroll modal's fields.
+    function fillSelect(el, items, placeholder = '-- any --', requiredPlaceholder = null) {
         if (!el) return;
-        el.innerHTML = `<option value="">${placeholder}</option>` +
+        const firstOption = requiredPlaceholder
+            ? `<option value="" disabled selected>${requiredPlaceholder}</option>`
+            : `<option value="">${placeholder}</option>`;
+        el.innerHTML = firstOption +
             items.map((item) => `<option value="${item.id}">${item.name_kh || item.name || item.code}</option>`).join('');
     }
 
@@ -175,10 +186,15 @@
 
         DOM.termSelect.innerHTML = '<option value="" disabled selected>-- select term --</option>' +
             list(terms).map((t) => `<option value="${t.id}">${t.code} — ${t.name}${t.is_active ? ' (active)' : ''}</option>`).join('');
-        fillSelect(DOM.campusSelect, list(campuses));
-        fillSelect(DOM.shiftSelect, list(shifts));
+        // Campus/Shift/Batch on the Create Class form are required — no
+        // "any" placeholder, must pick a real option (see classModal.blade.php).
+        fillSelect(DOM.campusSelect, list(campuses), null, '-- select campus --');
+        fillSelect(DOM.shiftSelect, list(shifts), null, '-- select shift --');
+        fillSelect(DOM.batchSelect, list(batches), null, '-- select batch --');
         fillSelect(document.getElementById('autoEnrollBatch'), list(batches));
         state.majors = list(majors);
+        state.batches = list(batches);
+        renderClassMajorChecklist(state.majors);
         renderMajorChecklist(state.majors);
         fillSelect(document.getElementById('autoEnrollShift'), list(shifts));
         fillSelect(document.getElementById('autoEnrollGroup'), list(groups));
@@ -216,6 +232,37 @@
         const match = state.lecturers.find((l) => lecturerLabel(l) === typed);
         DOM.lecturerId.value = match ? match.id : '';
         DOM.lecturerHint?.classList.toggle('hidden', Boolean(match) || typed === '');
+    });
+
+    // Checkbox list (not a native <select multiple> — much easier to scan
+    // and select from than ctrl/cmd-click). Rebuilt on lookup load same as
+    // the Auto-Enroll modal's own major checklist.
+    function renderClassMajorChecklist(majors) {
+        if (!DOM.majorChecklist) return;
+        DOM.majorChecklist.innerHTML = majors.map((m) => `
+            <label class="flex items-center gap-2 py-1 text-sm cursor-pointer">
+                <input type="checkbox" name="major_id[]" value="${m.id}" class="rounded border-neutral-300 dark:border-white/20 text-indigo-600 focus:ring-indigo-500/40">
+                <span>${m.name_kh || m.name_en || m.name}</span>
+            </label>`).join('');
+    }
+
+    function selectedMajorIds() {
+        return [...DOM.majorChecklist?.querySelectorAll('input[name="major_id[]"]:checked') ?? []].map((el) => el.value);
+    }
+
+    // Multiple majors can be selected — shows every distinct faculty among
+    // them, since a multi-major class can legitimately span more than one.
+    function syncFacultyDisplay() {
+        if (!DOM.facultyDisplay) return;
+        const ids = new Set(selectedMajorIds());
+        const faculties = state.majors
+            .filter((m) => ids.has(String(m.id)))
+            .map((m) => m.faculty?.name_kh || m.faculty?.name_en)
+            .filter(Boolean);
+        DOM.facultyDisplay.value = [...new Set(faculties)].join(', ');
+    }
+    DOM.majorChecklist?.addEventListener('change', (e) => {
+        if (e.target.matches('input[name="major_id[]"]')) syncFacultyDisplay();
     });
 
     // ---- Classes list ----
@@ -275,6 +322,7 @@
         DOM.subjectHint?.classList.add('hidden');
         DOM.lecturerId.value = '';
         DOM.lecturerHint?.classList.add('hidden');
+        if (DOM.facultyDisplay) DOM.facultyDisplay.value = '';
         state.editingClassId = null;
         if (DOM.classModalTitle) DOM.classModalTitle.textContent = 'Create Class';
         if (DOM.classSubmitBtn) DOM.classSubmitBtn.textContent = 'Save';
@@ -301,6 +349,16 @@
         DOM.shiftSelect.value = cls.shift?.id ?? '';
         DOM.classForm.querySelector('[name="code"]').value = cls.code ?? '';
         DOM.classForm.querySelector('[name="capacity"]').value = cls.capacity ?? '';
+        if (DOM.majorChecklist) {
+            const selectedIds = new Set((cls.majors ?? []).map((m) => String(m.id)));
+            DOM.majorChecklist.querySelectorAll('input[name="major_id[]"]').forEach((el) => {
+                el.checked = selectedIds.has(el.value);
+            });
+        }
+        syncFacultyDisplay();
+        if (DOM.batchSelect) DOM.batchSelect.value = cls.batch?.id ?? '';
+        DOM.classForm.querySelector('[name="room_number"]').value = cls.room_number ?? '';
+        if (DOM.timeSlotSelect) DOM.timeSlotSelect.value = cls.time_slot ?? '';
 
         // Lecturer is create-only here (see store()) — editing has its own
         // action (the Lecturer button), so this field is hidden, not just
@@ -328,6 +386,10 @@
             campus_id: DOM.campusSelect.value || null,
             shift_id: DOM.shiftSelect.value || null,
             capacity: DOM.classForm.querySelector('[name="capacity"]').value || null,
+            majors: selectedMajorIds(),
+            batch_id: DOM.batchSelect?.value || null,
+            room_number: DOM.classForm.querySelector('[name="room_number"]').value.trim() || null,
+            time_slot: DOM.timeSlotSelect?.value || null,
         };
         if (!isEdit) {
             payload.lecturer_id = DOM.lecturerId.value || null;

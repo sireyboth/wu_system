@@ -51,7 +51,8 @@
                                     <span class="absolute -bottom-2 -right-2 w-6 h-6 border-b-[3px] border-r-[3px] border-indigo-500 rounded-br-lg"></span>
 
                                     <div id="attendanceQrWrap" class="p-3 bg-white rounded-2xl border border-neutral-100">
-                                        <img id="attendanceQrImg" class="w-full max-w-[360px] aspect-square" alt="Attendance QR code">
+                                        <img id="attendanceQrImg" class="w-full max-w-[360px] aspect-square" alt="Attendance QR code"
+                                            src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20200%20200%22%3E%3Crect%20width%3D%22200%22%20height%3D%22200%22%20fill%3D%22%23f4f4f5%22/%3E%3Cg%20stroke%3D%22%23a1a1aa%22%20stroke-width%3D%226%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20fill%3D%22none%22%3E%3Crect%20x%3D%2236%22%20y%3D%2236%22%20width%3D%2242%22%20height%3D%2242%22%20rx%3D%226%22/%3E%3Crect%20x%3D%22122%22%20y%3D%2236%22%20width%3D%2242%22%20height%3D%2242%22%20rx%3D%226%22/%3E%3Crect%20x%3D%2236%22%20y%3D%22122%22%20width%3D%2242%22%20height%3D%2242%22%20rx%3D%226%22/%3E%3Cpath%20d%3D%22M122%20132h42M143%20111v42%22/%3E%3C/g%3E%3Ctext%20x%3D%22100%22%20y%3D%22182%22%20font-family%3D%22sans-serif%22%20font-size%3D%2215%22%20fill%3D%22%23a1a1aa%22%20text-anchor%3D%22middle%22%3ENo%20QR%20yet%3C/text%3E%3C/svg%3E">
                                     </div>
                                 </div>
 

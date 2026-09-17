@@ -20,7 +20,7 @@ class ClassSectionController extends Controller
         $this->name          = 'Class';
         $this->model         = ClassSection::class;
         $this->resource      = ClassSectionResource::class;
-        $this->relationships = ['subject', 'term', 'campus', 'shift', 'scoreConfig', 'teacherAssignments.lecturer'];
+        $this->relationships = ['subject', 'term', 'campus', 'shift', 'majors.faculty', 'batch', 'scoreConfig', 'teacherAssignments.lecturer'];
     }
 
     public function index(Request $request)
@@ -39,9 +39,11 @@ class ClassSectionController extends Controller
         return execute(function () use ($request) {
             $validated  = $request->validated();
             $lecturerId = $validated['lecturer_id'] ?? null;
-            unset($validated['lecturer_id']);
+            $majorIds   = $validated['majors'] ?? [];
+            unset($validated['lecturer_id'], $validated['majors']);
 
             $class = ClassSection::create($validated);
+            $class->majors()->sync($majorIds);
 
             if ($lecturerId) {
                 TeacherAssignment::create([
@@ -69,10 +71,12 @@ class ClassSectionController extends Controller
     public function update(ClassSectionRequest $request, ClassSection $class)
     {
         $validated = $request->validated();
-        unset($validated['lecturer_id']);
+        $majorIds  = $validated['majors'] ?? [];
+        unset($validated['lecturer_id'], $validated['majors']);
 
-        return execute(function () use ($request, $class, $validated) {
+        return execute(function () use ($class, $validated, $majorIds) {
             $class->update($validated);
+            $class->majors()->sync($majorIds);
             return new ClassSectionResource($this->reload($class));
         });
     }
