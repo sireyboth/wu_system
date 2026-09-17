@@ -9,9 +9,15 @@
                 <h3 class="text-lg font-bold text-neutral-900 dark:text-white">Attendance History — <span id="attendanceHistoryClassCode" class="font-mono text-indigo-600"></span></h3>
                 <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">Every session date this class has held. A date missing from the columns below is a week attendance was never taken.</p>
             </div>
-            <button type="button" onclick="AttendanceHistoryModal.toggle(false)" class="text-neutral-400 hover:text-neutral-600 dark:hover:text-white transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
+            <div class="flex items-center gap-3 shrink-0">
+                <button type="button" id="attendanceHistoryExportBtn" class="text-xs font-semibold text-neutral-600 dark:text-neutral-300 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M7 10l5 5 5-5M12 15V3"/></svg>
+                    Export
+                </button>
+                <button type="button" onclick="AttendanceHistoryModal.toggle(false)" class="text-neutral-400 hover:text-neutral-600 dark:hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
         </div>
 
         <div class="px-6 py-3 border-b border-neutral-100 dark:border-white/5 shrink-0 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">

@@ -11,11 +11,10 @@
 import { baseUri } from "../app";
 
 const API_BASE = baseUri('exam-states');
-const round = window.EXAM_ROUND; // 1, 2, or 3
-const roundIndex = round - 1;
-
-// Fixed session times, positionally matched to rounds 1/2/3.
-const ROUND_TIMES = ['08:00 AM', '10:00 AM', '01:00 PM'];
+const examTermId = window.EXAM_TERM_ID;
+const slot = window.EXAM_SLOT; // 1-based
+const roundIndex = slot - 1;
+const slotLabel = window.EXAM_SLOT_LABEL;
 
 const els = {
     search: document.getElementById('roomSearchInput'),
@@ -160,7 +159,10 @@ async function fetchRooms(search = '') {
     // silently truncates to the first 10 (by creation date) before the
     // sort below even runs, so it looked "sorted" but was actually missing
     // most rooms. A large per_page here is the actual fix for that.
-    const res = await fetch(`${API_BASE}?search=${encodeURIComponent(search)}&per_page=1000`, {
+    // exam_term_id scopes this to only the exam term the on-site staff
+    // actually picked — other exams' rooms (a different category or a
+    // different day) never show up here.
+    const res = await fetch(`${API_BASE}?search=${encodeURIComponent(search)}&per_page=1000&exam_term_id=${encodeURIComponent(examTermId)}`, {
         headers: { Accept: 'application/json' },
     });
     const json = await res.json();
@@ -192,7 +194,7 @@ function openModal(room) {
     const studentTotal = room.student_total ?? 0;
 
     els.modalTitle.textContent = `បន្ទប់ ${room.room ?? ''}`;
-    els.modalSubtitle.textContent = `${window.EXAM_ROUND_LABEL} — ${ROUND_TIMES[roundIndex]}`;
+    els.modalSubtitle.textContent = slotLabel;
     els.maxHint.textContent = `អតិបរមា ${studentTotal} នាក់ (និស្សិតសរុបក្នុងបន្ទប់)`;
     els.input.value = currentAbsent(room) ?? 0;
     els.input.max = studentTotal;
@@ -237,10 +239,12 @@ async function saveAbsence() {
     els.saveBtn.classList.add('opacity-60');
 
     const absences = Array.isArray(activeRoom.absences) ? [...activeRoom.absences] : [];
-    while (absences.length < 3) absences.push({ total: 0 });
+    // Pad up to this slot's index, not a fixed 3 — a term can have any
+    // number of slots now.
+    while (absences.length <= roundIndex) absences.push({ total: 0 });
     absences[roundIndex] = {
         major: activeRoom.major,
-        time: ROUND_TIMES[roundIndex],
+        time: slotLabel,
         total: n,
     };
 

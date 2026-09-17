@@ -84,6 +84,7 @@
         attendanceHistoryHead: document.getElementById('attendanceHistoryHead'),
         attendanceHistoryBody: document.getElementById('attendanceHistoryBody'),
         attendanceHistorySessionCount: document.getElementById('attendanceHistorySessionCount'),
+        attendanceHistoryExportBtn: document.getElementById('attendanceHistoryExportBtn'),
 
         assignLecturerForm: document.getElementById('assignLecturerForm'),
         assignLecturerModal: document.getElementById('assignLecturerModal'),
@@ -757,7 +758,7 @@
         DOM.attendanceHistoryBody.innerHTML = students.map((student) => `
             <tr>
                 <td class="py-2 pl-6 pr-3 font-medium whitespace-nowrap sticky left-0 bg-white dark:bg-neutral-900">${student.code ?? ''} — ${student.name}</td>
-                ${sessions.map((s) => `<td class="py-2 px-2 text-center">${historyStatusBadge(student.statuses?.[s.id])}</td>`).join('')}
+                ${sessions.map((s) => `<td class="py-2 px-2 text-center">${historyStatusBadge(student.statuses?.[s.id]?.status)}</td>`).join('')}
             </tr>`).join('');
     }
 
@@ -839,6 +840,10 @@
     });
     DOM.rosterAddStudentCancel?.addEventListener('click', cancelStudentPreview);
     DOM.rosterHistoryBtn?.addEventListener('click', () => openAttendanceHistory(state.currentClassId, DOM.rosterClassCode.textContent));
+    DOM.attendanceHistoryExportBtn?.addEventListener('click', () => {
+        if (!state.currentClassId) return;
+        window.open(`${CONFIG.API_CLASSES}/${state.currentClassId}/attendance-history/export`, '_blank');
+    });
     document.addEventListener('click', (e) => {
         if (!DOM.rosterAddStudentInput?.contains(e.target) && !DOM.rosterAddStudentResults?.contains(e.target)) {
             DOM.rosterAddStudentResults?.classList.add('hidden');

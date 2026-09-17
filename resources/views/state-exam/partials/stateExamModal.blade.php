@@ -1,5 +1,14 @@
 <x-ui.modal id="stateExamModal" title="បន្ថែមបន្ទប់ប្រឡងថ្មី (Add Exam Room)" form-id="stateExamForm" max-width="max-w-3xl">
 
+    <div class="relative group">
+        <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">ការប្រឡង (Exam Term)</label>
+        <select required name="exam_term_id" id="roomExamTermSelect"
+                class="w-full px-4 py-2.5 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-xl text-neutral-900 dark:text-white focus:ring-4 focus:ring-indigo-500/40 focus:border-indigo-500 focus:bg-white dark:focus:bg-neutral-900 transition-all duration-200 outline-none">
+            <option value="" disabled selected>-- Select Exam Term --</option>
+        </select>
+        <p class="mt-1.5 text-[11px] text-neutral-400">Which exam term this room belongs to — its time slots drive the dropdown in each row below.</p>
+    </div>
+
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="relative group">
             <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">បន្ទប់ (Room)</label>

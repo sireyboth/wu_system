@@ -111,6 +111,38 @@ class LecturerPortalController extends Controller
         return has_data(\App\Models\ClassSession::attendanceHistoryFor($class->id));
     }
 
+    public function exportAttendanceHistory(ClassSection $class)
+    {
+        $this->assertOwnsClass($class);
+
+        $history = \App\Models\ClassSession::attendanceHistoryFor($class->id);
+        return $this->export(new \App\Exports\AttendanceHistoryExport($history), "attendance-history-{$class->code}");
+    }
+
+    /**
+     * Bulk-fix companion to exportAttendanceHistory — see
+     * AttendanceHistoryImport's docblock for the exact column contract
+     * and the write-directly-no-approval behavior this shares with the
+     * History grid's own dropdowns.
+     */
+    public function importAttendanceHistory(Request $request, ClassSection $class)
+    {
+        $this->assertOwnsClass($class);
+
+        $validated = $request->validate(['file' => 'required|file|mimes:xlsx,xls,csv']);
+
+        $import = new \App\Imports\AttendanceHistoryImport($class->id);
+
+        try {
+            \Maatwebsite\Excel\Facades\Excel::import($import, $validated['file']);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Attendance history import failed', ['error' => $e->getMessage()]);
+            return no_data('The file could not be processed. Please check it is a valid, correctly formatted spreadsheet.', 422);
+        }
+
+        return has_data(['report' => $import->report()], 'Import complete.');
+    }
+
     /**
      * Records one score component for one student — same validation
      * (per-component cap from this class's own config) as the registrar

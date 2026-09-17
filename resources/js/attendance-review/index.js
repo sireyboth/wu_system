@@ -85,8 +85,9 @@
                 <td class="px-6 py-4">${riskBadge(row.risk_score)}</td>
                 <td class="px-6 py-4 text-xs max-w-xs">${signalsSummary(row.signals)}</td>
                 <td class="px-6 py-4 text-xs font-mono">${row.marked_at ?? '—'}</td>
-                <td class="px-6 py-4 text-right">
+                <td class="px-6 py-4 text-right space-x-1 whitespace-nowrap">
                     <button data-action="dismiss-flag" data-id="${row.id}" class="px-3 py-1.5 text-xs font-semibold text-neutral-600 hover:bg-neutral-100 dark:hover:bg-white/5 rounded-lg">Dismiss</button>
+                    <button data-action="dismiss-mark-absent" data-id="${row.id}" class="px-3 py-1.5 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-lg">Dismiss &amp; Mark Absent</button>
                 </td>
             </tr>`).join('');
     }
@@ -116,13 +117,27 @@
             </tr>`).join('');
     }
 
-    async function dismissFlag(id) {
-        const { error, data } = await request(`${CONFIG.API_BASE}/verifications/${id}/review`, { method: 'PATCH' });
+    async function dismissFlag(id, decision = 'dismiss') {
+        if (decision === 'mark_absent') {
+            const confirmation = await Swal.fire({
+                title: 'Dismiss and mark this student absent?',
+                text: 'The flag was right — this changes their attendance record to absent, right now (no separate approval step, since a flagged scan isn\'t locked yet).',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e11d48',
+                confirmButtonText: 'Mark Absent',
+            });
+            if (!confirmation.isConfirmed) return;
+        }
+
+        const { error, data } = await request(`${CONFIG.API_BASE}/verifications/${id}/review`, {
+            method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ decision }),
+        });
         if (error) {
             Toast.fire({ icon: 'error', title: data?.message || 'Failed to dismiss.' });
             return;
         }
-        Toast.fire({ icon: 'success', title: 'Marked reviewed.' });
+        Toast.fire({ icon: 'success', title: data?.message || 'Marked reviewed.' });
         loadQueue();
     }
 
@@ -149,9 +164,10 @@
     }
 
     DOM.flaggedTableBody?.addEventListener('click', (e) => {
-        const btn = e.target.closest('button[data-action="dismiss-flag"]');
+        const btn = e.target.closest('button[data-action]');
         if (!btn) return;
-        dismissFlag(btn.dataset.id);
+        if (btn.dataset.action === 'dismiss-flag') dismissFlag(btn.dataset.id);
+        if (btn.dataset.action === 'dismiss-mark-absent') dismissFlag(btn.dataset.id, 'mark_absent');
     });
 
     DOM.correctionsTableBody?.addEventListener('click', (e) => {

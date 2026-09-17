@@ -79,11 +79,29 @@ class AttendanceReviewController extends Controller
         ];
     }
 
-    /** Dismisses a flag — reviewed, no change to the underlying record. */
-    public function reviewVerification(AttendanceVerification $verification)
+    /**
+     * Dismisses a flag. Two outcomes: plain "dismiss" (the flag was a
+     * false positive — e.g. a legitimate borrowed phone — record stays
+     * present, nothing else changes) or "mark_absent" (the flag was
+     * right — this was buddy-punching — so besides marking the flag
+     * reviewed, this is the one path that also corrects the record
+     * itself, since a flagged scan is by definition not locked yet, so
+     * the normal correction-request/approval flow doesn't apply here.
+     */
+    public function reviewVerification(Request $request, AttendanceVerification $verification)
     {
-        $verification->update(['reviewed_by' => auth()->id(), 'reviewed_at' => now()]);
-        return has_data(null, 'Marked reviewed.');
+        $validated = $request->validate(['decision' => 'nullable|in:dismiss,mark_absent']);
+        $decision  = $validated['decision'] ?? 'dismiss';
+
+        return execute(function () use ($verification, $decision) {
+            if ($decision === 'mark_absent') {
+                $verification->attendanceRecord->update(['status' => 'absent']);
+            }
+
+            $verification->update(['reviewed_by' => auth()->id(), 'reviewed_at' => now()]);
+
+            return has_data(null, $decision === 'mark_absent' ? 'Marked absent and flag reviewed.' : 'Marked reviewed.');
+        });
     }
 
     /**

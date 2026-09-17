@@ -1,14 +1,14 @@
 @extends('layouts.state.public')
-@section('title', $roundLabel . ' — Exam Attendance')
+@section('title', $slotLabel . ' — ' . $examTerm->title)
 @section('content')
 
 <div class="mb-8 fade-up">
-    <a href="{{ route('state-exam.attendance.index') }}"
+    <a href="{{ route('state-exam.attendance.term', $examTerm) }}"
        class="group inline-flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-neutral-700 dark:text-neutral-200 bg-white/85 dark:bg-neutral-900/70 backdrop-blur-sm border border-neutral-200 dark:border-white/10 rounded-xl shadow-sm hover:shadow-md hover:border-indigo-400/60 dark:hover:border-indigo-500/40 hover:-translate-x-0.5 transition-all duration-300">
         <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
         </svg>
-        ត្រឡប់ក្រោយ (Back to sessions)
+        ត្រឡប់ក្រោយ (Back to time slots)
     </a>
 
     <div class="mt-5 flex items-center gap-3">
@@ -18,8 +18,8 @@
             </svg>
         </div>
         <div>
-            <h1 class="font-display text-2xl font-bold tracking-tight">{{ $roundLabel }}</h1>
-            <p class="text-sm text-neutral-500 dark:text-neutral-400">ស្វែងរកបន្ទប់ដើម្បីបញ្ចូល/កែប្រែអវត្តមាន</p>
+            <h1 class="font-display text-2xl font-bold tracking-tight">{{ $slotLabel }}</h1>
+            <p class="text-sm text-neutral-500 dark:text-neutral-400">{{ $examTerm->title }} — ស្វែងរកបន្ទប់ដើម្បីបញ្ចូល/កែប្រែអវត្តមាន</p>
         </div>
     </div>
 </div>
@@ -38,8 +38,9 @@
 <div id="roomList" class="space-y-3 fade-up" style="animation-delay:200ms"></div>
 
 <script>
-    window.EXAM_ROUND = {{ $round }};
-    window.EXAM_ROUND_LABEL = @json($roundLabel);
+    window.EXAM_TERM_ID = {{ $examTerm->id }};
+    window.EXAM_SLOT = {{ $slot }};
+    window.EXAM_SLOT_LABEL = @json($slotLabel);
 </script>
 
 @endsection

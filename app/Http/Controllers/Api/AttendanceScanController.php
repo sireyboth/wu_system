@@ -88,6 +88,23 @@ class AttendanceScanController extends Controller
 
         $device = $this->resolveDevice($validated['device_id'] ?? null);
 
+        // Hard block, not just a flag — scoped to THIS session only. A
+        // device that already checked someone else in for this exact
+        // class right now is the clearest possible "passing a phone down
+        // the row" case, so this one gets refused outright rather than
+        // silently allowed-and-flagged like the cross-session/day case
+        // scoreRisk() below still just flags.
+        if ($device) {
+            $alreadyCheckedInSomeoneElseHere = AttendanceRecord::where('device_id', $device->id)
+                ->where('class_session_id', $session->id)
+                ->where('student_id', '!=', $student->id)
+                ->exists();
+
+            if ($alreadyCheckedInSomeoneElseHere) {
+                return no_data("This device already checked someone else in for this class. You can't scan in on someone else's behalf — please use your own device, or ask your lecturer for help.", 422);
+            }
+        }
+
         $record = AttendanceRecord::create([
             'class_session_id'  => $session->id,
             'student_id'        => $student->id,

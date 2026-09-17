@@ -30,10 +30,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn() => redirect()->route(auth()->check() ? auth()->user()->homeRouteName() : 'dashboard'));
 
-// Public — on-site exam staff, no login required.
+// Public — on-site exam staff, no login required. Three steps now instead
+// of a fixed "pick 1 of 3 sessions": pick which ACTIVE exam term you're
+// working today (State Exam, Scholarship, whatever's live), then that
+// term's own real time slots (however many it has), then the room search
+// for that specific slot.
 Route::prefix('state-exam/attendance')->name('state-exam.attendance.')->group(function () {
     Route::get('/', [StateExamController::class, 'attendance'])->name('index');
-    Route::get('/{round}', [StateExamController::class, 'attendanceSearch'])->name('search');
+    Route::get('/{examTerm}', [StateExamController::class, 'attendanceTerm'])->name('term');
+    Route::get('/{examTerm}/{slot}', [StateExamController::class, 'attendanceSearch'])->name('search');
 });
 
 Route::get('/state-exam/invigilators', [StateExamController::class, 'invigilators'])->name('state-exam.invigilators.index');

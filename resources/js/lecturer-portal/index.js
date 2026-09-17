@@ -21,6 +21,8 @@ import QRCode from 'qrcode';
         API_MARK: (sessionId) => `/api/v1/lecturer-portal/sessions/${sessionId}/mark`,
         API_SUBMIT_SESSION: (sessionId) => `/api/v1/lecturer-portal/sessions/${sessionId}/submit`,
         API_ATTENDANCE_HISTORY: (classId) => `/api/v1/lecturer-portal/classes/${classId}/attendance-history`,
+        API_ATTENDANCE_HISTORY_EXPORT: (classId) => `/api/v1/lecturer-portal/classes/${classId}/attendance-history/export`,
+        API_ATTENDANCE_HISTORY_IMPORT: (classId) => `/api/v1/lecturer-portal/classes/${classId}/attendance-history/import`,
     };
 
     const Toast = typeof Swal !== 'undefined' ? Swal.mixin({
@@ -52,6 +54,9 @@ import QRCode from 'qrcode';
         attendanceHistoryHead: document.getElementById('attendanceHistoryHead'),
         attendanceHistoryBody: document.getElementById('attendanceHistoryBody'),
         attendanceHistorySessionCount: document.getElementById('attendanceHistorySessionCount'),
+        attendanceHistoryExportBtn: document.getElementById('attendanceHistoryExportBtn'),
+        attendanceHistoryImportBtn: document.getElementById('attendanceHistoryImportBtn'),
+        attendanceHistoryImportFile: document.getElementById('attendanceHistoryImportFile'),
 
         attendanceModal: document.getElementById('attendanceModal'),
         attendanceModalCard: document.getElementById('attendanceModalCard'),
@@ -73,6 +78,7 @@ import QRCode from 'qrcode';
 
     const rosterState = { enrollments: [], classId: null };
     const attendanceState = { classId: null, sessionId: null, qrTimer: null, pollTimer: null, clockTimer: null };
+    const historyState = { classId: null };
 
     const ApiService = {
         async request(url, options = {}) {
@@ -328,6 +334,24 @@ import QRCode from 'qrcode';
         return `<span class="inline-flex items-center justify-center w-6 h-6 rounded text-[10px] font-bold text-white ${color}" title="${status ?? 'No record'}">${letter}</span>`;
     }
 
+    const HISTORY_STATUS_OPTIONS = ['present', 'late', 'absent', 'excused'];
+
+    // Editable version of the badge above — a plain <select> styled to look
+    // like the badge until opened, colored the same way. Changing it fires
+    // straight through the ordinary mark-attendance endpoint, same one the
+    // live QR modal's own dropdown uses, no correction/approval step, on
+    // ANY past date (that endpoint never actually checks lock status —
+    // only the live modal's own UI hides the dropdown once locked).
+    function historyStatusEditable(sessionId, cell) {
+        if (!cell) return '<span class="text-xs text-neutral-300">—</span>';
+        const { status, session_roster_id: rosterId } = cell;
+        const map = { present: 'bg-emerald-500', absent: 'bg-rose-500', late: 'bg-amber-500', excused: 'bg-sky-500' };
+        const color = map[status] ?? 'bg-neutral-200 dark:bg-white/10 text-neutral-500';
+        const options = ['', ...HISTORY_STATUS_OPTIONS].map((opt) => `<option value="${opt}" ${opt === (status ?? '') ? 'selected' : ''}>${opt ? opt.charAt(0).toUpperCase() + opt.slice(1) : '—'}</option>`).join('');
+        return `<select data-action="history-mark" data-session-id="${sessionId}" data-session-roster-id="${rosterId}"
+            class="w-9 h-6 text-[10px] font-bold text-center rounded border-0 outline-none cursor-pointer ${color} ${status ? 'text-white' : ''}">${options}</select>`;
+    }
+
     function formatHistoryDate(dateStr) {
         return new Date(`${dateStr}T00:00:00`).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     }
@@ -358,11 +382,38 @@ import QRCode from 'qrcode';
         DOM.attendanceHistoryBody.innerHTML = students.map((student) => `
             <tr>
                 <td class="py-2 pl-6 pr-3 font-medium whitespace-nowrap sticky left-0 bg-white dark:bg-neutral-900">${student.code ?? ''} — ${student.name}</td>
-                ${sessions.map((s) => `<td class="py-2 px-2 text-center">${historyStatusBadge(student.statuses?.[s.id])}</td>`).join('')}
+                ${sessions.map((s) => `<td class="py-2 px-2 text-center">${historyStatusEditable(s.id, student.statuses?.[s.id])}</td>`).join('')}
             </tr>`).join('');
     }
 
+    async function markFromHistory(select) {
+        const sessionId = select.dataset.sessionId;
+        const sessionRosterId = select.dataset.sessionRosterId;
+        const status = select.value;
+        if (!status) return;
+
+        const { error, data } = await ApiService.request(CONFIG.API_MARK(sessionId), {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ session_roster_id: sessionRosterId, status }),
+        });
+
+        if (error) {
+            Toast.fire({ icon: 'error', title: data?.message || 'Failed to update.' });
+            return;
+        }
+        Toast.fire({ icon: 'success', title: `Marked ${status}.` });
+
+        // Re-color this one cell in place instead of reloading the whole
+        // grid — recolor, not just re-select, since the <select> itself
+        // carries the status color.
+        const map = { present: 'bg-emerald-500', absent: 'bg-rose-500', late: 'bg-amber-500', excused: 'bg-sky-500' };
+        Object.values(map).forEach((cls) => select.classList.remove(cls));
+        select.classList.remove('bg-neutral-200', 'dark:bg-white/10', 'text-neutral-500');
+        select.classList.add(map[status], 'text-white');
+    }
+
     async function openAttendanceHistory(classId, code) {
+        historyState.classId = classId;
         DOM.attendanceHistoryClassCode.textContent = code;
         DOM.attendanceHistoryHead.innerHTML = '';
         DOM.attendanceHistoryBody.innerHTML = '<tr><td class="py-6 px-6 text-center text-neutral-400">Loading history...</td></tr>';
@@ -376,6 +427,38 @@ import QRCode from 'qrcode';
         }
 
         renderAttendanceHistory(data?.data ?? { sessions: [], students: [] });
+    }
+
+    function exportAttendanceHistory() {
+        if (!historyState.classId) return;
+        window.open(CONFIG.API_ATTENDANCE_HISTORY_EXPORT(historyState.classId), '_blank');
+    }
+
+    async function importAttendanceHistory(file) {
+        if (!historyState.classId || !file) return;
+
+        const body = new FormData();
+        body.append('file', file);
+
+        const { error, data } = await ApiService.request(CONFIG.API_ATTENDANCE_HISTORY_IMPORT(historyState.classId), { method: 'POST', body });
+        if (error) {
+            Toast.fire({ icon: 'error', title: data?.message || 'Import failed.' });
+            return;
+        }
+
+        const report = data?.data?.report ?? {};
+        const skippedCount = report.skipped?.length ?? 0;
+        Toast.fire({
+            icon: skippedCount ? 'warning' : 'success',
+            title: `${report.updated_count ?? 0} record(s) updated${skippedCount ? `, ${skippedCount} row(s) skipped` : ''}.`,
+        });
+        if (skippedCount) {
+            console.warn('Attendance history import — skipped rows:', report.skipped);
+        }
+
+        // Re-fetch so the grid reflects whatever the file just changed.
+        const code = DOM.attendanceHistoryClassCode.textContent;
+        openAttendanceHistory(historyState.classId, code);
     }
 
     async function saveScoreCell(input) {
@@ -711,6 +794,19 @@ import QRCode from 'qrcode';
     });
 
     DOM.rosterSearchInput?.addEventListener('input', (e) => filterRoster(e.target.value));
+
+    DOM.attendanceHistoryBody?.addEventListener('change', (e) => {
+        if (e.target.dataset.action !== 'history-mark') return;
+        markFromHistory(e.target);
+    });
+
+    DOM.attendanceHistoryExportBtn?.addEventListener('click', exportAttendanceHistory);
+    DOM.attendanceHistoryImportBtn?.addEventListener('click', () => DOM.attendanceHistoryImportFile?.click());
+    DOM.attendanceHistoryImportFile?.addEventListener('change', () => {
+        const file = DOM.attendanceHistoryImportFile.files?.[0];
+        if (file) importAttendanceHistory(file);
+        DOM.attendanceHistoryImportFile.value = '';
+    });
 
     document.addEventListener('DOMContentLoaded', loadClasses);
 })();

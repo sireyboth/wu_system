@@ -33,6 +33,19 @@
             </div>
             <!-- Button -->
             <div class="flex flex-wrap items-center gap-3">
+                <!-- Exam Term filter + create -->
+                <div class="flex items-center gap-1.5">
+                    <select id="examTermFilterSelect" class="text-sm rounded-xl border-neutral-200 dark:border-white/10 bg-white dark:bg-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="">គ្រប់រយៈពេល (All terms)</option>
+                    </select>
+                    <button type="button" id="newExamTermBtn" title="Create a new exam term"
+                        class="shrink-0 p-2 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-xl transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                    </button>
+                </div>
+
                 <!-- Trash / Recycled Items Toggle -->
                 <button type="button" id="toggleTrashBtn"
                     class="group relative inline-flex items-center justify-center px-4 py-2.5 text-sm font-semibold text-rose-700 dark:text-rose-400 bg-rose-50/80 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/50 rounded-xl hover:bg-rose-100 dark:hover:bg-rose-900/50 hover:border-rose-300 dark:hover:border-rose-800 focus:outline-none focus:ring-2 focus:ring-rose-500/20 active:scale-95 transition-all duration-200 shadow-sm">
@@ -43,6 +56,26 @@
                     </svg>
                     <span id="toggleTrashLabel">ធុងសំរាម (Trash)</span>
                 </button>
+
+                <!-- Export / Import -->
+                <button type="button" id="examStatesExportBtn" title="Export the rooms currently shown to Excel"
+                    class="inline-flex items-center justify-center px-4 py-2.5 text-sm font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-900/50 rounded-xl hover:bg-emerald-100 dark:hover:bg-emerald-900/50 hover:border-emerald-300 dark:hover:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 active:scale-95 transition-all duration-200 shadow-sm">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                    </svg>
+                    <span>Export</span>
+                </button>
+
+                <button type="button" id="examStatesImportBtn" title="Bulk create/fix rooms for the selected term"
+                    class="inline-flex items-center justify-center px-4 py-2.5 text-sm font-semibold text-sky-700 dark:text-sky-400 bg-sky-50/80 dark:bg-sky-950/30 border border-sky-200/80 dark:border-sky-900/50 rounded-xl hover:bg-sky-100 dark:hover:bg-sky-900/50 hover:border-sky-300 dark:hover:border-sky-800 focus:outline-none focus:ring-2 focus:ring-sky-500/20 active:scale-95 transition-all duration-200 shadow-sm">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M7.5 7.5L12 3m0 0l4.5 4.5M12 3v13.5" />
+                    </svg>
+                    <span>Import</span>
+                </button>
+                <input type="file" id="examStatesImportFileInput" accept=".xlsx,.xls,.csv" class="hidden" />
 
                 <!-- Analytics Report Link -->
                 <a href="{{ route('state-exam.report') }}"
@@ -81,6 +114,7 @@
     </div>
 
     @include('state-exam.partials.stateExamModal')
+    @include('state-exam.partials.examTermModal')
 @endsection
 
 @push('scripts')

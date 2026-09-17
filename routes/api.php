@@ -49,14 +49,25 @@ Route::prefix('v1')->middleware('auth')->group(function () {
     Route::prefix('exam-states')->name('exam-states.')->group(function () {
         Route::get('/report', [ExamStateController::class, 'report'])->name('report');
         Route::delete('/bulk', [ExamStateController::class, 'bulkDestroy'])->name('bulk-destroy');
+        Route::get('/export', [ExamStateController::class, 'exportList'])->name('export');
+        Route::post('/import', [ExamStateController::class, 'importFile'])->name('import');
     });
 });
 
-// Exam-states stays fully public and unauthenticated — the on-site
-// attendance/invigilator pages (routes/web.php's public state-exam.*
-// group) have no login and PUT here directly to mark absences.
+// Exam-states, exam-terms and exam-categories all stay fully public and
+// unauthenticated, same reasoning — the on-site attendance/invigilator
+// pages (routes/web.php's public state-exam.* group) have no login, and
+// need to read (exam-terms: which are active, their time slots;
+// exam-categories: their labels) and, on the admin side, write, without
+// a session. The admin pages themselves stay gated at the web-route
+// level (`can:state-exam.view`) — this is the same trust model the
+// original exam-states endpoint already used.
 Route::prefix('v1')->group(function () {
-    api_routes(['exam-states' => ExamStateController::class]);
+    api_routes([
+        'exam-states'      => ExamStateController::class,
+        'exam-terms'       => \App\Http\Controllers\Api\ExamTermController::class,
+        'exam-categories'  => \App\Http\Controllers\Api\ExamCategoryController::class,
+    ]);
 });
 
 // Public self-service retake-exam registration — same reasoning as
@@ -403,6 +414,9 @@ Route::prefix('v1')->middleware('auth')->group(function () {
     Route::middleware('permission:class.view')
         ->get('/classes/{class}/attendance-history', [ClassSectionController::class, 'attendanceHistory'])
         ->name('classes.attendance-history');
+    Route::middleware('permission:class.view')
+        ->get('/classes/{class}/attendance-history/export', [ClassSectionController::class, 'exportAttendanceHistory'])
+        ->name('classes.attendance-history.export');
 
     // Registrar approve/reject on a student leave request.
     Route::middleware('permission:student-leave.edit')
@@ -418,10 +432,12 @@ Route::prefix('v1')->middleware('auth')->group(function () {
             Route::get('/classes/{class}/score-config', [LecturerPortalController::class, 'scoreConfig'])->name('score-config.show');
             Route::get('/classes/{class}/roster', [LecturerPortalController::class, 'roster'])->name('roster');
             Route::get('/classes/{class}/attendance-history', [LecturerPortalController::class, 'attendanceHistory'])->name('attendance-history');
+            Route::get('/classes/{class}/attendance-history/export', [LecturerPortalController::class, 'exportAttendanceHistory'])->name('attendance-history.export');
         });
         Route::middleware('permission:lecturer-portal.edit')->group(function () {
             Route::put('/classes/{class}/score-config', [LecturerPortalController::class, 'updateScoreConfig'])->name('score-config.update');
             Route::post('/scores', [LecturerPortalController::class, 'storeScore'])->name('scores.store');
+            Route::post('/classes/{class}/attendance-history/import', [LecturerPortalController::class, 'importAttendanceHistory'])->name('attendance-history.import');
 
             // Attendance: start a session, watch it live, rotate the QR,
             // manually mark stragglers, and lock it at the end.

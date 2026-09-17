@@ -18,6 +18,9 @@
             សង្ខេបស្ថិតិវត្តមាន/អវត្តមាននិស្សិត តាមម៉ោងប្រឡងនីមួយៗ
         </p>
     </div>
+    <select id="reportTermSelect" class="text-sm rounded-xl border-neutral-200 dark:border-white/10 bg-white dark:bg-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+        <option value="">គ្រប់រយៈពេល (All terms)</option>
+    </select>
     <button id="refreshReportBtn" type="button"
         class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-xl shadow-sm hover:bg-neutral-50 dark:hover:bg-white/5 transition-all active:scale-95">
         <svg id="refreshReportIcon" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -126,6 +129,7 @@
 
 <script>
     window.EXAM_STATE_REPORT_URL = @json(route('exam-states.report'));
+    window.EXAM_TERMS_URL = @json(route('exam-terms.index'));
 </script>
 
 @endsection

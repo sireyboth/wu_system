@@ -275,7 +275,10 @@ function attachTilt() {
 async function fetchRooms(search = '') {
     // per_page defaults to 10 server-side — a broad search (common surname,
     // short room prefix) could silently drop matches past the first 10.
-    const res = await fetch(`${API_BASE}?search=${encodeURIComponent(search)}&per_page=1000`, {
+    // active_terms_only=1 — a room whose exam term has been deactivated
+    // (the exam is over, or was never meant to be public) simply can't be
+    // found here anymore, without needing to know which term it's under.
+    const res = await fetch(`${API_BASE}?search=${encodeURIComponent(search)}&per_page=1000&active_terms_only=1`, {
         headers: { Accept: 'application/json' },
     });
     const json = await res.json();

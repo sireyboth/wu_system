@@ -7,6 +7,8 @@ class ExamStateResource extends IResource
     {
         return [
             'id'            => $this->id,
+            'exam_term_id'  => $this->exam_term_id,
+            'exam_term'     => new ExamTermResource($this->whenLoaded('examTerm')),
             'no'            => $this->no ?? 0,
             'room'          => $this->room,
             'floor'         => $this->floor ?? 0,

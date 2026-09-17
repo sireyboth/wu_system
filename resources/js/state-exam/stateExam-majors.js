@@ -4,7 +4,29 @@
  * is read-only and always recomputed as the sum of these rows.
  */
 
-const TIME_SLOTS = ['7:30-9:00', '9:15-10:48', '10:45-12:15', '07:30-12:15'];
+// Fallback only, used before an Exam Term is picked (or for a room saved
+// before Exam Terms existed) — once a term is selected in the room
+// modal, setTimeSlots() replaces this with that term's real, named
+// slots (e.g. "7:30-9:00") and refreshTimeDropdowns() re-renders every
+// already-added row's <select> to match.
+let TIME_SLOTS = ['7:30-9:00', '9:15-10:48', '10:45-12:15', '07:30-12:15'];
+
+export function setTimeSlots(slots) {
+    TIME_SLOTS = Array.isArray(slots) && slots.length ? slots : ['—'];
+}
+
+export function getTimeSlots() {
+    return TIME_SLOTS;
+}
+
+/** Re-renders every already-added row's time <select> to the current TIME_SLOTS, keeping its value if still valid. */
+export function refreshTimeDropdowns(dom) {
+    const selects = dom.form?.querySelectorAll('.major-time-input') ?? [];
+    selects.forEach((select) => {
+        const current = select.value;
+        select.innerHTML = timeOptionsHtml(TIME_SLOTS.includes(current) ? current : TIME_SLOTS[0]);
+    });
+}
 
 function recalcStudentTotal(dom) {
     const totals = dom.form.querySelectorAll('.major-total-input');

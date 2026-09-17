@@ -274,4 +274,10 @@ class ClassSectionController extends Controller
     {
         return has_data(\App\Models\ClassSession::attendanceHistoryFor($class->id));
     }
+
+    public function exportAttendanceHistory(ClassSection $class)
+    {
+        $history = \App\Models\ClassSession::attendanceHistoryFor($class->id);
+        return $this->export(new \App\Exports\AttendanceHistoryExport($history), "attendance-history-{$class->code}");
+    }
 }
