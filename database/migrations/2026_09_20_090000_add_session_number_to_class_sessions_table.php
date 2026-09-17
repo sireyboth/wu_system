@@ -16,14 +16,20 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('class_sessions', function (Blueprint $table) {
-            $table->unsignedTinyInteger('session_number')->default(1)->after('session_date');
-        });
+        // Guarded — an earlier, partially-applied run of this same migration
+        // (or a manual fix) may have already added the column/index.
+        if (! Schema::hasColumn('class_sessions', 'session_number')) {
+            Schema::table('class_sessions', function (Blueprint $table) {
+                $table->unsignedTinyInteger('session_number')->default(1)->after('session_date');
+            });
+        }
 
-        Schema::table('class_sessions', function (Blueprint $table) {
-            $table->dropUnique(['class_id', 'session_date']);
-            $table->unique(['class_id', 'session_date', 'session_number']);
-        });
+        if (! Schema::hasIndex('class_sessions', ['class_id', 'session_date', 'session_number'], 'unique')) {
+            Schema::table('class_sessions', function (Blueprint $table) {
+                $table->dropUnique(['class_id', 'session_date']);
+                $table->unique(['class_id', 'session_date', 'session_number']);
+            });
+        }
     }
 
     public function down(): void
