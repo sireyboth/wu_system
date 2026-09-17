@@ -24,19 +24,43 @@ return new class extends Migration
             });
         }
 
+        // class_id has a FK (class_sessions.class_id -> classes.id), and
+        // MySQL/InnoDB requires *some* index covering a FK column to exist
+        // at all times — it refuses to drop the old (class_id, session_date)
+        // unique if that's the only index backing it. Both indexes below
+        // start with class_id, so adding the new one FIRST keeps the FK
+        // continuously backed and lets the old one drop cleanly right after,
+        // with no need to touch the foreign key itself.
         if (! Schema::hasIndex('class_sessions', ['class_id', 'session_date', 'session_number'], 'unique')) {
             Schema::table('class_sessions', function (Blueprint $table) {
-                $table->dropUnique(['class_id', 'session_date']);
                 $table->unique(['class_id', 'session_date', 'session_number']);
+            });
+        }
+
+        if (Schema::hasIndex('class_sessions', ['class_id', 'session_date'], 'unique')) {
+            Schema::table('class_sessions', function (Blueprint $table) {
+                $table->dropUnique(['class_id', 'session_date']);
             });
         }
     }
 
     public function down(): void
     {
+        // Same reasoning as up() — add the old index back before dropping
+        // the new one, so class_id's FK is never left unbacked.
+        if (! Schema::hasIndex('class_sessions', ['class_id', 'session_date'], 'unique')) {
+            Schema::table('class_sessions', function (Blueprint $table) {
+                $table->unique(['class_id', 'session_date']);
+            });
+        }
+
+        if (Schema::hasIndex('class_sessions', ['class_id', 'session_date', 'session_number'], 'unique')) {
+            Schema::table('class_sessions', function (Blueprint $table) {
+                $table->dropUnique(['class_id', 'session_date', 'session_number']);
+            });
+        }
+
         Schema::table('class_sessions', function (Blueprint $table) {
-            $table->dropUnique(['class_id', 'session_date', 'session_number']);
-            $table->unique(['class_id', 'session_date']);
             $table->dropColumn('session_number');
         });
     }
