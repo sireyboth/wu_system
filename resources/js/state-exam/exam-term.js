@@ -54,13 +54,41 @@ function renderTermSelects(dom) {
     }
 }
 
+function categoryName(c) {
+    return (c.name_kh || c.name_en || '').trim();
+}
+
+/** Suggestions only (via <datalist>) — the category field itself is free text. */
 function renderCategoryOptions(dom) {
-    if (!dom.examTermCategorySelect) return;
-    const current = dom.examTermCategorySelect.value;
-    dom.examTermCategorySelect.innerHTML = state.examCategories
-        .map((c) => `<option value="${c.id}">${c.name_kh || c.name_en}${c.name_kh && c.name_en ? ` (${c.name_en})` : ''}</option>`)
+    if (!dom.examTermCategoryList) return;
+    dom.examTermCategoryList.innerHTML = state.examCategories
+        .map((c) => `<option value="${categoryName(c).replace(/"/g, '&quot;')}"></option>`)
         .join('');
-    if (current) dom.examTermCategorySelect.value = current;
+}
+
+/** Matches typed text against a known category (by name, case-insensitive); creates one if there's no match. */
+async function resolveCategoryId(dom, ApiService, typedName) {
+    const existing = state.examCategories.find((c) => categoryName(c).toLowerCase() === typedName.toLowerCase());
+    if (existing) return existing.id;
+
+    const { error, data } = await ApiService.request(CONFIG.EXAM_CATEGORIES_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name_en: typedName, name_kh: typedName }),
+    });
+
+    if (error) {
+        const firstError = data?.errors ? Object.values(data.errors)[0]?.[0] : null;
+        Toast.fire({ icon: 'error', title: firstError || data?.message || `Could not create category "${typedName}".` });
+        return null;
+    }
+
+    const created = data?.data;
+    if (created) {
+        state.examCategories.push(created);
+        renderCategoryOptions(dom);
+    }
+    return created?.id ?? null;
 }
 
 export async function loadExamTermLookups(dom, ApiService) {
@@ -126,7 +154,7 @@ export function openExamTermModal(dom, term = null) {
     if (term) {
         if (dom.examTermModalTitle) dom.examTermModalTitle.textContent = 'កែប្រែការប្រឡង (Edit Exam Term)';
         if (dom.examTermSubmitBtn) dom.examTermSubmitBtn.textContent = 'រក្សាទុក (Save)';
-        if (dom.examTermCategorySelect) dom.examTermCategorySelect.value = term.exam_category_id ?? term.category?.id ?? '';
+        if (dom.examTermCategoryInput) dom.examTermCategoryInput.value = term.category ? categoryName(term.category) : '';
         if (dom.examTermCampusSelect) dom.examTermCampusSelect.value = term.campus_id ?? term.campus?.id ?? '';
         if (dom.examTermTitleInput) dom.examTermTitleInput.value = term.title ?? '';
         if (dom.examTermDateInput) dom.examTermDateInput.value = term.exam_date ?? '';
@@ -164,25 +192,36 @@ export function closeExamTermModal(dom) {
 export async function submitExamTermForm(dom, ApiService, onDone) {
     if (!dom.examTermForm) return;
 
+    const title = dom.examTermTitleInput?.value?.trim();
+    const campusId = dom.examTermCampusSelect?.value;
+    const categoryTyped = dom.examTermCategoryInput?.value?.trim();
+
+    if (!title || !categoryTyped || !campusId) {
+        Toast.fire({ icon: 'warning', title: 'Title, Category, and Campus are required.' });
+        return;
+    }
+
+    if (dom.examTermSubmitBtn) dom.examTermSubmitBtn.disabled = true;
+
+    const categoryId = await resolveCategoryId(dom, ApiService, categoryTyped);
+    if (!categoryId) {
+        if (dom.examTermSubmitBtn) dom.examTermSubmitBtn.disabled = false;
+        return; // resolveCategoryId already showed a toast
+    }
+
     const payload = {
-        exam_category_id: dom.examTermCategorySelect?.value,
-        campus_id: dom.examTermCampusSelect?.value,
-        title: dom.examTermTitleInput?.value?.trim(),
+        exam_category_id: categoryId,
+        campus_id: campusId,
+        title,
         exam_date: dom.examTermDateInput?.value || null,
         is_active: !!dom.examTermActiveInput?.checked,
         time_slots: collectSlots(dom),
     };
 
-    if (!payload.title || !payload.exam_category_id || !payload.campus_id) {
-        Toast.fire({ icon: 'warning', title: 'Title, Category, and Campus are required.' });
-        return;
-    }
-
     const isEditing = !!state.editingTermId;
     const url = isEditing ? `${CONFIG.EXAM_TERMS_API}/${state.editingTermId}` : CONFIG.EXAM_TERMS_API;
     const method = isEditing ? 'PUT' : 'POST';
 
-    if (dom.examTermSubmitBtn) dom.examTermSubmitBtn.disabled = true;
     const { error, data } = await ApiService.request(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -209,36 +248,6 @@ export async function submitExamTermForm(dom, ApiService, onDone) {
     onDone?.();
 }
 
-/** Quick inline "+ add a category" — a prompt, not a full page, since categories are a short, rarely-changed list. */
-export async function addCategoryInline(dom, ApiService) {
-    const { value: nameEn } = await Swal.fire({
-        title: 'New Exam Category',
-        input: 'text',
-        inputLabel: 'e.g. "Scholarship Exam", "Entrance Exam"',
-        showCancelButton: true,
-        confirmButtonText: 'Add',
-    });
-    if (!nameEn) return;
-
-    const { error, data } = await ApiService.request(CONFIG.EXAM_CATEGORIES_API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name_en: nameEn, name_kh: nameEn }),
-    });
-
-    if (error) {
-        const firstError = data?.errors ? Object.values(data.errors)[0]?.[0] : null;
-        Toast.fire({ icon: 'error', title: firstError || data?.message || 'Could not add category.' });
-        return;
-    }
-
-    Toast.fire({ icon: 'success', title: 'Category added.' });
-    const categoriesRes = await ApiService.request(`${CONFIG.EXAM_CATEGORIES_API}?per_page=200`);
-    state.examCategories = categoriesRes.error ? state.examCategories : (categoriesRes.data?.data ?? categoriesRes.data ?? []);
-    renderCategoryOptions(dom);
-    if (data?.data?.id && dom.examTermCategorySelect) dom.examTermCategorySelect.value = data.data.id;
-}
-
 export function bindExamTermEvents(dom, ApiService) {
     dom.newExamTermBtn?.addEventListener('click', () => openExamTermModal(dom));
     dom.editExamTermBtn?.addEventListener('click', () => openExamTermModalForSelected(dom));
@@ -250,6 +259,5 @@ export function bindExamTermEvents(dom, ApiService) {
     dom.examTermSlotsContainer?.addEventListener('click', (e) => {
         if (e.target.closest('.remove-slot-row')) e.target.closest('.flex')?.remove();
     });
-    dom.addCategoryBtn?.addEventListener('click', () => addCategoryInline(dom, ApiService));
     dom.roomExamTermSelect?.addEventListener('change', () => applySelectedTermSlots(dom));
 }

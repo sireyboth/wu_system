@@ -80,7 +80,7 @@
 
                     <div x-show="open" x-transition
                         style="display: none;"
-                        class="absolute right-0 z-20 mt-2 w-60 overflow-hidden rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-neutral-900 shadow-xl">
+                        class="absolute right-0 z-30 mt-2 w-60 overflow-hidden rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-neutral-900 shadow-xl">
                         <a href="{{ route('state-exam.report') }}"
                             class="flex items-center gap-2.5 px-4 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                             <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

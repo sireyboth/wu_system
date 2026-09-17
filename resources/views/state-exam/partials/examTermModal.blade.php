@@ -4,13 +4,12 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-            <div class="flex items-center justify-between mb-1.5">
-                <label class="block text-sm font-semibold text-neutral-700 dark:text-neutral-300">ប្រភេទ (Category)</label>
-                <button type="button" id="addCategoryBtn" title="Add a new category"
-                    class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300">+ New</button>
-            </div>
-            <select id="examTermCategorySelect" required
-                class="w-full text-sm p-2.5 rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></select>
+            <label class="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5">ប្រភេទ (Category)</label>
+            <input type="text" id="examTermCategoryInput" list="examTermCategoryList" required autocomplete="off"
+                placeholder="e.g. State Exam, Scholarship Exam"
+                class="w-full text-sm p-2.5 rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-neutral-900 dark:text-white dark:placeholder-neutral-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+            <datalist id="examTermCategoryList"></datalist>
+            <p class="mt-1.5 text-[11px] text-neutral-400">Pick an existing one from the suggestions, or type a new name to create it.</p>
         </div>
         <div>
             <label class="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5">បរិវេណ (Campus)</label>
