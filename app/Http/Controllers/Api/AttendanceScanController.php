@@ -9,6 +9,7 @@ use App\Models\QrToken;
 use App\Models\SessionRoster;
 use App\Models\Student;
 use App\Models\StudentDevice;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 
 /**
@@ -105,16 +106,33 @@ class AttendanceScanController extends Controller
             }
         }
 
-        $record = AttendanceRecord::create([
-            'class_session_id'  => $session->id,
-            'student_id'        => $student->id,
-            'session_roster_id' => $roster->id,
-            'status'            => 'present',
-            'method'            => 'qr',
-            'marked_at'         => now(),
-            'device_id'         => $device?->id,
-            'ip_address'        => $request->ip(),
-        ]);
+        // Two scans for the same student can race past the $existing check
+        // above (double-tap, a flaky-network retry) — the unique index on
+        // (class_session_id, student_id) is what actually stops the
+        // duplicate; this just turns the loser's constraint violation into
+        // the same friendly "already marked" response instead of a 500.
+        try {
+            $record = AttendanceRecord::create([
+                'class_session_id'  => $session->id,
+                'student_id'        => $student->id,
+                'session_roster_id' => $roster->id,
+                'status'            => 'present',
+                'method'            => 'qr',
+                'marked_at'         => now(),
+                'device_id'         => $device?->id,
+                'ip_address'        => $request->ip(),
+            ]);
+        } catch (QueryException $e) {
+            if (! $this->isDuplicateKeyError($e)) {
+                throw $e;
+            }
+
+            $existing = AttendanceRecord::where('class_session_id', $session->id)
+                ->where('student_id', $student->id)
+                ->first();
+
+            return has_data(['status' => $existing->status], "Already marked {$existing->status} for this session.");
+        }
 
         $rapidSharedDevice = $device && $this->scoreRisk($record, $device);
 
@@ -152,11 +170,31 @@ class AttendanceScanController extends Controller
             return $device;
         }
 
-        return StudentDevice::create([
-            'fingerprint'   => $fingerprint,
-            'first_seen_at' => now(),
-            'last_seen_at'  => now(),
-        ]);
+        // Same race as the attendance record above — two near-simultaneous
+        // first scans from the same device (plausible: a double-tap) can
+        // both miss the firstWhere() above and race to create(); the
+        // unique index on `fingerprint` lets only one through.
+        try {
+            return StudentDevice::create([
+                'fingerprint'   => $fingerprint,
+                'first_seen_at' => now(),
+                'last_seen_at'  => now(),
+            ]);
+        } catch (QueryException $e) {
+            if (! $this->isDuplicateKeyError($e)) {
+                throw $e;
+            }
+
+            $device = StudentDevice::firstWhere('fingerprint', $fingerprint);
+            $device?->update(['last_seen_at' => now()]);
+            return $device;
+        }
+    }
+
+    /** MySQL 1062 (SQLSTATE 23000) — a unique-index violation, e.g. the two races above. */
+    private function isDuplicateKeyError(QueryException $e): bool
+    {
+        return $e->getCode() === '23000' || ($e->errorInfo[1] ?? null) === 1062;
     }
 
     /**
