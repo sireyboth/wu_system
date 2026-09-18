@@ -156,6 +156,15 @@
         }
     }
 
+    // Major/campus/etc. names are user-editable elsewhere in the app (by a
+    // different role than whoever views this page) — never trust them as
+    // raw HTML when building innerHTML strings.
+    function escapeHtml(str) {
+        return String(str ?? '').replace(/[&<>"']/g, (c) => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+        })[c]);
+    }
+
     // requiredPlaceholder (disabled+selected, no blank/"any" option) is used
     // for fields that must have a real value picked, like Campus/Shift/Batch
     // on the Create Class form; plain `placeholder` (a selectable blank) is
@@ -166,7 +175,7 @@
             ? `<option value="" disabled selected>${requiredPlaceholder}</option>`
             : `<option value="">${placeholder}</option>`;
         el.innerHTML = firstOption +
-            items.map((item) => `<option value="${item.id}">${item.name_kh || item.name || item.code}</option>`).join('');
+            items.map((item) => `<option value="${item.id}">${escapeHtml(item.name_kh || item.name || item.code)}</option>`).join('');
     }
 
     async function loadLookups() {
@@ -242,7 +251,7 @@
         DOM.majorChecklist.innerHTML = majors.map((m) => `
             <label class="flex items-center gap-2 py-1 text-sm cursor-pointer">
                 <input type="checkbox" name="major_id[]" value="${m.id}" class="rounded border-neutral-300 dark:border-white/20 text-indigo-600 focus:ring-indigo-500/40">
-                <span>${m.name_kh || m.name_en || m.name}</span>
+                <span>${escapeHtml(m.name_kh || m.name_en || m.name)}</span>
             </label>`).join('');
     }
 
@@ -452,7 +461,7 @@
         list.innerHTML = visible.map((m) => `
             <label class="flex items-center gap-2 py-1 text-sm cursor-pointer">
                 <input type="checkbox" name="major_id[]" value="${m.id}" class="rounded border-neutral-300 dark:border-white/20 text-indigo-600 focus:ring-indigo-500/40">
-                <span>${m.name_kh || m.name_en || m.name}</span>
+                <span>${escapeHtml(m.name_kh || m.name_en || m.name)}</span>
             </label>`).join('');
     }
 
