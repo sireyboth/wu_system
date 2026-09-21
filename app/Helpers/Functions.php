@@ -119,11 +119,12 @@ if (! function_exists('has_data')) {
 }
 
 if (! function_exists('no_data')) {
-    function no_data(string $message, int $code = 400): JsonResponse
+    function no_data(string $message, int $code = 400, array $extra = []): JsonResponse
     {
         return response()->json([
             'success' => false,
             'message' => $message,
+            ...$extra,
         ], $code);
     }
 }

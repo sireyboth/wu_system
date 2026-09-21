@@ -167,9 +167,10 @@
 
     async function handleCreateAccount(id, code) {
         const { value: formValues } = await Swal.fire({
-            title: `Create login for ${code || 'this lecturer'}`,
+            title: `Create login for ${escapeHtml(code) || 'this lecturer'}`,
             html:
-                '<input id="swal-account-email" type="email" class="swal2-input" placeholder="Email">' +
+                `<p style="font-size:13px;margin:0 0 8px;color:#64748b">They can sign in with their <b>Lecturer ID (${escapeHtml(code) || '—'})</b> and this password. Email is optional.</p>` +
+                '<input id="swal-account-email" type="email" class="swal2-input" placeholder="Email (optional)">' +
                 '<input id="swal-account-password" type="password" class="swal2-input" placeholder="Password (min 8 chars)">',
             focusConfirm: false,
             showCancelButton: true,
@@ -178,11 +179,11 @@
             preConfirm: () => {
                 const email = document.getElementById('swal-account-email').value.trim();
                 const password = document.getElementById('swal-account-password').value;
-                if (!email || !password || password.length < 8) {
-                    Swal.showValidationMessage('Enter a valid email and a password of at least 8 characters.');
+                if (!password || password.length < 8) {
+                    Swal.showValidationMessage('Enter a password of at least 8 characters.');
                     return false;
                 }
-                return { email, password };
+                return { email: email || null, password };
             },
         });
 

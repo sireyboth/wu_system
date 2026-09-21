@@ -41,6 +41,19 @@
             Mark Me Present
         </button>
 
+        <p id="attendLocationStatus" class="mt-3 text-xs text-center text-neutral-400 dark:text-neutral-500">
+            ទីតាំងរបស់អ្នកនឹងត្រូវបានស្នើសុំរាល់ពេលស្កេន (Your location is requested on every scan)
+        </p>
+
+        <div id="attendLocationHelp" class="hidden mt-4 px-4 py-4 rounded-2xl border border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300 text-sm" role="alert">
+            <p id="attendLocationHelpTitle" class="font-bold"></p>
+            <ol id="attendLocationHelpSteps" class="mt-2 ml-4 list-decimal space-y-1 text-xs leading-relaxed"></ol>
+            <button id="attendLocationRetryBtn" type="button"
+                class="mt-3 w-full px-4 py-2.5 text-xs font-bold text-amber-900 dark:text-amber-200 bg-amber-100 dark:bg-amber-500/20 hover:bg-amber-200 dark:hover:bg-amber-500/30 rounded-xl active:scale-[0.98] transition-all">
+                ព្យាយាមម្តងទៀត (Try location again)
+            </button>
+        </div>
+
         <div id="attendResult" class="hidden mt-5 px-4 py-4 rounded-2xl border text-sm text-center font-semibold"></div>
 
         @unless(request('token'))

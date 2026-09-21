@@ -52,12 +52,14 @@ class AttendanceScanController extends Controller
         $campus = $session->classSection?->campus;
         if ($campus && $campus->hasGeofence()) {
             if (! isset($validated['latitude'], $validated['longitude'])) {
-                return no_data('This class requires your location to check in. Please allow location access and try again.', 422);
+                // `reason` lets the scan page tell "your browser is blocking
+                // location" apart from every other 422 and show how to fix it.
+                return no_data('This class requires your location to check in. Please allow location access and try again.', 422, ['reason' => 'location_required']);
             }
 
             $distance = $campus->distanceInMetersFrom($validated['latitude'], $validated['longitude']);
             if ($distance > $campus->attendance_radius_meters) {
-                return no_data("You're too far from campus to check in for this class. Please make sure you're on campus and try again.", 422);
+                return no_data("You're too far from campus to check in for this class. Please make sure you're on campus and try again.", 422, ['reason' => 'outside_geofence']);
             }
         }
 

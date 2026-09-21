@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\Lecturer;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -27,9 +28,29 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            // Field keeps the name `email` but accepts either an email or a
+            // Lecturer ID (code) — see resolveEmail().
+            'email' => ['required', 'string'],
             'password' => ['required', 'string'],
         ];
+    }
+
+    /**
+     * A lecturer can sign in with their Lecturer ID instead of an email.
+     * Anything without an "@" is looked up as a lecturer code and mapped to
+     * that lecturer's linked user's email; an unknown/unlinked code just
+     * falls through as-is and fails the normal way, so the error message
+     * never reveals whether an ID exists.
+     */
+    private function resolveEmail(): string
+    {
+        $login = trim($this->string('email')->toString());
+
+        if (str_contains($login, '@')) {
+            return $login;
+        }
+
+        return Lecturer::where('code', $login)->whereNotNull('user_id')->first()?->user?->email ?? $login;
     }
 
     /**
@@ -41,7 +62,9 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        $credentials = ['email' => $this->resolveEmail(), 'password' => $this->input('password')];
+
+        if (! Auth::attempt($credentials, $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([

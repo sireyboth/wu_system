@@ -10,6 +10,7 @@ use App\Models\Lecturer;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 
 class LecturerController extends Controller
@@ -120,20 +121,36 @@ class LecturerController extends Controller
         }
 
         $validated = $request->validate([
-            'email'    => 'required|email|unique:users,email',
+            // Optional — a lecturer can sign in with their Lecturer ID
+            // instead (see LoginRequest). users.email is still NOT NULL
+            // and unique, so a blank one gets a placeholder derived from
+            // the code below.
+            'email'    => 'nullable|email|unique:users,email',
             'password' => 'required|string|min:8',
         ]);
 
-        return execute(function () use ($validated, $lecturer) {
+        $email = $validated['email'] ?? null;
+        if (! $email) {
+            $email = Str::slug($lecturer->code) . '@lecturer.local';
+
+            if (User::where('email', $email)->exists()) {
+                return no_data("A login with the placeholder email {$email} already exists — enter a real email for this lecturer instead.", 422);
+            }
+        }
+
+        return execute(function () use ($validated, $lecturer, $email) {
             $user = User::create([
                 'name'     => trim("{$lecturer->name_en}") ?: $lecturer->code,
-                'email'    => $validated['email'],
+                'email'    => $email,
                 'password' => Hash::make($validated['password']),
             ]);
             $user->assignRole('Lecturer');
             $lecturer->update(['user_id' => $user->id]);
 
-            return has_data(['user_id' => $user->id, 'email' => $user->email], "Login created for {$lecturer->code}.");
+            return has_data(
+                ['user_id' => $user->id, 'email' => $user->email, 'login_id' => $lecturer->code],
+                "Login created — {$lecturer->name_en} can sign in with Lecturer ID {$lecturer->code}."
+            );
         });
     }
 
