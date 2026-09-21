@@ -67,10 +67,18 @@
         async request(url, options = {}) {
             this.toggleLoader(true);
             try {
+                // headers is pulled out first: spreading ...options after a
+                // `headers:` key replaces the whole object, silently dropping
+                // Accept: application/json whenever a caller passes its own
+                // Content-Type. Without Accept, Laravel answers a failed
+                // validation with a 302 redirect instead of a 422, fetch
+                // follows it to a 200 HTML page, and the caller reports a
+                // save that never happened as a success.
+                const { headers, ...restOptions } = options;
                 const response = await fetch(url, {
                     credentials: 'same-origin',
-                    headers: { 'Accept': 'application/json', ...options.headers },
-                    ...options
+                    headers: { 'Accept': 'application/json', ...headers },
+                    ...restOptions
                 });
 
                 const contentType = response.headers.get("content-type");

@@ -8,6 +8,7 @@ use App\Models\ClassSession;
 use App\Models\QrToken;
 use App\Models\SessionRoster;
 use App\Models\TeacherAssignment;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -58,10 +59,13 @@ class ClassSessionController extends Controller
     }
 
     /**
-     * Starts (or resumes) today's session for this class — freezes the
-     * roster from whoever is currently enrolled at this exact moment, so
-     * someone auto-enrolled after the session opens doesn't retroactively
-     * appear on a session already in progress.
+     * Starts (or resumes) today's session for this class. A new session
+     * takes its roster from whoever is enrolled at that moment; resuming a
+     * still-OPEN session tops the roster up with anyone enrolled since
+     * (see syncMissingRosterRows) — otherwise opening Attendance once
+     * before enrolling, or adding a late student, leaves that day's
+     * session permanently short. A locked (submitted) session is never
+     * touched.
      */
     public function start(Request $request, ClassSection $class)
     {
@@ -120,11 +124,40 @@ class ClassSessionController extends Controller
                 $message = $latest ? "Session {$session->session_number} started." : 'Session started.';
             } else {
                 $session = $latest;
+                if ($session->status === 'open') {
+                    $this->syncMissingRosterRows($session, $class);
+                }
                 $message = 'Session resumed.';
             }
 
             return has_data($this->sessionPayload($session->fresh()), $message);
         });
+    }
+
+    /**
+     * Add-only: puts anyone currently enrolled but not yet on this open
+     * session's roster onto it. Never removes or edits an existing roster
+     * row, so scans already recorded are unaffected. The unique index on
+     * (class_session_id, course_enrollment_id) makes a concurrent double
+     * call (open modal + poll) safe — the loser's duplicate is ignored.
+     */
+    private function syncMissingRosterRows(ClassSession $session, ClassSection $class): void
+    {
+        $missing = $class->courseEnrollments()
+            ->where('status', 'enrolled')
+            ->whereNotIn('id', $session->sessionRosters()->select('course_enrollment_id'))
+            ->pluck('id');
+
+        foreach ($missing as $enrollmentId) {
+            try {
+                SessionRoster::create([
+                    'class_session_id'     => $session->id,
+                    'course_enrollment_id' => $enrollmentId,
+                ]);
+            } catch (UniqueConstraintViolationException) {
+                // Already added by a concurrent request — nothing to do.
+            }
+        }
     }
 
     /** Live monitor view: roster + who's scanned in so far, per student. */
