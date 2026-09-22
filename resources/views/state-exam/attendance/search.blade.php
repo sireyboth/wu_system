@@ -2,10 +2,10 @@
 @section('title', $slotLabel . ' — ' . $examTerm->title)
 @section('content')
 
-<div class="mb-8 fade-up">
+<div class="mb-8">
     <a href="{{ route('state-exam.attendance.term', $examTerm) }}"
-       class="group inline-flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-neutral-700 dark:text-neutral-200 bg-white/85 dark:bg-neutral-900/70 backdrop-blur-sm border border-neutral-200 dark:border-white/10 rounded-xl shadow-sm hover:shadow-md hover:border-indigo-400/60 dark:hover:border-indigo-500/40 hover:-translate-x-0.5 transition-all duration-300">
-        <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+       class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-neutral-700 dark:text-neutral-200 bg-white/85 dark:bg-neutral-900/70 backdrop-blur-sm border border-neutral-200 dark:border-white/10 rounded-xl shadow-sm hover:shadow-md hover:border-indigo-400/60 dark:hover:border-indigo-500/40">
+        <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
         </svg>
         ត្រឡប់ក្រោយ (Back to time slots)
@@ -24,7 +24,7 @@
     </div>
 </div>
 
-<div class="relative mb-6 fade-up" style="animation-delay:120ms">
+<div class="relative mb-6">
     <div class="absolute inset-y-0 left-0 flex items-center ps-4 pointer-events-none">
         <svg class="w-4.5 h-4.5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -32,10 +32,10 @@
         </svg>
     </div>
     <input id="roomSearchInput" type="text" placeholder="ស្វែងរកបន្ទប់, ជំនាញ, សញ្ញាបត្រ..." autocomplete="off"
-        class="block w-full p-4 ps-11 text-base sm:text-sm bg-white/80 dark:bg-neutral-900/70 backdrop-blur-sm border border-neutral-200 dark:border-white/10 rounded-2xl shadow-sm focus:ring-4 focus:ring-indigo-500/15 focus:border-indigo-400 dark:focus:border-indigo-500/50 dark:placeholder-neutral-500 outline-none transition-all" />
+        class="block w-full p-4 ps-11 text-base sm:text-sm bg-white/80 dark:bg-neutral-900/70 backdrop-blur-sm border border-neutral-200 dark:border-white/10 rounded-2xl shadow-sm focus:ring-4 focus:ring-indigo-500/15 focus:border-indigo-400 dark:focus:border-indigo-500/50 dark:placeholder-neutral-500 outline-none" />
 </div>
 
-<div id="roomList" class="space-y-3 fade-up" style="animation-delay:200ms"></div>
+<div id="roomList" class="space-y-3"></div>
 
 <script>
     window.EXAM_TERM_ID = {{ $examTerm->id }};
@@ -54,13 +54,13 @@
 <div id="stateToastStack" class="fixed top-5 right-5 z-[70] flex flex-col gap-2 w-[calc(100%-2.5rem)] max-w-sm"></div>
 
 {{-- Custom absence-entry modal — same reasoning, must live outside <main>. --}}
-<div id="absenceModal" class="fixed inset-0 z-[60] hidden items-start justify-center overflow-y-auto p-4 py-8 bg-neutral-900/50 dark:bg-black/70 backdrop-blur-sm transition-opacity duration-300">
+<div id="absenceModal" class="fixed inset-0 z-[60] hidden items-start justify-center overflow-y-auto p-4 py-8 bg-neutral-900/50 dark:bg-black/70 backdrop-blur-sm">
     <div id="absenceModalCard"
-         class="w-full max-w-sm my-auto max-h-[85dvh] flex flex-col bg-white dark:bg-neutral-900 rounded-3xl shadow-2xl border border-neutral-200/70 dark:border-white/10 overflow-hidden scale-95 opacity-0 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]">
+         class="w-full max-w-sm my-auto max-h-[85dvh] flex flex-col bg-white dark:bg-neutral-900 rounded-3xl shadow-2xl border border-neutral-200/70 dark:border-white/10 overflow-hidden">
 
         <div class="shrink-0 relative px-6 pt-7 pb-5 text-center bg-gradient-to-br from-indigo-600 to-indigo-800">
             <button id="absenceCloseBtn" type="button"
-                    class="absolute top-3 right-3 flex items-center justify-center w-8 h-8 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors">
+                    class="absolute top-3 right-3 flex items-center justify-center w-8 h-8 rounded-full text-white/70 hover:text-white hover:bg-white/10">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -81,13 +81,13 @@
 
             <div class="flex items-center justify-center gap-4">
                 <button id="absenceMinusBtn" type="button"
-                        class="flex items-center justify-center w-11 h-11 rounded-2xl bg-neutral-100 dark:bg-white/5 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-white/10 active:scale-95 transition-all">
+                        class="flex items-center justify-center w-11 h-11 rounded-2xl bg-neutral-100 dark:bg-white/5 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-white/10">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" /></svg>
                 </button>
                 <input id="absenceInput" type="number" min="0" inputmode="numeric"
                        class="w-24 text-center text-3xl font-black bg-transparent text-neutral-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
                 <button id="absencePlusBtn" type="button"
-                        class="flex items-center justify-center w-11 h-11 rounded-2xl bg-neutral-100 dark:bg-white/5 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-white/10 active:scale-95 transition-all">
+                        class="flex items-center justify-center w-11 h-11 rounded-2xl bg-neutral-100 dark:bg-white/5 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-white/10">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m-7-7h14" /></svg>
                 </button>
             </div>
@@ -97,11 +97,11 @@
 
         <div class="shrink-0 flex gap-2.5 p-6 pt-0">
             <button id="absenceCancelBtn" type="button"
-                    class="flex-1 py-3.5 rounded-2xl font-bold text-sm text-neutral-600 dark:text-neutral-300 bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 transition-colors">
+                    class="flex-1 py-3.5 rounded-2xl font-bold text-sm text-neutral-600 dark:text-neutral-300 bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10">
                 បោះបង់
             </button>
             <button id="absenceSaveBtn" type="button"
-                    class="flex-1 py-3.5 rounded-2xl font-bold text-sm text-white bg-indigo-600 shadow-lg shadow-indigo-500/25 hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-500/30 active:scale-95 transition-all">
+                    class="flex-1 py-3.5 rounded-2xl font-bold text-sm text-white bg-indigo-600 shadow-lg shadow-indigo-500/25 hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-500/30">
                 រក្សាទុក
             </button>
         </div>

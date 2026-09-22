@@ -62,7 +62,7 @@ function showToast(type, message) {
     }[type] ?? { bg: 'bg-neutral-800', icon: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' };
 
     const toast = document.createElement('div');
-    toast.className = `flex items-center gap-3 px-4 py-3.5 rounded-2xl shadow-2xl text-white text-sm font-bold ${palette.bg} translate-x-6 opacity-0 transition-all duration-300`;
+    toast.className = `flex items-center gap-3 px-4 py-3.5 rounded-2xl shadow-2xl text-white text-sm font-bold ${palette.bg}`;
     toast.innerHTML = `
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="${palette.icon}" />
@@ -70,12 +70,7 @@ function showToast(type, message) {
         <span>${escapeHtml(message)}</span>`;
 
     els.toastStack.appendChild(toast);
-    requestAnimationFrame(() => toast.classList.remove('translate-x-6', 'opacity-0'));
-
-    setTimeout(() => {
-        toast.classList.add('translate-x-6', 'opacity-0');
-        setTimeout(() => toast.remove(), 300);
-    }, 2600);
+    setTimeout(() => toast.remove(), 2600);
 }
 
 // ---------- List rendering ----------
@@ -94,8 +89,8 @@ function emptyState() {
 }
 
 function skeletonRows(n = 4) {
-    return Array.from({ length: n }).map((_, i) => `
-        <div class="flex items-center justify-between gap-3 p-4 bg-white/60 dark:bg-neutral-900/50 border border-neutral-200/70 dark:border-white/5 rounded-2xl animate-pulse" style="animation-delay:${i * 80}ms">
+    return Array.from({ length: n }).map(() => `
+        <div class="flex items-center justify-between gap-3 p-4 bg-white/60 dark:bg-neutral-900/50 border border-neutral-200/70 dark:border-white/5 rounded-2xl">
             <div class="flex items-center gap-3 min-w-0 flex-1">
                 <div class="w-11 h-11 rounded-xl bg-neutral-200 dark:bg-white/10 shrink-0"></div>
                 <div class="min-w-0 flex-1 space-y-2">
@@ -113,7 +108,7 @@ function renderList(rooms) {
         return;
     }
 
-    els.list.innerHTML = rooms.map((room, i) => {
+    els.list.innerHTML = rooms.map((room) => {
         const absent = currentAbsent(room);
         const isDone = absent !== null;
         const statusBadge = isDone
@@ -127,21 +122,23 @@ function renderList(rooms) {
                </span>`;
 
         return `
-            <div class="fade-up group flex items-center justify-between gap-4 p-4 sm:p-5 bg-white/85 dark:bg-neutral-900/70 backdrop-blur-sm border ${isDone ? 'border-emerald-200/70 dark:border-emerald-500/15' : 'border-neutral-200/80 dark:border-white/10'} rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-300/70 dark:hover:border-indigo-500/30 transition-all duration-300" style="animation-delay:${Math.min(i, 8) * 60}ms">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-4 sm:p-5 bg-white/85 dark:bg-neutral-900/70 backdrop-blur-sm border ${isDone ? 'border-emerald-200/70 dark:border-emerald-500/15' : 'border-neutral-200/80 dark:border-white/10'} rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-300/70 dark:hover:border-indigo-500/30">
                 <div class="flex items-center gap-3.5 min-w-0 flex-1">
-                    <div class="flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-800 text-white font-bold text-sm shadow-md shadow-indigo-500/20 shrink-0">
-                        ${escapeHtml(room.room ?? '?')}
+                    <div class="flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-800 text-white shadow-md shadow-indigo-500/20 shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 21V6.75A2.25 2.25 0 0111.25 4.5h1.5A2.25 2.25 0 0115 6.75V21m-6 0h6m-6 0H5.25m9.75 0h4.5M9 12h.008v.008H9V12zm0 3h.008v.008H9V15z" />
+                        </svg>
                     </div>
                     <div class="min-w-0">
-                        <div class="font-bold text-neutral-900 dark:text-white">បន្ទប់ ${escapeHtml(room.room ?? 'N/A')}</div>
+                        <div class="font-bold text-neutral-900 dark:text-white break-words">បន្ទប់ ${escapeHtml(room.room ?? 'N/A')}</div>
                         <div class="text-xs text-neutral-400 dark:text-neutral-500 truncate">
                             ${escapeHtml(room.major ?? '')} &middot; ${escapeHtml(room.degree ?? '')} &middot; និស្សិត ${escapeHtml(room.student_total ?? 0)} នាក់
                         </div>
                     </div>
                 </div>
-                <div class="flex items-center gap-3 shrink-0">
+                <div class="flex items-center justify-between sm:justify-end gap-3 shrink-0">
                     ${statusBadge}
-                    <button data-id="${room.id}" class="enter-absence-btn px-4 py-2.5 text-sm font-bold text-white bg-indigo-600 rounded-xl shadow-sm shadow-indigo-500/25 hover:bg-indigo-700 hover:shadow-md hover:shadow-indigo-500/30 active:scale-95 transition-all">
+                    <button data-id="${room.id}" class="enter-absence-btn px-4 py-2.5 text-sm font-bold text-white bg-indigo-600 rounded-xl shadow-sm shadow-indigo-500/25 hover:bg-indigo-700 hover:shadow-md hover:shadow-indigo-500/30">
                         បញ្ចូល/កែប្រែ
                     </button>
                 </div>
@@ -202,21 +199,13 @@ function openModal(room) {
 
     els.modal.classList.remove('hidden');
     els.modal.classList.add('flex');
-    requestAnimationFrame(() => {
-        els.modalCard.classList.remove('scale-95', 'opacity-0');
-        els.modalCard.classList.add('scale-100', 'opacity-100');
-    });
-    setTimeout(() => els.input?.focus(), 200);
+    els.input?.focus();
 }
 
 function closeModal() {
-    els.modalCard.classList.add('scale-95', 'opacity-0');
-    els.modalCard.classList.remove('scale-100', 'opacity-100');
-    setTimeout(() => {
-        els.modal.classList.add('hidden');
-        els.modal.classList.remove('flex');
-        activeRoom = null;
-    }, 250);
+    els.modal.classList.add('hidden');
+    els.modal.classList.remove('flex');
+    activeRoom = null;
 }
 
 async function saveAbsence() {

@@ -48,12 +48,15 @@
 
         html.dark .state-bg { background-color: #05070f; }
 
+        /* Static decorative curve pattern + soft glows — no motion, kept
+           static (not repainting every frame) so this page stays light
+           on low-end devices instead of running a background animation
+           forever regardless of whether anyone's even looking at it. */
         .state-waves {
             position: absolute;
             inset: -20% -10%;
             background-repeat: repeat-x;
             background-size: 480px 100%;
-            will-change: background-position;
         }
 
         .state-waves.layer-1 {
@@ -61,7 +64,6 @@
             height: 46%;
             opacity: .5;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 480 220'%3E%3Cpath d='M0 130 C 60 70, 120 190, 180 130 S 300 70, 360 130 S 480 190, 480 130' fill='none' stroke='%234f46e5' stroke-opacity='0.16' stroke-width='1.6'/%3E%3C/svg%3E");
-            animation: waveDriftA 46s linear infinite;
         }
 
         .state-waves.layer-2 {
@@ -69,7 +71,6 @@
             height: 46%;
             opacity: .4;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 480 220'%3E%3Cpath d='M0 100 C 60 160, 120 40, 180 100 S 300 160, 360 100 S 480 40, 480 100' fill='none' stroke='%23f59e0b' stroke-opacity='0.14' stroke-width='1.4'/%3E%3C/svg%3E");
-            animation: waveDriftB 60s linear infinite;
         }
 
         .state-waves.layer-3 {
@@ -77,17 +78,6 @@
             height: 46%;
             opacity: .3;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 480 220'%3E%3Cpath d='M0 130 C 60 70, 120 190, 180 130 S 300 70, 360 130 S 480 190, 480 130' fill='none' stroke='%236366f1' stroke-opacity='0.12' stroke-width='1.2'/%3E%3C/svg%3E");
-            animation: waveDriftA 75s linear infinite reverse;
-        }
-
-        @keyframes waveDriftA {
-            from { background-position-x: 0; }
-            to   { background-position-x: -480px; }
-        }
-
-        @keyframes waveDriftB {
-            from { background-position-x: 0; }
-            to   { background-position-x: 480px; }
         }
 
         .state-glow {
@@ -95,14 +85,12 @@
             border-radius: 9999px;
             filter: blur(100px);
             opacity: .28;
-            animation: driftGlow 24s ease-in-out infinite;
         }
 
         .state-glow.gold {
             width: 28rem; height: 28rem;
             top: -12%; right: -8%;
             background: radial-gradient(circle, hsla(var(--gold), .5), transparent 70%);
-            animation-delay: -6s;
         }
 
         .state-glow.indigo {
@@ -111,47 +99,9 @@
             background: radial-gradient(circle, rgba(79,70,229,.45), transparent 70%);
         }
 
-        @keyframes driftGlow {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(4%, 3%) scale(1.08); }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .state-glow, .state-waves { animation: none; }
-        }
-
-        /* ---------- Entrance animations ---------- */
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(14px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
-        .fade-up {
-            animation: fadeUp .6s cubic-bezier(.16,1,.3,1) both;
-        }
-
-        /* ---------- Scroll-reveal (fade + zoom in) — plain IntersectionObserver, no library ---------- */
-        .scroll-reveal {
-            opacity: 0;
-            transform: scale(.75);
-            transition: opacity 1.2s cubic-bezier(.16,1,.3,1), transform 1.2s cubic-bezier(.16,1,.3,1);
-        }
-
-        .scroll-reveal.in-view {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .scroll-reveal { opacity: 1; transform: none; transition: none; }
-        }
-
         /* ---------- Hover brightness — logos, icons, and links light up on hover so
-           they're easier to pick out, especially against the dark-mode background ---------- */
-        .hover-brighten {
-            transition: filter .25s ease-out;
-        }
-
+           they're easier to pick out, especially against the dark-mode background.
+           Instant on hover, no transition, so it costs nothing while idle. ---------- */
         .hover-brighten:hover {
             filter: brightness(1.25);
         }
@@ -162,7 +112,7 @@
     </style>
 </head>
 
-<body class="relative min-h-screen text-neutral-900 dark:text-white transition-colors">
+<body class="relative min-h-screen text-neutral-900 dark:text-white">
 
     <div class="state-bg">
         <div class="state-waves layer-1"></div>
@@ -191,7 +141,7 @@
             </div>
 
             <button onclick="toggleDarkMode()" title="Toggle light / dark mode"
-                class="hover-brighten flex items-center justify-center w-10 h-10 bg-white dark:bg-white/5 border border-neutral-200 dark:border-white/10 rounded-xl shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-500/40 transition-all">
+                class="hover-brighten flex items-center justify-center w-10 h-10 bg-white dark:bg-white/5 border border-neutral-200 dark:border-white/10 rounded-xl shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-500/40">
                 <svg class="hidden w-4.5 h-4.5 text-amber-500 dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
@@ -214,25 +164,24 @@
         </p>
     </footer>
 
-    <footer id="roumdoulFooter" pAnimateOnScroll enterClass="animate-enter fade-in-10 zoom-in-75 animate-duration-1200"
-        class="scroll-reveal mt-20 px-4 mb-32">
+    <footer id="roumdoulFooter" class="mt-20 px-4 mb-32">
         <div class="flex flex-col items-center justify-center space-y-3">
 
-            <div class="text-center group transition-all duration-500 hover:scale-105">
+            <div class="text-center">
                 <h3 class="text-gray-800 dark:text-neutral-400 tracking-[0.4em] text-[10px] uppercase mb-4">
                     Premium Services
                 </h3>
                 <a href="https://t.me/roumdol_invite" target="_blank"
-                    class="hover-brighten mx-auto mb-3 flex items-center justify-center w-16 h-16 rounded-2xl bg-white dark:bg-white/5 border border-neutral-200/80 dark:border-white/10 shadow-md shadow-pink-900/10 p-2 transition-transform duration-500 group-hover:scale-105">
+                    class="hover-brighten mx-auto mb-3 flex items-center justify-center w-16 h-16 rounded-2xl bg-white dark:bg-white/5 border border-neutral-200/80 dark:border-white/10 shadow-md shadow-pink-900/10 p-2">
                     <img src="{{ asset('images/Roumdoul_Logo.png') }}" alt="Roumdoul logo" class="w-full h-full object-contain">
                 </a>
                 <div class="flex flex-col items-center">
                     <span class="my-3 text-3xl text-pink-900 dark:text-pink-400 font-bold">
-                        <a href="https://t.me/roumdol_invite" target="_blank" class="hover-brighten hover:text-pink-700 dark:hover:text-pink-300 transition-colors">
+                        <a href="https://t.me/roumdol_invite" target="_blank" class="hover-brighten hover:text-pink-700 dark:hover:text-pink-300">
                             រំដួល </a>
                     </span>
                     <span class="text-lg font-medium text-pink-900 dark:text-pink-400 tracking-widest uppercase">
-                        <a href="https://t.me/roumdol_invite" target="_blank" class="hover-brighten hover:text-pink-700 dark:hover:text-pink-300 transition-colors">
+                        <a href="https://t.me/roumdol_invite" target="_blank" class="hover-brighten hover:text-pink-700 dark:hover:text-pink-300">
                             ROUMDOUL </a>
                     </span>
                 </div>
@@ -240,21 +189,21 @@
 
             <div class="flex items-center gap-6 py-6">
                 <a href="https://www.facebook.com/share/1AoKyVb4t3/?mibextid=wwXIfr" target="_blank"
-                    class="hover-brighten flex items-center justify-center w-10 h-10 rounded-full dark:bg-white/5 transition-all duration-300 opacity-60 hover:opacity-100 hover:-translate-y-1 hover:scale-110">
+                    class="hover-brighten flex items-center justify-center w-10 h-10 rounded-full dark:bg-white/5 opacity-60 hover:opacity-100">
                     <img src="https://img.icons8.com/material-rounded/48/831843/facebook-f.png" class="w-6 h-6"
                         alt="Facebook">
                 </a>
                 <a href="https://www.instagram.com/roumd_oul" target="_blank"
-                    class="hover-brighten flex items-center justify-center w-10 h-10 rounded-full dark:bg-white/5 transition-all duration-300 opacity-60 hover:opacity-100 hover:-translate-y-1 hover:scale-110">
+                    class="hover-brighten flex items-center justify-center w-10 h-10 rounded-full dark:bg-white/5 opacity-60 hover:opacity-100">
                     <img src="https://img.icons8.com/material-rounded/48/831843/instagram-new.png" class="w-6 h-6"
                         alt="Instagram">
                 </a>
                 <a href="https://www.tiktok.com/@roum_doul?_r=1&_t=ZS-92Nr8NVeJhE" target="_blank"
-                    class="hover-brighten flex items-center justify-center w-10 h-10 rounded-full dark:bg-white/5 transition-all duration-300 opacity-60 hover:opacity-100 hover:-translate-y-1 hover:scale-110">
+                    class="hover-brighten flex items-center justify-center w-10 h-10 rounded-full dark:bg-white/5 opacity-60 hover:opacity-100">
                     <img src="https://img.icons8.com/material-rounded/48/831843/tiktok.png" class="w-6 h-6" alt="TikTok">
                 </a>
                 <a href="https://t.me/roumdoul_official" target="_blank"
-                    class="hover-brighten flex items-center justify-center w-10 h-10 rounded-full dark:bg-white/5 transition-all duration-300 opacity-60 hover:opacity-100 hover:-translate-y-1 hover:scale-110">
+                    class="hover-brighten flex items-center justify-center w-10 h-10 rounded-full dark:bg-white/5 opacity-60 hover:opacity-100">
                     <img src="https://img.icons8.com/material-rounded/48/831843/telegram-app.png" class="w-6 h-6"
                         alt="Telegram">
                 </a>
@@ -277,40 +226,6 @@
          <main>'s stacking context, so `position: fixed` + z-index on a modal
          actually paints above the footer instead of being trapped under it. --}}
     @stack('modals')
-
-    <script>
-        window.addEventListener('load', function () {
-            var start = function () {
-                var el = document.getElementById('roumdoulFooter');
-                if (!el || el.dataset.revealBound) return;
-                el.dataset.revealBound = '1';
-
-                if (!('IntersectionObserver' in window)) {
-                    el.classList.add('in-view');
-                    return;
-                }
-
-                var observer = new IntersectionObserver(function (entries) {
-                    entries.forEach(function (entry) {
-                        if (entry.isIntersecting) {
-                            entry.target.classList.add('in-view');
-                            observer.unobserve(entry.target);
-                        }
-                    });
-                }, { threshold: 0.15 });
-
-                observer.observe(el);
-            };
-
-            // Wait for webfonts too — a late font swap can shift layout
-            // enough to falsely trigger (or miss) the intersection check.
-            if (document.fonts && document.fonts.ready) {
-                document.fonts.ready.then(start);
-            } else {
-                start();
-            }
-        });
-    </script>
 
     @stack('scripts')
 </body>
