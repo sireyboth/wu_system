@@ -37,6 +37,27 @@ function seatCode(i) {
     return `${row}${(i % 9) + 1}`;
 }
 
+/**
+ * Room names aren't always a short "104"-style code — this campus uses
+ * ones like "F1-01(ស្ទឹងមានជ័យ)" (room + a parenthesized location note).
+ * The boarding-pass room number is deliberately huge (it's the one thing
+ * someone glances at to find their room), but at a fixed giant size a
+ * longer real name wraps and breaks mid-character on a phone. Scale the
+ * size down by length instead of assuming every room name is short.
+ */
+function roomSizeClass(text, { big = false } = {}) {
+    const len = (text || '').length;
+    if (big) {
+        if (len <= 6) return 'text-5xl sm:text-6xl';
+        if (len <= 12) return 'text-3xl sm:text-4xl';
+        if (len <= 20) return 'text-2xl sm:text-3xl';
+        return 'text-lg sm:text-xl';
+    }
+    if (len <= 10) return 'text-xl';
+    if (len <= 20) return 'text-base';
+    return 'text-sm';
+}
+
 const NOT_ASSIGNED = 'មិនទាន់មានអនុរក្ស (Not yet assigned)';
 
 // ---------- Normalize a room's majors/invigilators into one roster ----------
@@ -164,12 +185,12 @@ function boardingPass(room, roster, i, keyword) {
                             State Exam &middot; Invigilator Duty Pass
                         </div>
 
-                        <div class="mt-4 flex items-end justify-between gap-4">
-                            <div>
+                        <div class="mt-4 flex items-start justify-between gap-4">
+                            <div class="min-w-0 flex-1">
                                 <div class="text-[10px] font-bold uppercase tracking-widest text-neutral-500 dark:text-neutral-400">Room</div>
-                                <div class="text-5xl sm:text-6xl font-black leading-none tracking-tight text-neutral-900 dark:text-white [text-shadow:0_-1px_0_rgba(255,255,255,0.7),0_4px_18px_rgba(79,70,229,0.4)]">${escapeHtml(room.room ?? '—')}</div>
+                                <div class="${roomSizeClass(room.room, { big: true })} font-black leading-tight tracking-tight break-words text-neutral-900 dark:text-white [text-shadow:0_-1px_0_rgba(255,255,255,0.7),0_4px_18px_rgba(79,70,229,0.4)]">${escapeHtml(room.room ?? '—')}</div>
                             </div>
-                            <div class="text-right shrink-0 pb-1">
+                            <div class="text-right shrink-0">
                                 <div class="text-[10px] font-bold uppercase tracking-widest text-neutral-500 dark:text-neutral-400">Floor</div>
                                 <div class="text-2xl font-bold text-neutral-700 dark:text-neutral-200">${escapeHtml(room.floor_label ?? 'N/A')}</div>
                             </div>
@@ -212,9 +233,9 @@ function boardingPass(room, roster, i, keyword) {
                     <!-- Stub -->
                     <div class="relative shrink-0 w-full sm:w-36 bg-gradient-to-br from-indigo-500/85 to-violet-600/85 backdrop-blur-xl text-white p-5 flex sm:flex-col items-center justify-between sm:justify-center gap-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]">
                         <div class="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-transparent" aria-hidden="true"></div>
-                        <div class="relative sm:text-center">
+                        <div class="relative min-w-0 flex-1 sm:flex-none sm:text-center">
                             <div class="text-[9px] font-bold uppercase tracking-[0.2em] text-indigo-100">Duty Pass</div>
-                            <div class="text-xl font-black tracking-tight [text-shadow:0_1px_2px_rgba(0,0,0,0.25)]">${escapeHtml(room.room ?? '—')}</div>
+                            <div class="${roomSizeClass(room.room)} font-black tracking-tight break-words [text-shadow:0_1px_2px_rgba(0,0,0,0.25)]">${escapeHtml(room.room ?? '—')}</div>
                         </div>
 
                         <div class="relative flex sm:flex-col items-center gap-0.5" aria-hidden="true">

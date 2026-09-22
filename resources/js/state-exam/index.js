@@ -8,6 +8,7 @@ import { resetAbsenceInputs } from './stateExam-absences.js';
 import { bindBulkSelect } from './stateExam-bulk.js';
 import { bindPagination } from './stateExam-pagination.js';
 import { loadExamTermLookups, bindExamTermEvents, applySelectedTermSlots, openExamTermModal, closeExamTermModal } from './exam-term.js';
+import { escapeHtml } from './form-utils.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const dom = buildDom();
@@ -145,11 +146,31 @@ function initExportImportEvents(dom, ApiService) {
         window.open(`${CONFIG.EXAM_STATES_EXPORT_API}?${params.toString()}`, '_blank');
     });
 
-    dom.importBtn?.addEventListener('click', () => {
+    dom.importBtn?.addEventListener('click', async () => {
         if (!state.termFilterId) {
             Toast.fire({ icon: 'warning', title: 'Select an Exam Term above first — import loads rooms into that term.' });
             return;
         }
+
+        const confirmation = await Swal.fire({
+            title: 'Import Exam Rooms',
+            html: `
+                <div class="text-left text-sm leading-relaxed">
+                    <p>One row per Major. To give a room several majors, repeat the same <b>Room</b> value on the next row(s) and leave Room/Shift/Degree/Exam Date blank there — they only need filling on a room's first row.</p>
+                    <ul class="mt-2 pl-4 list-disc space-y-0.5">
+                        <li><b>Room</b> — required on a room's first row.</li>
+                        <li><b>Major</b> &amp; <b>Degree</b> — required to create a new room (not required when only updating fields on an existing one).</li>
+                        <li><b>Exam Date</b> — a real date (e.g. 2026-10-01), or leave blank.</li>
+                        <li><b>Total</b> — a number.</li>
+                    </ul>
+                </div>`,
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Choose File',
+            cancelButtonText: 'Cancel',
+        });
+        if (!confirmation.isConfirmed) return;
+
         dom.importFileInput?.click();
     });
 
@@ -170,12 +191,24 @@ function initExportImportEvents(dom, ApiService) {
 
         const report = data?.data?.report ?? {};
         const skippedCount = report.skipped?.length ?? 0;
-        Toast.fire({
-            icon: skippedCount ? 'warning' : 'success',
-            title: `${report.created_count ?? 0} created, ${report.updated_count ?? 0} updated${skippedCount ? `, ${skippedCount} row(s) skipped` : ''}.`,
-        });
+
         if (skippedCount) {
-            console.warn('Exam room import — skipped rows:', report.skipped);
+            const items = report.skipped.map((s) => {
+                const where = s.room ? `Room "${escapeHtml(s.room)}"` : (s.row ? `Row ${escapeHtml(s.row)}` : 'A row');
+                return `<li class="py-1"><b>${where}</b>: ${escapeHtml(s.reason)}</li>`;
+            }).join('');
+
+            Swal.fire({
+                icon: 'warning',
+                title: `${report.created_count ?? 0} created, ${report.updated_count ?? 0} updated — ${skippedCount} row(s) need attention`,
+                html: `<ul class="text-left text-sm max-h-72 overflow-y-auto divide-y divide-neutral-100 dark:divide-white/10">${items}</ul>`,
+                confirmButtonText: 'OK',
+            });
+        } else {
+            Toast.fire({
+                icon: 'success',
+                title: `${report.created_count ?? 0} created, ${report.updated_count ?? 0} updated.`,
+            });
         }
 
         loadStateExam(dom, ApiService, dom.searchInput?.value || '');
