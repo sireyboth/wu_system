@@ -64,8 +64,15 @@ const NOT_ASSIGNED = 'មិនទាន់មានអនុរក្ស (Not y
 
 function rosterFromRoom(room) {
     if (Array.isArray(room.majors) && room.majors.length > 0) {
-        return room.majors.map((m) => ({
-            invigilator: (m.invigilator || '').trim() || NOT_ASSIGNED,
+        // majors[i] holds {major, time, total} — the invigilator for that
+        // row lives in the separate invigilators[] array at the same
+        // index, not on the majors entry itself (same pairing the edit
+        // modal and the importer use). Reading m.invigilator directly
+        // here always came back undefined, so every room with a majors
+        // breakdown showed "Not yet assigned" no matter what was in the DB.
+        const invigilators = Array.isArray(room.invigilators) ? room.invigilators : [];
+        return room.majors.map((m, i) => ({
+            invigilator: (invigilators[i] || '').trim() || NOT_ASSIGNED,
             major: m.major || room.major,
             time: m.time || '',
         }));
