@@ -102,6 +102,56 @@
      footer, so this lives outside it, in the layout's 'modals' stack. --}}
 <div id="retakeToastStack" class="fixed top-5 right-5 z-[70] flex flex-col gap-2 w-[calc(100%-2.5rem)] max-w-sm"></div>
 
+{{-- Confirm-registration dialog — replaces the browser's native
+     window.confirm() so the student sees exactly which subjects will be
+     locked in (and which won't) before they commit. Same 'modals' stack
+     for the same stacking reason as the toast stack above. --}}
+<div id="retakeConfirmModal" class="hidden fixed inset-0 z-[80] items-end sm:items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="retakeConfirmModalTitle">
+    <div data-confirm-backdrop class="absolute inset-0 bg-neutral-950/50 backdrop-blur-sm opacity-0 transition-opacity duration-200"></div>
+
+    <div data-confirm-card class="relative w-full max-w-md bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden opacity-0 translate-y-4 sm:scale-95 transition-all duration-200">
+        <div class="px-6 pt-6 pb-4 text-center">
+            <div class="mx-auto mb-4 flex items-center justify-center w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10">
+                <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <h3 id="retakeConfirmModalTitle" class="font-bold text-lg text-neutral-900 dark:text-white">បញ្ជាក់ការចុះឈ្មោះ</h3>
+            <p class="text-xs text-neutral-400">Confirm Registration</p>
+        </div>
+
+        <div class="px-6 pb-4 max-h-[50vh] overflow-y-auto space-y-4">
+            <div>
+                <div class="text-[11px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2">
+                    នឹងចុះឈ្មោះ (Will register) · <span id="retakeConfirmSelectedCount">0</span>
+                </div>
+                <ul id="retakeConfirmSelectedList" class="space-y-1.5"></ul>
+            </div>
+            <div id="retakeConfirmUnselectedBlock" class="hidden">
+                <div class="text-[11px] font-bold uppercase tracking-widest text-neutral-400 mb-2">
+                    មិនចុះឈ្មោះ (Will not register) · <span id="retakeConfirmUnselectedCount">0</span>
+                </div>
+                <ul id="retakeConfirmUnselectedList" class="space-y-1.5"></ul>
+            </div>
+            <p class="text-xs text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 rounded-xl px-3 py-2.5">
+                សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ។ សូមទៅបង់ប្រាក់នៅការិយាល័យកិច្ចការនិស្សិត។
+                <span class="block mt-0.5 text-amber-600/80 dark:text-amber-400/70">This cannot be undone here. Please pay at the Student Affairs office afterward.</span>
+            </p>
+        </div>
+
+        <div class="flex flex-col-reverse sm:flex-row gap-2 px-6 py-4 bg-neutral-50 dark:bg-white/[0.03] border-t border-neutral-100 dark:border-white/5">
+            <button type="button" data-confirm-cancel
+                class="flex-1 px-4 py-3 text-sm font-bold text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-2xl hover:bg-neutral-50 dark:hover:bg-white/5 active:scale-[0.98] transition-all">
+                បោះបង់ (Cancel)
+            </button>
+            <button type="button" data-confirm-ok
+                class="flex-1 px-4 py-3 text-sm font-bold text-white bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 rounded-2xl shadow-lg shadow-emerald-500/25 active:scale-[0.98] transition-all">
+                បញ្ជាក់ (Confirm)
+            </button>
+        </div>
+    </div>
+</div>
+
 {{-- Roumdoul promo splash — shown on every visit for 1.5s, then plays a
      pop-out animation and fades away on its own (Leng's call: this is the
      university's own student-facing page, so a promo shouldn't force a

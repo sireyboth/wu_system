@@ -5,8 +5,11 @@ use App\Exports\RetakeRegistrationExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RetakeRegistrationRequest;
 use App\Http\Resources\RetakeRegistrationResource;
+use App\Models\Lecturer;
 use App\Models\RetakeBatch;
 use App\Models\RetakeRegistration;
+use App\Models\Student;
+use App\Models\Subject;
 use Illuminate\Http\Request;
 
 class RetakeRegistrationController extends Controller
@@ -149,10 +152,88 @@ class RetakeRegistrationController extends Controller
         $data  = $request->validated();
         $batch = RetakeBatch::findOrFail($data['batch_id']);
 
+        if ($this->isDuplicate($batch->id, $data['student_id'], $data['subject_id'])) {
+            return no_data('This student already has this subject in this batch.', 422);
+        }
+
         return $this->save($request, [
             'retake_term_id' => $batch->retake_term_id,
             'exam_type_id'   => $batch->exam_type_id,
+            // Opt-in, same as import/carry-forward: the student ticks it
+            // themselves on the public page.
+            'is_selected'    => $data['is_selected'] ?? false,
         ]);
+    }
+
+    /**
+     * REG corrects a registration — wrong student, subject, lecturer or
+     * remark. The batch is fixed: moving a row between batches would mean
+     * re-deriving its term/exam type and breaks carry-forward lineage, so
+     * that's delete + re-add instead. Student/subject are also frozen once
+     * paid, since the payment was taken against that exact pairing.
+     */
+    public function update(RetakeRegistrationRequest $request, RetakeRegistration $retakeRegistration)
+    {
+        $data    = $request->validated();
+        $batchId = $retakeRegistration->batch_id;
+
+        $pairingChanged = (int) $data['student_id'] !== $retakeRegistration->student_id
+            || (int) $data['subject_id'] !== $retakeRegistration->subject_id;
+
+        if ($pairingChanged && $retakeRegistration->payment_status === RetakeRegistration::PAYMENT_PAID) {
+            return no_data('This registration is already paid — the student and subject can no longer be changed.', 422);
+        }
+
+        if ($pairingChanged && $this->isDuplicate($batchId, $data['student_id'], $data['subject_id'], $retakeRegistration->id)) {
+            return no_data('This student already has this subject in this batch.', 422);
+        }
+
+        return $this->release($request, $retakeRegistration, ['batch_id' => $batchId]);
+    }
+
+    /**
+     * Searchable options for the add/edit modal's student/subject/lecturer
+     * pickers — at most 20 {id, label} pairs per call.
+     */
+    public function options(Request $request)
+    {
+        $validated = $request->validate([
+            'type'   => 'required|in:student,subject,lecturer',
+            'search' => 'nullable|string|max:100',
+        ]);
+        $search = $validated['search'] ?? null;
+
+        $items = match ($validated['type']) {
+            'student' => Student::query()->with('person')->search($search)->orderBy('code')->limit(20)->get()
+                ->map(function (Student $s) {
+                    $p    = $s->person;
+                    $name = trim(($p?->first_name_kh ?? '') . ' ' . ($p?->last_name_kh ?? ''))
+                        ?: trim(($p?->first_name ?? '') . ' ' . ($p?->last_name ?? ''));
+
+                    return ['id' => $s->id, 'label' => $name !== '' ? "{$s->code} — {$name}" : $s->code];
+                }),
+            'subject' => Subject::query()->search($search)->orderBy('name_en')->limit(20)->get()
+                ->map(fn(Subject $s) => ['id' => $s->id, 'label' => $s->code ? "{$s->code} — {$s->name_en}" : $s->name_en]),
+            'lecturer' => Lecturer::query()->search($search)->orderBy('name_en')->limit(20)->get()
+                ->map(fn(Lecturer $l) => ['id' => $l->id, 'label' => $l->code ? "{$l->code} — {$l->name_en}" : $l->name_en]),
+        };
+
+        return has_data($items->values());
+    }
+
+    /**
+     * Mirrors the uq_reg_batch_student_subject unique index — which also
+     * covers soft-deleted rows, hence withTrashed() — so a clash comes back
+     * as a readable 422 instead of a database error.
+     */
+    protected function isDuplicate(int $batchId, int $studentId, int $subjectId, ?int $ignoreId = null): bool
+    {
+        return RetakeRegistration::withTrashed()
+            ->where('batch_id', $batchId)
+            ->where('student_id', $studentId)
+            ->where('subject_id', $subjectId)
+            ->when($ignoreId, fn($q) => $q->whereKeyNot($ignoreId))
+            ->exists();
     }
 
     public function show(RetakeRegistration $retakeRegistration)
@@ -313,6 +394,13 @@ class RetakeRegistrationController extends Controller
         $validated = $request->validate([
             'is_selected' => 'required|boolean',
         ]);
+
+        // Unselecting a paid subject would drop money already taken out of
+        // every SA/report view — refund/reverse the payment first.
+        if (! $validated['is_selected'] && $retakeRegistration->payment_status === RetakeRegistration::PAYMENT_PAID) {
+            return no_data('This subject is already paid — it cannot be unselected.', 422);
+        }
+        $validated['selection_saved_at'] = now();
 
         $retakeRegistration->update($validated);
 

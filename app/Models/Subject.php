@@ -17,7 +17,7 @@ class Subject extends IModel
 
         $this->fillable   = array_merge($base, ['faculty_id', 'level', 'lecturer_hour', 'credit']);
         $this->searchable = array_merge($this->fillable, [
-            'faculty.name', 'faculty.name_kh', 'faculty.name_en', 'faculty.shortcut',
+            'faculty.name_kh', 'faculty.name_en', 'faculty.shortcut',
         ]);
     }
 

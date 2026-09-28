@@ -33,6 +33,7 @@ export async function loadRegistrations(dom, ApiService, permissions) {
     }
 
     const rows = Array.isArray(data?.data) ? data.data : [];
+    state.rows = new Map(rows.map((row) => [String(row.id), row]));
     renderTable(dom, permissions, rows);
     renderPagination(data?.meta);
 }

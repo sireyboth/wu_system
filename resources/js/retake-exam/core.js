@@ -20,6 +20,8 @@ export const state = {
     terms: [],
     examTypes: [],
     batches: [],
+    // Rows on the current page, by id — the edit modal prefills from these.
+    rows: new Map(),
 };
 
 /** Builds a fresh DOM selector map. Call once, on DOMContentLoaded. */
@@ -36,6 +38,16 @@ export function buildDom() {
         importBtn: document.getElementById('retakeImportBtn'),
         newTermBtn: document.getElementById('retakeNewTermBtn'),
         exportBtn: document.getElementById('retakeExportBtn'),
+        addRegBtn: document.getElementById('retakeAddRegBtn'),
+
+        // Add / edit registration modal
+        regModal: document.getElementById('retakeRegModal'),
+        regModalTitle: document.getElementById('retakeRegModalTitle'),
+        regForm: document.getElementById('retakeRegForm'),
+        regBatchSelect: document.getElementById('retakeRegBatch'),
+        regBatchHint: document.getElementById('retakeRegBatchHint'),
+        regRemark: document.getElementById('retakeRegRemark'),
+        regSubmitBtn: document.getElementById('retakeRegSubmitBtn'),
 
         // Term modal
         termModal: document.getElementById('retakeTermModal'),

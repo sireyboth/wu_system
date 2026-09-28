@@ -73,7 +73,12 @@ function renderRow(row, index, permissions) {
         PAYMENT_BADGE[row.payment_status] ?? PAYMENT_BADGE.unpaid
     );
     const outcomeBadge = badge(OUTCOME_LABEL[row.outcome] ?? row.outcome ?? '—', OUTCOME_BADGE[row.outcome] ?? OUTCOME_BADGE.pending);
-    const selectedBadge = row.is_selected
+    // Unconfirmed and never saved = the student hasn't chosen yet, whatever
+    // is_selected holds (see the add_selection_saved_at migration).
+    const notChosenYet = !row.registered_at && !row.selection_saved_at;
+    const selectedBadge = notChosenYet
+        ? badge('មិនទាន់ជ្រើស (Not chosen yet)', 'bg-neutral-100 text-neutral-400 dark:bg-white/5 dark:text-neutral-500')
+        : row.is_selected
         ? badge('✓ ជ្រើសរើស', 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400')
         : badge('មិនជ្រើសរើស', 'bg-neutral-100 text-neutral-400 dark:bg-white/5 dark:text-neutral-500');
 
@@ -136,10 +141,13 @@ function renderActions(row, permissions) {
     }
 
     if (permissions.canEdit) {
+        buttons.push(`<button data-action="edit" data-id="${row.id}" class="p-2 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-xl transition-colors" title="Edit">
+            <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" /></svg>
+        </button>`);
         buttons.push(`<button data-action="outcome" data-id="${row.id}" data-outcome="${row.outcome ?? 'pending'}" class="p-2 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-xl transition-colors" title="Set outcome">
             <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
         </button>`);
-        buttons.push(`<button data-action="toggle-selection" data-id="${row.id}" data-selected="${row.is_selected ? '1' : '0'}" class="p-2 text-slate-600 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors" title="Toggle selection">
+        buttons.push(`<button data-action="toggle-selection" data-id="${row.id}" data-selected="${row.is_selected && (row.registered_at || row.selection_saved_at) ? '1' : '0'}" class="p-2 text-slate-600 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors" title="Toggle selection">
             <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3" stroke-linecap="round" stroke-linejoin="round" /><path stroke-linecap="round" stroke-linejoin="round" d="M8 12l2.5 2.5L16 9" /></svg>
         </button>`);
     }

@@ -3,6 +3,7 @@
 @section('content')
 
     <script>
+        window.CAN_CREATE_RETAKE_REGISTRATION = @json(auth()->user()->can('retake-registration.create'));
         window.CAN_EDIT_RETAKE_REGISTRATION = @json(auth()->user()->can('retake-registration.edit'));
         window.CAN_DELETE_RETAKE_REGISTRATION = @json(auth()->user()->can('retake-registration.delete'));
         window.CAN_EDIT_RETAKE_BATCH = @json(auth()->user()->can('retake-batch.edit'));
@@ -26,6 +27,13 @@
                     </svg>
                     របាយការណ៍ (Report)
                 </a>
+                <button type="button" id="retakeAddRegBtn"
+                    class="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-colors">
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    បន្ថែមនិស្សិត (Add Student)
+                </button>
                 <button type="button" id="retakeImportBtn"
                 class="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold text-white bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 rounded-xl shadow-md shadow-indigo-500/25 active:scale-95 transition-all duration-200">
                 <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -148,6 +156,62 @@
             <button type="submit" form="retakeTermForm"
                 class="px-4 py-2.5 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-lg shadow-indigo-500/30 transition-all active:scale-95">
                 បង្កើត (Create)
+            </button>
+        </x-slot:footer>
+    </x-ui.modal>
+
+    {{-- Add / edit one registration by hand (a student missed by the
+         import, a Special-type row, or correcting a wrong student/subject/
+         lecturer). Batch is only chosen on create — see
+         RetakeRegistrationController@update for why it's fixed after. --}}
+    <x-ui.modal id="retakeRegModal" card-id="retakeRegModalCard" title-id="retakeRegModalTitle"
+        title="បន្ថែមនិស្សិត (Add Student)" form-id="retakeRegForm"
+        close-fn="RetakeRegModal" max-width="max-w-lg">
+        <div>
+            <label for="retakeRegBatch" class="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5">ជំនាន់ (Batch)</label>
+            <select id="retakeRegBatch" required class="w-full text-sm p-2.5 rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-neutral-900 dark:text-white dark:placeholder-neutral-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></select>
+            <p id="retakeRegBatchHint" class="hidden mt-1 text-xs text-neutral-400">មិនអាចប្តូរជំនាន់បានទេ — លុប ហើយបន្ថែមម្តងទៀត (The batch can't be changed — delete and re-add instead).</p>
+        </div>
+        <div>
+            <label for="retakeRegStudentSearch" class="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5">និស្សិត (Student)</label>
+            <input type="text" id="retakeRegStudentSearch" list="retakeRegStudentList" required autocomplete="off"
+                placeholder="វាយដើម្បីស្វែងរក (Type to search by code or name)..."
+                class="w-full text-sm p-2.5 rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-neutral-900 dark:text-white dark:placeholder-neutral-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+            <datalist id="retakeRegStudentList"></datalist>
+            <input type="hidden" id="retakeRegStudentId">
+            <p id="retakeRegStudentHint" class="hidden mt-1 text-xs text-rose-500">សូមជ្រើសរើសពីបញ្ជី (Pick a student from the list — typing alone does not select one).</p>
+        </div>
+        <div>
+            <label for="retakeRegSubjectSearch" class="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5">មុខវិជ្ជា (Subject)</label>
+            <input type="text" id="retakeRegSubjectSearch" list="retakeRegSubjectList" required autocomplete="off"
+                placeholder="វាយដើម្បីស្វែងរក (Type to search by code or name)..."
+                class="w-full text-sm p-2.5 rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-neutral-900 dark:text-white dark:placeholder-neutral-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+            <datalist id="retakeRegSubjectList"></datalist>
+            <input type="hidden" id="retakeRegSubjectId">
+            <p id="retakeRegSubjectHint" class="hidden mt-1 text-xs text-rose-500">សូមជ្រើសរើសពីបញ្ជី (Pick a subject from the list — typing alone does not select one).</p>
+        </div>
+        <div>
+            <label for="retakeRegLecturerSearch" class="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5">សាស្ត្រាចារ្យ (Lecturer) <span class="font-normal text-neutral-400">(optional)</span></label>
+            <input type="text" id="retakeRegLecturerSearch" list="retakeRegLecturerList" autocomplete="off"
+                placeholder="វាយដើម្បីស្វែងរក (Type to search by code or name)..."
+                class="w-full text-sm p-2.5 rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-neutral-900 dark:text-white dark:placeholder-neutral-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+            <datalist id="retakeRegLecturerList"></datalist>
+            <input type="hidden" id="retakeRegLecturerId">
+            <p id="retakeRegLecturerHint" class="hidden mt-1 text-xs text-rose-500">សូមជ្រើសរើសពីបញ្ជី ឬទុកទទេ (Pick a lecturer from the list, or leave it empty).</p>
+        </div>
+        <div>
+            <label for="retakeRegRemark" class="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5">កំណត់សម្គាល់ (Remark) <span class="font-normal text-neutral-400">(optional)</span></label>
+            <textarea id="retakeRegRemark" rows="2" maxlength="500" class="w-full text-sm p-2.5 rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-neutral-900 dark:text-white dark:placeholder-neutral-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+        </div>
+
+        <x-slot:footer>
+            <button type="button" onclick="RetakeRegModal.toggle(false)"
+                class="px-4 py-2.5 text-sm font-semibold text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-white/5 rounded-xl transition-colors">
+                បោះបង់ (Cancel)
+            </button>
+            <button type="submit" form="retakeRegForm" id="retakeRegSubmitBtn"
+                class="px-4 py-2.5 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-lg shadow-indigo-500/30 transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed">
+                រក្សាទុក (Save)
             </button>
         </x-slot:footer>
     </x-ui.modal>

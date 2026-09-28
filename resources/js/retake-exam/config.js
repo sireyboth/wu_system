@@ -7,6 +7,7 @@ import { baseUri } from "../app";
 export const CONFIG = {
     REGISTRATIONS_API: baseUri('retake-registrations'),
     REGISTRATIONS_EXPORT_API: baseUri('retake-registrations-export'),
+    REGISTRATION_OPTIONS_API: baseUri('retake-registrations-options'),
     BATCHES_API: baseUri('retake-batches'),
     TERMS_API: baseUri('retake-terms'),
     EXAM_TYPES_API: baseUri('exam-types'),

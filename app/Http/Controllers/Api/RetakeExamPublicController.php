@@ -66,7 +66,7 @@ class RetakeExamPublicController extends Controller
                 ->where('id', $selection['id'])
                 ->where('student_id', $student->id)
                 ->whereNull('registered_at')
-                ->update(['is_selected' => $selection['is_selected']]);
+                ->update(['is_selected' => $selection['is_selected'], 'selection_saved_at' => now()]);
         }
 
         return has_data($this->buildPayload($student), 'Selections saved.');
@@ -96,6 +96,15 @@ class RetakeExamPublicController extends Controller
         if ($pending === 0) {
             return no_data('Nothing left to confirm — there is no pending registration for this student.', 404);
         }
+
+        // A row nobody ever chose was shown unticked on the page, so it
+        // locks in as not registering, whatever is_selected still holds
+        // from before the import went opt-in.
+        RetakeRegistration::query()
+            ->where('student_id', $student->id)
+            ->whereNull('registered_at')
+            ->whereNull('selection_saved_at')
+            ->update(['is_selected' => false]);
 
         RetakeRegistration::query()
             ->where('student_id', $student->id)
@@ -130,6 +139,9 @@ class RetakeExamPublicController extends Controller
             ->groupBy('batch_id')
             ->map(function ($rows) {
                 $first = $rows->first();
+                // Same rule as the page's checkboxes: only a saved choice
+                // counts as selected.
+                [$chosen, $notChosen] = $rows->partition(fn($r) => $r->is_selected && $r->selection_saved_at);
 
                 return [
                     'batch_id'          => $first->batch_id,
@@ -137,8 +149,8 @@ class RetakeExamPublicController extends Controller
                     // built with is_common=false) — it uses 'title' instead.
                     'term'              => $first->term?->title,
                     'exam_type'         => $first->examType?->name,
-                    'will_register'     => RetakeRegistrationResource::collection($rows->where('is_selected', true)->values()),
-                    'will_not_register' => RetakeRegistrationResource::collection($rows->where('is_selected', false)->values()),
+                    'will_register'     => RetakeRegistrationResource::collection($chosen->values()),
+                    'will_not_register' => RetakeRegistrationResource::collection($notChosen->values()),
                 ];
             })
             ->values();

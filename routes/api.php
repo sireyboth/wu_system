@@ -137,6 +137,14 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         ->post('/retake-registrations', [RetakeRegistrationController::class, 'store'])
         ->name('retake-registrations.store');
 
+    // Student/subject/lecturer pickers for the add/edit modal — REG has no
+    // student.view/subject.view/lecturer.view of its own (see
+    // PermissionSeeder), so the modal can't hit those modules' own lists.
+    // Flat sibling route for the same wildcard reason as export above.
+    Route::middleware('permission:retake-registration.create|retake-registration.edit')
+        ->get('/retake-registrations-options', [RetakeRegistrationController::class, 'options'])
+        ->name('retake-registrations.options');
+
     // Split into three permissions, not one shared "edit" — the design
     // doc's RBAC notes are explicit that SA shouldn't be able to touch
     // scores and Score shouldn't be able to touch payments, so each
@@ -154,6 +162,7 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         ->name('retake-registrations.score');
 
     Route::middleware('permission:retake-registration.edit')->prefix('retake-registrations')->name('retake-registrations.')->group(function () {
+        Route::put('/{retake_registration}', [RetakeRegistrationController::class, 'update'])->name('update');
         Route::patch('/{retake_registration}/outcome', [RetakeRegistrationController::class, 'setOutcome'])->name('outcome');
         // Manual override, post-lock (decision #15) — REG only for now;
         // revisit if SA turns out to need this too at the front desk.

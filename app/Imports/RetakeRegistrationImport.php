@@ -138,19 +138,24 @@ class RetakeRegistrationImport implements ToCollection, WithHeadingRow
         // uq_reg_batch_student_subject unique constraint, so re-importing
         // the same or an overlapping file updates the lecturer link
         // instead of throwing a duplicate-row error.
-        $registration = RetakeRegistration::query()->updateOrCreate(
-            [
-                'batch_id'   => $this->batch->id,
-                'student_id' => $student->id,
-                'subject_id' => $subjectId,
-            ],
-            [
-                'retake_term_id' => $this->batch->retake_term_id,
-                'exam_type_id'   => $this->batch->exam_type_id,
-                'lecturer_id'    => $lecturerId,
-                'is_selected'    => true,
-            ]
-        );
+        $registration = RetakeRegistration::query()->firstOrNew([
+            'batch_id'   => $this->batch->id,
+            'student_id' => $student->id,
+            'subject_id' => $subjectId,
+        ]);
+        $registration->fill([
+            'retake_term_id' => $this->batch->retake_term_id,
+            'exam_type_id'   => $this->batch->exam_type_id,
+            'lecturer_id'    => $lecturerId,
+        ]);
+        if (! $registration->exists) {
+            // Opt-in (same as carry-forward in RetakeBatch): the public
+            // page shows every subject unticked and the student ticks only
+            // the ones they'll actually pay for. Set on create only, so a
+            // re-import never wipes ticks a student already saved.
+            $registration->is_selected = false;
+        }
+        $registration->save();
 
         $this->created[] = $registration->id;
 

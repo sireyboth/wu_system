@@ -24,7 +24,7 @@ class RetakeRegistration extends IModel
     protected $fillable = [
         'batch_id', 'student_id', 'retake_term_id', 'exam_type_id', 'subject_id', 'lecturer_id',
         'previous_registration_id', 'previous_deletion_log_id',
-        'is_selected', 'registered_at',
+        'is_selected', 'selection_saved_at', 'registered_at',
         'payment_status', 'payment_batch_id',
         'outcome', 'telegram_invited_at', 'exam_session_id',
         'remark',
@@ -38,6 +38,7 @@ class RetakeRegistration extends IModel
 
     protected $casts = [
         'is_selected'         => 'boolean',
+        'selection_saved_at'  => 'datetime',
         'registered_at'       => 'datetime',
         'telegram_invited_at' => 'datetime',
     ];

@@ -10,11 +10,13 @@ import {
 } from './batches.js';
 import { bindPagination } from './pagination.js';
 import { handleSetOutcome, handleToggleSelection, handleDelete, handleRestore } from './actions.js';
+import { initRegistrationForm, openCreateRegistration, openEditRegistration, submitRegistrationForm } from './registration-form.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const dom = buildDom();
     const ApiService = createApiService(dom);
     const permissions = {
+        canCreate: window.CAN_CREATE_RETAKE_REGISTRATION === true,
         canEdit: window.CAN_EDIT_RETAKE_REGISTRATION === true,
         canDelete: window.CAN_DELETE_RETAKE_REGISTRATION === true,
         canEditBatch: window.CAN_EDIT_RETAKE_BATCH === true,
@@ -30,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     if (!permissions.canCreateBatch) dom.importBtn?.classList.add('hidden');
+    if (!permissions.canCreate) dom.addRegBtn?.classList.add('hidden');
     if (!permissions.canCreateTerm) dom.newTermBtn?.classList.add('hidden');
 
     // Every <x-ui.modal> toggles itself via `<closeFn>.toggle(open)` — each
@@ -38,9 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
     window.RetakeTermModal = { toggle: (open) => (open ? openModal(dom.termModal) : closeModal(dom.termModal)) };
     window.RetakeImportModal = { toggle: (open) => (open ? openModal(dom.importModal) : closeModal(dom.importModal)) };
     window.RetakeImportResultsModal = { toggle: (open) => (open ? openModal(dom.importResultsModal) : closeModal(dom.importResultsModal)) };
+    window.RetakeRegModal = { toggle: (open) => (open ? openModal(dom.regModal) : closeModal(dom.regModal)) };
 
     initFilters(dom, refresh);
     initTable(dom, ApiService, refresh);
+    initRegistrationForm();
     initBatchStrip(dom, ApiService, refreshBatchesAndList);
     bindPagination((page) => {
         state.page = page;
@@ -58,6 +63,12 @@ document.addEventListener('DOMContentLoaded', () => {
         submitImportForm(dom, ApiService, refreshBatchesAndList);
     });
     dom.exportBtn?.addEventListener('click', () => exportCurrentFilters());
+    dom.addRegBtn?.addEventListener('click', () => openCreateRegistration(dom));
+    dom.regForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        // New rows change the batch chips' registration counts too.
+        submitRegistrationForm(dom, ApiService, refreshBatchesAndList);
+    });
     initImportDropzone(dom);
 
     loadLookups(dom, ApiService).then(() => {
@@ -153,7 +164,10 @@ function initTable(dom, ApiService, refresh) {
         const id = btn.dataset.id;
         if (!id) return;
 
-        if (btn.dataset.action === 'outcome') {
+        if (btn.dataset.action === 'edit') {
+            const row = state.rows.get(String(id));
+            if (row) openEditRegistration(dom, row);
+        } else if (btn.dataset.action === 'outcome') {
             await handleSetOutcome(ApiService, id, btn.dataset.outcome, refresh);
         } else if (btn.dataset.action === 'toggle-selection') {
             await handleToggleSelection(ApiService, id, btn.dataset.selected === '1', refresh);

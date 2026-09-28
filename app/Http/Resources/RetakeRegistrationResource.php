@@ -18,6 +18,9 @@ class RetakeRegistrationResource extends IResource
             'status_note' => $this->status_note,
 
             'is_selected'   => (bool) $this->is_selected,
+            // Null = nobody has chosen yet (see the add_selection_saved_at
+            // migration) — the public page shows such rows unticked.
+            'selection_saved_at' => $this->selection_saved_at?->format('Y-m-d H:i:s'),
             'registered_at' => $this->registered_at?->format('Y-m-d H:i:s'),
 
             'payment_status'   => $this->payment_status,

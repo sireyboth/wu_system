@@ -29,7 +29,18 @@ const els = {
 
     confirmedSection: document.getElementById('retakeConfirmedSection'),
     confirmedList: document.getElementById('retakeConfirmedList'),
+
+    confirmModal: document.getElementById('retakeConfirmModal'),
+    confirmSelectedList: document.getElementById('retakeConfirmSelectedList'),
+    confirmSelectedCount: document.getElementById('retakeConfirmSelectedCount'),
+    confirmUnselectedBlock: document.getElementById('retakeConfirmUnselectedBlock'),
+    confirmUnselectedList: document.getElementById('retakeConfirmUnselectedList'),
+    confirmUnselectedCount: document.getElementById('retakeConfirmUnselectedCount'),
 };
+
+// Last payload rendered, so the confirm dialog can look up each checked
+// row's subject/lecturer by id without re-parsing the DOM.
+let pendingRowsById = new Map();
 
 let currentCode = null;
 
@@ -87,6 +98,23 @@ function subjectLabel(row) {
     return (row.subject && (row.subject.name || row.subject.code)) ? (row.subject.name || row.subject.code) : ('Subject #' + row.id);
 }
 
+// Lecturer is optional on a registration (the import lets an unmatched
+// name through with lecturer_id null), so this always has a fallback.
+function lecturerLabel(row) {
+    const l = row.lecturer;
+    return (l && (l.name_en || l.name_kh)) || 'មិនទាន់កំណត់ (Not assigned)';
+}
+
+function lecturerLine(row) {
+    return `
+        <div class="flex items-center gap-1.5 mt-0.5 text-xs text-neutral-500 dark:text-neutral-400 min-w-0">
+            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            </svg>
+            <span class="truncate">${escapeHtml(lecturerLabel(row))}</span>
+        </div>`;
+}
+
 // ---------- Rendering ----------
 
 function badge(text, classes) {
@@ -126,6 +154,7 @@ function renderStudent(data) {
 function renderPending(data) {
     const container = els.pendingBatches;
     container.innerHTML = '';
+    pendingRowsById = new Map();
 
     if (!data.pending_batches || data.pending_batches.length === 0) {
         container.innerHTML = `
@@ -138,6 +167,7 @@ function renderPending(data) {
 
     data.pending_batches.forEach((batch) => {
         const rows = [...(batch.will_register || []), ...(batch.will_not_register || [])];
+        rows.forEach((row) => pendingRowsById.set(row.id, row));
 
         const block = document.createElement('div');
         block.className = 'bg-white/80 dark:bg-neutral-900/70 backdrop-blur-sm border border-neutral-200/80 dark:border-white/10 rounded-2xl shadow-sm overflow-hidden';
@@ -156,7 +186,9 @@ function renderPending(data) {
 }
 
 function subjectRow(row) {
-    const checked = !!row.is_selected;
+    // Only a choice someone actually saved counts — an untouched row
+    // starts unticked even if is_selected is still true from an old import.
+    const checked = !!row.is_selected && !!row.selection_saved_at;
     return `
         <label data-subject-row
             class="flex items-center gap-3 px-4 py-3.5 rounded-xl border cursor-pointer transition-all ${checked
@@ -164,7 +196,10 @@ function subjectRow(row) {
                 : 'border-neutral-200 dark:border-white/10 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-white/5'}">
             <input type="checkbox" class="w-4 h-4 rounded border-neutral-300 dark:border-white/20 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-0 cursor-pointer"
                 data-registration-id="${row.id}" ${checked ? 'checked' : ''}>
-            <span class="text-sm font-semibold text-neutral-800 dark:text-neutral-100">${escapeHtml(subjectLabel(row))}</span>
+            <div class="min-w-0">
+                <div class="text-sm font-semibold text-neutral-800 dark:text-neutral-100">${escapeHtml(subjectLabel(row))}</div>
+                ${lecturerLine(row)}
+            </div>
         </label>`;
 }
 
@@ -189,6 +224,7 @@ function renderConfirmed(data) {
             <div class="flex items-center justify-between gap-3 px-4 py-3.5 bg-white/80 dark:bg-neutral-900/70 backdrop-blur-sm border border-neutral-200/80 dark:border-white/10 rounded-xl">
                 <div class="min-w-0">
                     <div class="text-sm font-semibold text-neutral-900 dark:text-white truncate">${escapeHtml(subjectLabel(row))}</div>
+                    ${lecturerLine(row)}
                     <div class="text-xs text-neutral-400">${escapeHtml(termTitle)} · ${escapeHtml(examTypeName)}</div>
                 </div>
                 <div class="flex items-center gap-1.5 shrink-0">${paymentBadge}${outcomeBadge}</div>
@@ -267,8 +303,14 @@ els.saveBtn.addEventListener('click', () => {
         .catch((err) => showToast('error', err.message));
 });
 
-els.confirmBtn.addEventListener('click', () => {
-    if (!window.confirm('បញ្ជាក់ការចុះឈ្មោះជាមួយមុខវិជ្ជាដែលបានធីកខាងលើ? សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ។\n\nConfirm registration with the subjects currently checked? This cannot be undone here.')) {
+els.confirmBtn.addEventListener('click', async () => {
+    const selections = collectSelections();
+    if (!selections.some((s) => s.is_selected)) {
+        showToast('error', 'សូមជ្រើសរើសយ៉ាងហោចណាស់មុខវិជ្ជាមួយ (Please select at least one subject).');
+        return;
+    }
+
+    if (!(await openConfirmDialog(selections))) {
         return;
     }
 
@@ -280,11 +322,80 @@ els.confirmBtn.addEventListener('click', () => {
     // it registers anyway because the uncheck was never sent. So /select is
     // sent here first, with whatever's checked right now, before /confirm
     // reads it back from the database.
-    post('/select', { code: currentCode, selections: collectSelections() })
+    els.confirmBtn.disabled = true;
+    post('/select', { code: currentCode, selections })
         .then(() => post('/confirm', { code: currentCode }))
         .then((data) => {
             showToast('success', 'បញ្ជាក់ការចុះឈ្មោះជោគជ័យ! សូមទៅកាន់ការិយាល័យកិច្ចការនិស្សិត (Confirmed — please proceed to Student Affairs for payment)');
             renderAll(data);
         })
-        .catch((err) => showToast('error', err.message));
+        .catch((err) => showToast('error', err.message))
+        .finally(() => { els.confirmBtn.disabled = false; });
 });
+
+// ---------- Confirm dialog ----------
+
+function confirmListItem(row, selected) {
+    return `
+        <li class="px-3 py-2 rounded-xl border ${selected
+            ? 'border-emerald-200 dark:border-emerald-500/20 bg-emerald-50/60 dark:bg-emerald-500/5'
+            : 'border-neutral-200 dark:border-white/10 opacity-60'}">
+            <div class="text-sm font-semibold text-neutral-800 dark:text-neutral-100 ${selected ? '' : 'line-through'}">${escapeHtml(subjectLabel(row))}</div>
+            ${lecturerLine(row)}
+        </li>`;
+}
+
+// Resolves true on Confirm, false on Cancel / backdrop / Escape.
+function openConfirmDialog(selections) {
+    const modal = els.confirmModal;
+    const rows = selections.map((s) => ({ row: pendingRowsById.get(s.id) ?? { id: s.id }, selected: s.is_selected }));
+    const selected = rows.filter((r) => r.selected);
+    const unselected = rows.filter((r) => !r.selected);
+
+    els.confirmSelectedCount.textContent = selected.length;
+    els.confirmSelectedList.innerHTML = selected.map((r) => confirmListItem(r.row, true)).join('');
+    els.confirmUnselectedCount.textContent = unselected.length;
+    els.confirmUnselectedList.innerHTML = unselected.map((r) => confirmListItem(r.row, false)).join('');
+    els.confirmUnselectedBlock.classList.toggle('hidden', unselected.length === 0);
+
+    const backdrop = modal.querySelector('[data-confirm-backdrop]');
+    const card = modal.querySelector('[data-confirm-card]');
+    const okBtn = modal.querySelector('[data-confirm-ok]');
+    const cancelBtn = modal.querySelector('[data-confirm-cancel]');
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => {
+        backdrop.classList.remove('opacity-0');
+        card.classList.remove('opacity-0', 'translate-y-4', 'sm:scale-95');
+        okBtn.focus();
+    });
+
+    return new Promise((resolve) => {
+        const close = (result) => {
+            okBtn.removeEventListener('click', onOk);
+            cancelBtn.removeEventListener('click', onCancel);
+            backdrop.removeEventListener('click', onCancel);
+            document.removeEventListener('keydown', onKey);
+
+            backdrop.classList.add('opacity-0');
+            card.classList.add('opacity-0', 'translate-y-4', 'sm:scale-95');
+            setTimeout(() => {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 200);
+            els.confirmBtn.focus();
+            resolve(result);
+        };
+        const onOk = () => close(true);
+        const onCancel = () => close(false);
+        const onKey = (e) => { if (e.key === 'Escape') close(false); };
+
+        okBtn.addEventListener('click', onOk);
+        cancelBtn.addEventListener('click', onCancel);
+        backdrop.addEventListener('click', onCancel);
+        document.addEventListener('keydown', onKey);
+    });
+}
