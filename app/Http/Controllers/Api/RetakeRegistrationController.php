@@ -46,8 +46,11 @@ class RetakeRegistrationController extends Controller
             // SA only ever acts on confirmed registrations (payment can't
             // happen against a selection that might still change) — this
             // lets their page ask for just those instead of the full list.
+            // is_selected too: confirm() stamps registered_at on every open
+            // row, including subjects the student unticked, so registered_at
+            // alone doesn't mean "registered".
             if ($request->boolean('confirmed_only')) {
-                $query->whereNotNull('registered_at');
+                $query->whereNotNull('registered_at')->where('is_selected', true);
             }
 
             return $query;
@@ -66,7 +69,7 @@ class RetakeRegistrationController extends Controller
             'retake_term_id' => 'nullable|integer|exists:retake_terms,id',
         ]);
 
-        $base = RetakeRegistration::query()->whereNotNull('registered_at');
+        $base = RetakeRegistration::query()->whereNotNull('registered_at')->where('is_selected', true);
         if ($termId = $validated['retake_term_id'] ?? null) {
             $base->where('retake_term_id', $termId);
         }
@@ -116,7 +119,7 @@ class RetakeRegistrationController extends Controller
      */
     public function customerService(Request $request)
     {
-        return $this->list($request, fn($query) => $query->withSubjectCount()->whereNotNull('registered_at'));
+        return $this->list($request, fn($query) => $query->withSubjectCount()->whereNotNull('registered_at')->where('is_selected', true));
     }
 
     /**
@@ -188,6 +191,9 @@ class RetakeRegistrationController extends Controller
         if (! $retakeRegistration->registered_at) {
             return no_data('This student has not confirmed their registration yet — cannot mark it paid.', 422);
         }
+        if (! $retakeRegistration->is_selected) {
+            return no_data('The student did not select this subject — cannot mark it paid.', 422);
+        }
 
         $retakeRegistration->update([
             'payment_status'   => RetakeRegistration::PAYMENT_PAID,
@@ -213,11 +219,12 @@ class RetakeRegistrationController extends Controller
         ]);
 
         $unconfirmed = RetakeRegistration::whereIn('id', $validated['ids'])
-            ->whereNull('registered_at')
+            ->where(fn($q) => $q->whereNull('registered_at')->orWhere('is_selected', false))
             ->pluck('id');
 
         $count = RetakeRegistration::whereIn('id', $validated['ids'])
             ->whereNotNull('registered_at')
+            ->where('is_selected', true)
             ->update([
                 'payment_status'   => RetakeRegistration::PAYMENT_PAID,
                 'payment_batch_id' => $validated['payment_batch_id'],
@@ -225,7 +232,7 @@ class RetakeRegistrationController extends Controller
 
         $message = "{$count} registration(s) marked paid.";
         if ($unconfirmed->isNotEmpty()) {
-            $message .= " {$unconfirmed->count()} skipped — not yet confirmed by the student.";
+            $message .= " {$unconfirmed->count()} skipped — not confirmed or not selected by the student.";
         }
 
         return has_data(['skipped_ids' => $unconfirmed->values()], $message);

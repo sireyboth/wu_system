@@ -333,7 +333,7 @@ function renderTable(campuss) {
         if (DOM.locationStatus) { DOM.locationStatus.textContent = ''; DOM.locationStatus.className = 'text-[11px] hidden'; }
 
         document.querySelectorAll('.smart-hint').forEach(hint => {
-            hint.classList.add('opacity-0', 'scale-95', 'translate-y-1');
+            hint.classList.add('opacity-0', 'scale-95', 'translate-yx`-1');
         });
     }
 

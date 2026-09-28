@@ -248,13 +248,18 @@ els.code.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') els.lookupBtn.click();
 });
 
-els.saveBtn.addEventListener('click', () => {
-    const selections = Array.from(els.pendingBatches.querySelectorAll('input[data-registration-id]')).map((el) => ({
+// The single source of truth for what's "checked above" — read fresh from
+// the DOM every time, so both Save and Confirm (below) send exactly what
+// the student currently sees, not whatever was last saved to the server.
+function collectSelections() {
+    return Array.from(els.pendingBatches.querySelectorAll('input[data-registration-id]')).map((el) => ({
         id: parseInt(el.dataset.registrationId, 10),
         is_selected: el.checked,
     }));
+}
 
-    post('/select', { code: currentCode, selections })
+els.saveBtn.addEventListener('click', () => {
+    post('/select', { code: currentCode, selections: collectSelections() })
         .then((data) => {
             showToast('success', 'រក្សាទុកជម្រើសបានជោគជ័យ! (Selections saved)');
             renderAll(data);
@@ -267,7 +272,16 @@ els.confirmBtn.addEventListener('click', () => {
         return;
     }
 
-    post('/confirm', { code: currentCode })
+    // /confirm on its own locks in whatever is_selected the SERVER already
+    // has — it never looks at the checkboxes. If a student ticks/unticks a
+    // box and hits Confirm without hitting Save first, that change was only
+    // ever in the browser and /confirm would silently lock in the OLD,
+    // still-saved state instead — e.g. they uncheck a subject, confirm, and
+    // it registers anyway because the uncheck was never sent. So /select is
+    // sent here first, with whatever's checked right now, before /confirm
+    // reads it back from the database.
+    post('/select', { code: currentCode, selections: collectSelections() })
+        .then(() => post('/confirm', { code: currentCode }))
         .then((data) => {
             showToast('success', 'បញ្ជាក់ការចុះឈ្មោះជោគជ័យ! សូមទៅកាន់ការិយាល័យកិច្ចការនិស្សិត (Confirmed — please proceed to Student Affairs for payment)');
             renderAll(data);

@@ -147,6 +147,9 @@ class RetakeExamPublicController extends Controller
             ->with(['term', 'examType', 'subject', 'lecturer'])
             ->where('student_id', $student->id)
             ->whereNotNull('registered_at')
+            // Unticked subjects get registered_at too on confirm() — they
+            // were locked in as "not registering", so don't list them.
+            ->where('is_selected', true)
             ->latest('registered_at')
             ->get();
 
