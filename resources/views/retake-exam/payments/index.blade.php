@@ -57,6 +57,7 @@
             'Subject',
             'Registered At',
             'Payment',
+            'Proof',
             'Telegram',
             ['label' => 'Actions', 'align' => 'right'],
         ]" body-id="retake-payment-table-body" />

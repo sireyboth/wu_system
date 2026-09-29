@@ -1,4 +1,5 @@
 import { CONFIG } from './config.js';
+import { studentName as studentDisplayName } from '../uitilities/helper.js';
 
 function escapeHtml(value) {
     const div = document.createElement('div');
@@ -51,7 +52,7 @@ function renderRow(row, index) {
     const term = row.term ?? {};
     const examType = row.exam_type ?? {};
 
-    const studentName = escapeHtml(student.name || student.name_en || 'N/A');
+    const studentName = escapeHtml(studentDisplayName(student) || 'N/A');
     const studentCode = escapeHtml(student.code ?? '');
     const subjectName = escapeHtml(subject.name || subject.name_en || subject.code || 'N/A');
     const termTitle = escapeHtml(term.title ?? '—');

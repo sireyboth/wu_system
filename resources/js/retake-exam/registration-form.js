@@ -1,5 +1,6 @@
 import { CONFIG } from './config.js';
 import { state, openModal, closeModal, Toast } from './core.js';
+import { studentName as studentDisplayName } from '../uitilities/helper.js';
 
 /**
  * Add / edit one registration by hand. The student, subject and lecturer
@@ -164,7 +165,7 @@ export function openEditRegistration(dom, row) {
     const student = row.student ?? {};
     const subject = row.subject ?? {};
     const lecturer = row.lecturer ?? {};
-    pickers.student.set(student.id, lookupLabel(student.code, student.name || student.name_en));
+    pickers.student.set(student.id, lookupLabel(student.code, studentDisplayName(student)));
     pickers.subject.set(subject.id, lookupLabel(subject.code, subject.name_en || subject.name));
     pickers.lecturer.set(lecturer.id, lookupLabel(lecturer.code, lecturer.name_en || lecturer.name));
     dom.regRemark.value = row.remark ?? '';

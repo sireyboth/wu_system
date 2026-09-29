@@ -1,3 +1,4 @@
+import { studentName as studentDisplayName } from '../uitilities/helper.js';
 function escapeHtml(value) {
     const div = document.createElement('div');
     div.textContent = value ?? '';
@@ -57,7 +58,7 @@ function renderRow(row, index, permissions) {
     const term = row.term ?? {};
     const examType = row.exam_type ?? {};
 
-    const studentName = escapeHtml(student.name || student.name_en || 'N/A');
+    const studentName = escapeHtml(studentDisplayName(student) || 'N/A');
     const studentCode = escapeHtml(student.code ?? '');
     const subjectName = escapeHtml(subject.name || subject.name_en || subject.code || 'N/A');
     const lecturerName = escapeHtml(lecturer.name || lecturer.name_en || '—');

@@ -2,6 +2,7 @@ import { CONFIG } from './config.js';
 import { state, Toast } from './core.js';
 import { getRenderedRow } from './table-render.js';
 import { compressImage } from './image-compress.js';
+import { studentName as studentDisplayName } from '../uitilities/helper.js';
 
 function escapeHtml(value) {
     const div = document.createElement('div');
@@ -24,7 +25,7 @@ export function openPayModal(dom, ids) {
     state.editingPaymentBatchId = null;
     setPayModalMode(dom, false);
 
-    const studentName = escapeHtml(rows[0].student?.name || rows[0].student?.code || '—');
+    const studentName = escapeHtml(studentDisplayName(rows[0].student) || '—');
     const subjectList = rows.map((r) => escapeHtml(r.subject?.name || r.subject?.code || '—')).join(', ');
 
     if (dom.payContext) {
@@ -161,7 +162,7 @@ export async function openEditPayModal(dom, ApiService, registrationId, paymentB
     setPayModalMode(dom, true);
     clearPayFile(dom);
 
-    const studentName = escapeHtml(row.student?.name || row.student?.code || '—');
+    const studentName = escapeHtml(studentDisplayName(row.student) || '—');
     const paidAt = batch.paid_at ? escapeHtml(batch.paid_at) : '—';
     if (dom.payContext) {
         dom.payContext.innerHTML = `<strong>${studentName}</strong><br><span class="text-xs text-neutral-500 dark:text-neutral-400">បង់នៅ (Paid at) ${paidAt} — changes apply to every subject on this payment</span>`;

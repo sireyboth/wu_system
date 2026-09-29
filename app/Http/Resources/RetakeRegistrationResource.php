@@ -25,6 +25,8 @@ class RetakeRegistrationResource extends IResource
 
             'payment_status'   => $this->payment_status,
             'payment_batch_id' => $this->payment_batch_id,
+            // Proof image etc. for SA's payments table.
+            'payment_batch'    => new PaymentBatchResource($this->whenLoaded('paymentBatch')),
 
             'outcome'             => $this->outcome,
             'telegram_invited_at' => $this->telegram_invited_at?->format('Y-m-d H:i:s'),

@@ -1,3 +1,4 @@
+import { studentName as studentDisplayName } from '../uitilities/helper.js';
 function escapeHtml(value) {
     const div = document.createElement('div');
     div.textContent = value ?? '';
@@ -30,7 +31,7 @@ export function renderTable(dom, batches) {
 
 function renderRow(batch, index) {
     const student = batch.student ?? {};
-    const studentName = escapeHtml(student.name || student.code || 'N/A');
+    const studentName = escapeHtml(studentDisplayName(student) || 'N/A');
     const studentCode = escapeHtml(student.code ?? '');
     const proof = batch.invoice_url
         ? `<a href="${batch.invoice_url}" target="_blank" rel="noopener" class="inline-block group">

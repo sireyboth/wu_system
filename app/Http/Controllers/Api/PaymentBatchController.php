@@ -15,7 +15,7 @@ class PaymentBatchController extends Controller
         $this->name          = 'Payment Batch';
         $this->model         = PaymentBatch::class;
         $this->resource      = PaymentBatchResource::class;
-        $this->relationships = ['student', 'entries'];
+        $this->relationships = ['student.person.nationality', 'entries'];
     }
 
     public function index(Request $request)

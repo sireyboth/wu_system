@@ -1,6 +1,7 @@
 import { CONFIG } from './config.js';
 import { state, Toast } from './core.js';
 import { getRenderedBatch } from './table-render.js';
+import { studentName as studentDisplayName } from '../uitilities/helper.js';
 
 function escapeHtml(value) {
     const div = document.createElement('div');
@@ -21,7 +22,7 @@ export function openEntryModal(dom, batchId) {
                  <img src="${batch.invoice_url}" alt="Payment proof" class="max-h-32 rounded-lg border border-neutral-200 dark:border-white/10">
                </a>`
             : '<span class="block mt-1 text-xs text-neutral-400">No proof image uploaded</span>';
-        dom.entryContext.innerHTML = `<strong>${escapeHtml(student.name || student.code || '—')}</strong>${proof}`;
+        dom.entryContext.innerHTML = `<strong>${escapeHtml(studentDisplayName(student) || '—')}</strong>${proof}`;
     }
 
     // At most one entry per batch (unique constraint) — pre-fill it if one

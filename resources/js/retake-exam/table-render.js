@@ -1,4 +1,5 @@
 import { CONFIG } from './config.js';
+import { studentName as studentDisplayName } from '../uitilities/helper.js';
 
 function escapeHtml(value) {
     const div = document.createElement('div');
@@ -53,7 +54,7 @@ function renderRow(row, index, permissions) {
     const term = row.term ?? {};
     const examType = row.exam_type ?? {};
 
-    const studentName = escapeHtml(student.name || student.name_en || 'N/A');
+    const studentName = escapeHtml(studentDisplayName(student) || 'N/A');
     const studentCode = escapeHtml(student.code ?? '');
     const restudyBadge = student.is_restudy
         ? badge('RESTUDY', 'bg-fuchsia-50 text-fuchsia-700 dark:bg-fuchsia-500/10 dark:text-fuchsia-400')

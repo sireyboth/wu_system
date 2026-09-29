@@ -1,5 +1,6 @@
 import { CONFIG } from './config.js';
 import { state, Toast } from './core.js';
+import { studentName as studentDisplayName } from '../uitilities/helper.js';
 
 function escapeHtml(value) {
     const div = document.createElement('div');
@@ -14,7 +15,7 @@ export function openScoreModal(dom, row) {
     const student = row.student ?? {};
     const subject = row.subject ?? {};
     if (dom.scoreContext) {
-        dom.scoreContext.innerHTML = `${escapeHtml(student.name || student.code || '—')} — ${escapeHtml(subject.name || subject.code || '—')}`;
+        dom.scoreContext.innerHTML = `${escapeHtml(studentDisplayName(student) || '—')} — ${escapeHtml(subject.name || subject.code || '—')}`;
     }
     if (dom.scoreValueInput) dom.scoreValueInput.value = row.score ?? '';
     if (dom.scoreRemarkInput) dom.scoreRemarkInput.value = '';

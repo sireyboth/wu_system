@@ -1,5 +1,6 @@
 import { CONFIG } from './config.js';
 import { state } from './core.js';
+import { studentName as studentDisplayName } from '../uitilities/helper.js';
 
 function escapeHtml(value) {
     const div = document.createElement('div');
@@ -30,7 +31,7 @@ export function renderTable(dom, rows) {
     lastRows = new Map((rows ?? []).map((row) => [String(row.id), row]));
 
     if (!rows || rows.length === 0) {
-        dom.tableBody.innerHTML = `<tr><td colspan="10" class="text-center py-10 text-neutral-500">
+        dom.tableBody.innerHTML = `<tr><td colspan="11" class="text-center py-10 text-neutral-500">
             រកមិនឃើញទិន្នន័យទេ (No confirmed registrations found for the current filters).
         </td></tr>`;
         return;
@@ -48,7 +49,7 @@ function renderRow(row, index) {
     const term = row.term ?? {};
     const examType = row.exam_type ?? {};
 
-    const studentName = escapeHtml(student.name || student.name_en || 'N/A');
+    const studentName = escapeHtml(studentDisplayName(student) || 'N/A');
     const studentCode = escapeHtml(student.code ?? '');
     const subjectName = escapeHtml(subject.name || subject.name_en || subject.code || 'N/A');
     const termTitle = escapeHtml(term.title ?? '—');
@@ -73,6 +74,13 @@ function renderRow(row, index) {
 
     const actions = renderActions(row, isPaid);
 
+    const invoiceUrl = row.payment_batch?.invoice_url;
+    const proof = invoiceUrl
+        ? `<a href="${escapeHtml(invoiceUrl)}" target="_blank" rel="noopener" class="inline-block group shrink-0" title="Open full image">
+             <img src="${escapeHtml(invoiceUrl)}" alt="Payment proof" loading="lazy" class="w-12 h-12 object-cover rounded-lg border border-neutral-200 dark:border-white/10 group-hover:opacity-80 transition-opacity">
+           </a>`
+        : (isPaid ? '<span class="text-neutral-300 text-xs">No image</span>' : '<span class="text-neutral-300 text-xs">—</span>');
+
     return `
         <tr class="block md:table-row bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-2xl shadow-sm md:shadow-none md:border-0 md:border-b md:rounded-none overflow-hidden md:overflow-visible">
             <td class="hidden md:table-cell px-6 py-4">${checkbox}</td>
@@ -82,6 +90,7 @@ function renderRow(row, index) {
             <td class="block md:hidden p-0">
                 <div class="flex items-center gap-3 p-4 border-b border-neutral-100 dark:border-white/5">
                     ${checkbox}
+                    ${invoiceUrl ? proof : ''}
                     <div class="min-w-0">
                         <div class="font-bold text-neutral-900 dark:text-neutral-100 text-[15px] leading-tight">${studentName}</div>
                         <div class="text-xs text-neutral-400">${studentCode} · ${subjectName}</div>
@@ -107,6 +116,7 @@ function renderRow(row, index) {
             <td class="hidden md:table-cell px-6 py-4 text-sm">${subjectName}</td>
             <td class="hidden md:table-cell px-6 py-4 text-xs font-mono text-neutral-500">${registeredAt}</td>
             <td class="hidden md:table-cell px-6 py-4">${paymentBadge}</td>
+            <td class="hidden md:table-cell px-6 py-4">${proof}</td>
             <td class="hidden md:table-cell px-6 py-4">${telegramBadge}</td>
             <td class="hidden md:table-cell p-6 text-right">
                 <div class="flex justify-end flex-wrap gap-1.5">${actions}</div>

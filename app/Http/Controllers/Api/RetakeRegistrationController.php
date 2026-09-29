@@ -19,7 +19,7 @@ class RetakeRegistrationController extends Controller
         $this->name          = 'Retake Registration';
         $this->model         = RetakeRegistration::class;
         $this->resource      = RetakeRegistrationResource::class;
-        $this->relationships = ['student', 'term', 'examType', 'subject', 'lecturer', 'score', 'paymentBatch'];
+        $this->relationships = ['student.person.nationality', 'term', 'examType', 'subject', 'lecturer', 'score', 'paymentBatch'];
     }
 
     /**
