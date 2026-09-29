@@ -6,6 +6,7 @@ use App\Http\Requests\PaymentBatchRequest;
 use App\Http\Resources\PaymentBatchResource;
 use App\Models\PaymentBatch;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PaymentBatchController extends Controller
 {
@@ -61,9 +62,34 @@ class PaymentBatchController extends Controller
         return $this->view($paymentBatch);
     }
 
+    /**
+     * SA corrects a recorded payment — replaces the proof image and/or
+     * edits the remark. Same explicit build as store() so the raw
+     * UploadedFile never reaches mass assignment. student_id, paid_at and
+     * uploaded_by stay as recorded: the payment still belongs to the same
+     * student and happened when it happened. Sent as POST + _method=PUT,
+     * since PHP doesn't parse multipart bodies on a real PUT.
+     */
     public function update(PaymentBatchRequest $request, PaymentBatch $paymentBatch)
     {
-        return $this->release($request, $paymentBatch);
+        $data    = ['remark' => $request->validated('remark')];
+        $file    = $request->file('invoice_file');
+        $oldPath = $paymentBatch->invoice_path;
+
+        if ($file) {
+            $data['invoice_path'] = $file->store('payment-invoices', 'public');
+            $data['invoice_type'] = $file->getClientMimeType();
+        }
+
+        $paymentBatch->update($data);
+
+        // Only after the new path is saved, so a failed update never
+        // leaves the record pointing at a deleted file.
+        if ($file && $oldPath) {
+            Storage::disk('public')->delete($oldPath);
+        }
+
+        return new PaymentBatchResource($this->reload($paymentBatch));
     }
 
     public function destroy(PaymentBatch $paymentBatch)

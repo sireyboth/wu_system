@@ -2,7 +2,7 @@ import { CONFIG } from './config.js';
 import { buildDom, state, openModal, closeModal, Toast } from './core.js';
 import { createApiService } from './api-service.js';
 import { loadRegistrations } from './list.js';
-import { openPayModal, submitPayForm, handleInviteTelegram, setPayFile, clearPayFile } from './actions.js';
+import { openPayModal, openEditPayModal, submitPayForm, setPayFile, clearPayFile } from './actions.js';
 import { getRenderedRow } from './table-render.js';
 import { bindPagination } from './pagination.js';
 
@@ -35,11 +35,12 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
- * Three ways to stage an image on the Mark Paid modal: click-to-browse,
- * drag-and-drop onto the dropzone, or paste (Ctrl+V) an image copied from
- * anywhere else — a screenshot, a chat app, etc. Paste only fires while
- * the modal is open (checked via the dropzone's visibility) so it doesn't
- * hijack clipboard paste elsewhere on the page.
+ * Ways to stage an image on the Mark Paid modal: click-to-browse,
+ * drag-and-drop onto the dropzone, or paste an image copied from anywhere
+ * else (a screenshot, a chat app, etc) — into the paste box, via its Paste
+ * button, or Ctrl+V anywhere while the modal is open. The page-wide paste
+ * only fires while the modal is open (checked via its visibility) so it
+ * doesn't hijack clipboard paste elsewhere on the page.
  */
 function initPayImagePicker(dom) {
     dom.payDropzone?.addEventListener('click', () => dom.payFileInput?.click());
@@ -78,13 +79,66 @@ function initPayImagePicker(dom) {
         if (file) setPayFile(dom, file);
     });
 
+    const imageFromClipboardEvent = (e) => {
+        const item = [...(e.clipboardData?.items || [])].find((i) => i.type.startsWith('image/'));
+        return item?.getAsFile() ?? null;
+    };
+    const showPasteHint = (message) => {
+        if (!dom.payPasteHint) return;
+        dom.payPasteHint.textContent = message;
+        dom.payPasteHint.classList.toggle('hidden', !message);
+    };
+
+    // The paste box is only a paste target — nothing ever stays in it.
+    dom.payPasteBox?.addEventListener('paste', (e) => {
+        e.preventDefault();
+        e.stopPropagation(); // the page-wide handler below would stage it twice
+        const file = imageFromClipboardEvent(e);
+        if (file) {
+            showPasteHint('');
+            setPayFile(dom, file);
+        } else {
+            showPasteHint('មិនមានរូបភាពក្នុង clipboard ទេ (No image on the clipboard — copy an image first).');
+        }
+    });
+    dom.payPasteBox?.addEventListener('beforeinput', (e) => e.preventDefault()); // no typing / dropping text
+    dom.payPasteBox?.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const file = e.dataTransfer?.files?.[0];
+        if (file) setPayFile(dom, file);
+    });
+
+    // Reads the clipboard directly — the only paste route on a phone with
+    // no keyboard. Needs HTTPS (or localhost) and the browser's permission;
+    // falls back to asking for Ctrl+V when either is missing.
+    dom.payPasteBtn?.addEventListener('click', async () => {
+        if (!navigator.clipboard?.read) {
+            showPasteHint('Browser នេះមិនអនុញ្ញាត — សូមចុចប្រអប់ រួច Ctrl+V (This browser blocks it — click the box, then Ctrl+V).');
+            dom.payPasteBox?.focus();
+            return;
+        }
+        try {
+            const items = await navigator.clipboard.read();
+            for (const item of items) {
+                const type = item.types.find((t) => t.startsWith('image/'));
+                if (!type) continue;
+                const blob = await item.getType(type);
+                const ext = type.split('/')[1] || 'png';
+                showPasteHint('');
+                setPayFile(dom, new File([blob], `pasted-image.${ext}`, { type }));
+                return;
+            }
+            showPasteHint('មិនមានរូបភាពក្នុង clipboard ទេ (No image on the clipboard — copy an image first).');
+        } catch {
+            showPasteHint('មិនអាចអាន clipboard បានទេ — សូមចុចប្រអប់ រួច Ctrl+V (Clipboard access was blocked — click the box, then Ctrl+V).');
+            dom.payPasteBox?.focus();
+        }
+    });
+
     document.addEventListener('paste', (e) => {
         if (dom.payModal?.classList.contains('invisible')) return; // modal not open
 
-        const item = [...(e.clipboardData?.items || [])].find((i) => i.type.startsWith('image/'));
-        if (!item) return;
-
-        const file = item.getAsFile();
+        const file = imageFromClipboardEvent(e);
         if (file) setPayFile(dom, file);
     });
 }
@@ -150,8 +204,8 @@ function initTable(dom, ApiService, refresh) {
 
         if (btn.dataset.action === 'mark-paid') {
             openPayModal(dom, [id]);
-        } else if (btn.dataset.action === 'invite-telegram') {
-            await handleInviteTelegram(ApiService, id, refresh);
+        } else if (btn.dataset.action === 'edit-payment') {
+            await openEditPayModal(dom, ApiService, id, btn.dataset.paymentBatchId);
         }
     });
 

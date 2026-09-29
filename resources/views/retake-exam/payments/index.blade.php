@@ -73,20 +73,42 @@
                 រូបភាពបញ្ជាក់ការបង់ប្រាក់ (Payment proof image)
             </label>
 
-            {{-- Click to browse, drag a file in, or paste (Ctrl+V) an image
-                 copied from elsewhere (a screenshot, a chat app, etc). --}}
+            {{-- Option 1: click to browse, or drag a file in. --}}
             <div id="retakePayDropzone" tabindex="0"
                 class="relative flex flex-col items-center justify-center gap-2 px-4 py-8 text-center border-2 border-dashed border-neutral-300 dark:border-white/15 rounded-xl cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-500/50 hover:bg-indigo-50/40 dark:hover:bg-indigo-500/5 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-colors">
                 <svg class="w-8 h-8 text-neutral-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
                 </svg>
                 <p class="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-                    ចុចដើម្បីជ្រើសរើសរូបភាព ឬអូសមក ឬ Paste (Ctrl+V)
-                    <span class="block text-neutral-400 dark:text-neutral-500 font-normal mt-0.5">Click to browse, drag a file in, or paste an image</span>
+                    ចុចដើម្បីជ្រើសរើសរូបភាព ឬអូសមក
+                    <span class="block text-neutral-400 dark:text-neutral-500 font-normal mt-0.5">Click to browse, or drag a file in</span>
                 </p>
                 <img id="retakePayPreview" class="hidden max-h-40 rounded-lg border border-neutral-200 dark:border-white/10 object-contain" />
             </div>
             <input type="file" id="retakePayFile" accept="image/*" class="hidden">
+
+            <div class="flex items-center gap-3 my-2.5 text-[11px] font-bold uppercase tracking-widest text-neutral-400">
+                <span class="flex-1 h-px bg-neutral-200 dark:bg-white/10"></span>ឬ (or)<span class="flex-1 h-px bg-neutral-200 dark:bg-white/10"></span>
+            </div>
+
+            {{-- Option 2: paste an image copied from elsewhere (a screenshot,
+                 a chat app, etc). contenteditable, not an <input>, so the
+                 right-click / long-press menu offers "Paste" for images too;
+                 the JS never lets anything actually land in it. --}}
+            <div class="flex items-stretch gap-2">
+                <div id="retakePayPasteBox" contenteditable="true" role="textbox" aria-label="Paste payment proof image here"
+                    data-placeholder="ចុចទីនេះ រួច Ctrl+V (Click here, then Ctrl+V or right-click → Paste)"
+                    class="flex-1 min-w-0 flex items-center px-3 py-2.5 text-xs text-transparent caret-transparent border-2 border-dashed border-neutral-300 dark:border-white/15 rounded-xl bg-white dark:bg-neutral-900 cursor-text overflow-hidden whitespace-nowrap focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/30 dark:focus:border-indigo-500/50 transition-colors
+                        empty:before:content-[attr(data-placeholder)] empty:before:text-neutral-400 dark:empty:before:text-neutral-500 empty:before:truncate"></div>
+                <button type="button" id="retakePayPasteBtn" title="Paste the image from your clipboard"
+                    class="shrink-0 inline-flex items-center gap-1.5 px-3 text-xs font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
+                    </svg>
+                    Paste
+                </button>
+            </div>
+            <p id="retakePayPasteHint" class="hidden mt-1.5 text-xs text-rose-500"></p>
             <div class="flex items-center justify-between mt-1.5">
                 <p id="retakePayFileName" class="text-xs text-neutral-400 truncate"></p>
                 <button type="button" id="retakePayClearBtn" class="hidden text-xs font-semibold text-rose-500 hover:text-rose-600">
@@ -106,8 +128,8 @@
                 class="px-4 py-2.5 text-sm font-semibold text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-white/5 rounded-xl transition-colors">
                 បោះបង់ (Cancel)
             </button>
-            <button type="submit" form="retakePayForm"
-                class="px-4 py-2.5 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-lg shadow-emerald-500/30 transition-all active:scale-95">
+            <button type="submit" form="retakePayForm" id="retakePaySubmitBtn"
+                class="px-4 py-2.5 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-lg shadow-emerald-500/30 transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed">
                 កត់ត្រាការបង់ប្រាក់ (Record Payment)
             </button>
         </x-slot:footer>

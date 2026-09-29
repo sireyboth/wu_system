@@ -21,6 +21,8 @@ export function openPayModal(dom, ids) {
 
     state.payingIds = ids;
     state.payingStudentId = rows[0].student?.id ?? null;
+    state.editingPaymentBatchId = null;
+    setPayModalMode(dom, false);
 
     const studentName = escapeHtml(rows[0].student?.name || rows[0].student?.code || '—');
     const subjectList = rows.map((r) => escapeHtml(r.subject?.name || r.subject?.code || '—')).join(', ');
@@ -59,6 +61,7 @@ export async function setPayFile(dom, file) {
 
 export function clearPayFile(dom) {
     state.payingFile = null;
+    dom.payPasteHint?.classList.add('hidden');
     if (dom.payFileInput) dom.payFileInput.value = '';
     if (dom.payPreview) {
         dom.payPreview.src = '';
@@ -75,6 +78,15 @@ export function clearPayFile(dom) {
  * the same whether it's 1 id or several).
  */
 export async function submitPayForm(dom, ApiService, onDone) {
+    if (state.editingPaymentBatchId) {
+        dom.paySubmitBtn && (dom.paySubmitBtn.disabled = true);
+        try {
+            await submitEditPayForm(dom, ApiService, onDone);
+        } finally {
+            dom.paySubmitBtn && (dom.paySubmitBtn.disabled = false);
+        }
+        return;
+    }
     if (!state.payingStudentId || state.payingIds.length === 0) return;
 
     const body = new FormData();
@@ -118,15 +130,77 @@ export async function submitPayForm(dom, ApiService, onDone) {
     onDone();
 }
 
-export async function handleInviteTelegram(ApiService, id, onDone) {
-    const { error, data } = await ApiService.request(`${CONFIG.REGISTRATIONS_API}/${id}/invite-telegram`, {
-        method: 'PATCH',
+function setPayModalMode(dom, isEdit) {
+    if (dom.payModalTitle) {
+        dom.payModalTitle.textContent = isEdit ? 'កែប្រែការបង់ប្រាក់ (Edit Payment)' : 'កត់ត្រាការបង់ប្រាក់ (Record Payment)';
+    }
+    if (dom.paySubmitBtn) {
+        dom.paySubmitBtn.textContent = isEdit ? 'រក្សាទុក (Save Changes)' : 'កត់ត្រាការបង់ប្រាក់ (Record Payment)';
+    }
+}
+
+/**
+ * Opens the same modal to edit an already-recorded payment — its proof
+ * image and remark. One payment_batch can cover several subjects paid
+ * together, so the context line lists every subject it covers.
+ */
+export async function openEditPayModal(dom, ApiService, registrationId, paymentBatchId) {
+    const row = getRenderedRow(registrationId);
+    if (!row || !paymentBatchId) return;
+
+    const { error, data } = await ApiService.request(`${CONFIG.PAYMENT_BATCHES_API}/${paymentBatchId}`);
+    if (error) {
+        Toast.fire({ icon: 'error', title: data?.message || 'មិនអាចទាញយកការបង់ប្រាក់បានទេ' });
+        return;
+    }
+    const batch = data?.data ?? data;
+
+    state.payingIds = [];
+    state.payingStudentId = batch.student?.id ?? row.student?.id ?? null;
+    state.editingPaymentBatchId = paymentBatchId;
+    setPayModalMode(dom, true);
+    clearPayFile(dom);
+
+    const studentName = escapeHtml(row.student?.name || row.student?.code || '—');
+    const paidAt = batch.paid_at ? escapeHtml(batch.paid_at) : '—';
+    if (dom.payContext) {
+        dom.payContext.innerHTML = `<strong>${studentName}</strong><br><span class="text-xs text-neutral-500 dark:text-neutral-400">បង់នៅ (Paid at) ${paidAt} — changes apply to every subject on this payment</span>`;
+    }
+    if (dom.payRemark) dom.payRemark.value = batch.remark ?? '';
+
+    // Show the image already on file; staging a new one replaces it.
+    if (batch.invoice_url && dom.payPreview) {
+        dom.payPreview.src = batch.invoice_url;
+        dom.payPreview.classList.remove('hidden');
+        if (dom.payFileName) dom.payFileName.textContent = 'រូបភាពបច្ចុប្បន្ន (Current image) — browse or paste to replace';
+    }
+
+    window.RetakePayModal.toggle(true);
+}
+
+async function submitEditPayForm(dom, ApiService, onDone) {
+    const body = new FormData();
+    // POST + _method=PUT: PHP doesn't parse multipart bodies on a real PUT.
+    body.append('_method', 'PUT');
+    body.append('student_id', state.payingStudentId);
+    if (state.payingFile) body.append('invoice_file', state.payingFile);
+    body.append('remark', dom.payRemark?.value ?? '');
+
+    const { error, data } = await ApiService.request(`${CONFIG.PAYMENT_BATCHES_API}/${state.editingPaymentBatchId}`, {
+        method: 'POST',
+        body,
     });
 
     if (error) {
-        Toast.fire({ icon: 'error', title: data?.message || 'មិនអាចអញ្ជើញបានទេ' });
+        const firstError = data?.errors ? Object.values(data.errors)[0]?.[0] : null;
+        Toast.fire({ icon: 'error', title: firstError || data?.message || 'មិនអាចរក្សាទុកបានទេ' });
         return;
     }
-    Toast.fire({ icon: 'success', title: 'អញ្ជើញជោគជ័យ!' });
+
+    Toast.fire({ icon: 'success', title: 'កែប្រែការបង់ប្រាក់ជោគជ័យ! (Payment updated)' });
+    window.RetakePayModal.toggle(false);
+    state.editingPaymentBatchId = null;
+    state.payingStudentId = null;
+    clearPayFile(dom);
     onDone();
 }

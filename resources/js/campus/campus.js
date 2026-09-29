@@ -293,7 +293,6 @@ function renderTable(campuss) {
     // 7. INTERACTIVE & MODAL TRANSLATION ENGINE
     function toggleModal(forceOpen = null) {
         if (!DOM.modal || !DOM.modalCard) return;
-
         const isOpen = DOM.modal.classList.contains('flex');
         const makeOpen = forceOpen !== null ? forceOpen : !isOpen;
 

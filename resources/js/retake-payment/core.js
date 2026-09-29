@@ -25,6 +25,9 @@ export const state = {
     // The image File currently staged in the Mark Paid modal (from file
     // picker, drag-drop, or clipboard paste) — read on submit.
     payingFile: null,
+    // Set while the modal is editing an existing payment instead of
+    // recording a new one — submit then updates this payment_batch.
+    editingPaymentBatchId: null,
 };
 
 export function buildDom() {
@@ -40,10 +43,15 @@ export function buildDom() {
 
         // Mark Paid modal
         payModal: document.getElementById('retakePayModal'),
+        payModalTitle: document.getElementById('retakePayModalTitle'),
+        paySubmitBtn: document.getElementById('retakePaySubmitBtn'),
         payForm: document.getElementById('retakePayForm'),
         payContext: document.getElementById('retakePayContext'),
         payDropzone: document.getElementById('retakePayDropzone'),
         payFileInput: document.getElementById('retakePayFile'),
+        payPasteBox: document.getElementById('retakePayPasteBox'),
+        payPasteBtn: document.getElementById('retakePayPasteBtn'),
+        payPasteHint: document.getElementById('retakePayPasteHint'),
         payPreview: document.getElementById('retakePayPreview'),
         payFileName: document.getElementById('retakePayFileName'),
         payClearBtn: document.getElementById('retakePayClearBtn'),
