@@ -57,6 +57,21 @@ class PaymentBatchController extends Controller
         return new PaymentBatchResource($this->reload($batch));
     }
 
+    /**
+     * Streams the stored proof image — see the route's note in api.php
+     * for why this exists instead of a direct /storage URL.
+     */
+    public function invoice(PaymentBatch $paymentBatch)
+    {
+        $path = $paymentBatch->invoice_path;
+
+        if (! $path || ! Storage::disk('public')->exists($path)) {
+            return no_data('Payment proof image not found on this server.', 404);
+        }
+
+        return Storage::disk('public')->response($path);
+    }
+
     public function show(PaymentBatch $paymentBatch)
     {
         return $this->view($paymentBatch);

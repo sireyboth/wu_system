@@ -9,10 +9,13 @@ class PaymentBatchResource extends IResource
             'student'      => new StudentResource($this->whenLoaded('student')),
             'invoice_path' => $this->invoice_path,
             'invoice_type' => $this->invoice_type,
-            // Root-relative, like the front end's own /api/v1 calls — an
-            // absolute asset() URL follows the request's host/scheme and
-            // comes out http:// behind an HTTPS proxy, which browsers block.
-            'invoice_url'  => $this->invoice_path ? '/storage/' . ltrim($this->invoice_path, '/') : null,
+            // Served by PaymentBatchController::invoice, not /storage (see
+            // its route note). Root-relative like the front end's own
+            // /api/v1 calls; ?v= changes when the image is replaced, so the
+            // browser never shows a cached old one.
+            'invoice_url'  => $this->invoice_path
+                ? "/api/v1/payment-batches/{$this->id}/invoice?v=" . ($this->updated_at?->timestamp ?? 0)
+                : null,
             'uploaded_by'  => $this->uploaded_by,
             'paid_at'      => $this->paid_at?->format('Y-m-d H:i:s'),
             'entries'      => PaymentEntryResource::collection($this->whenLoaded('entries')),

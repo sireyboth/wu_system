@@ -137,6 +137,14 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         ->post('/retake-registrations', [RetakeRegistrationController::class, 'store'])
         ->name('retake-registrations.store');
 
+    // Payment proof image, streamed through Laravel instead of a
+    // public/storage URL — works without the storage:link symlink (which
+    // shared hosts often lack or put outside the served folder), and keeps
+    // invoices behind login + permission instead of open to any link.
+    Route::middleware('permission:payment-batch.view')
+        ->get('/payment-batches/{payment_batch}/invoice', [PaymentBatchController::class, 'invoice'])
+        ->name('payment-batches.invoice');
+
     // Student/subject/lecturer pickers for the add/edit modal — REG has no
     // student.view/subject.view/lecturer.view of its own (see
     // PermissionSeeder), so the modal can't hit those modules' own lists.
