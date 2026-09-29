@@ -154,6 +154,7 @@ Route::prefix('v1')->middleware('auth')->group(function () {
     Route::middleware('permission:retake-payment.edit')->prefix('retake-registrations')->name('retake-registrations.')->group(function () {
         Route::patch('/bulk-mark-paid', [RetakeRegistrationController::class, 'bulkMarkPaid'])->name('bulk-mark-paid');
         Route::patch('/{retake_registration}/mark-paid', [RetakeRegistrationController::class, 'markPaid'])->name('mark-paid');
+        Route::patch('/{retake_registration}/mark-unpaid', [RetakeRegistrationController::class, 'markUnpaid'])->name('mark-unpaid');
         Route::patch('/{retake_registration}/invite-telegram', [RetakeRegistrationController::class, 'inviteTelegram'])->name('invite-telegram');
     });
 

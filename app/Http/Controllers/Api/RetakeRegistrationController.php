@@ -11,6 +11,7 @@ use App\Models\RetakeRegistration;
 use App\Models\Student;
 use App\Models\Subject;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class RetakeRegistrationController extends Controller
 {
@@ -317,6 +318,44 @@ class RetakeRegistrationController extends Controller
         }
 
         return has_data(['skipped_ids' => $unconfirmed->values()], $message);
+    }
+
+    /**
+     * SA: undoes a payment marked by mistake. Blocked once Accounting has
+     * reconciled the payment_batch (a payment_entry exists) — undoing it
+     * here would leave ACC's books pointing at a payment that no longer
+     * exists, so ACC removes its entry first. The Telegram invite goes too,
+     * since it's only ever handed out after payment.
+     *
+     * One payment_batch can cover several subjects paid together; this
+     * only unpays the one row. If that leaves the batch covering nothing,
+     * it's soft-deleted so it stops showing on ACC's reconciliation list
+     * as a phantom invoice (soft, so the proof image is kept).
+     */
+    public function markUnpaid(RetakeRegistration $retakeRegistration)
+    {
+        if ($retakeRegistration->payment_status !== RetakeRegistration::PAYMENT_PAID) {
+            return no_data('This registration is not marked paid.', 422);
+        }
+
+        $batch = $retakeRegistration->paymentBatch;
+        if ($batch && $batch->entries()->exists()) {
+            return no_data('Accounting has already reconciled this payment — ask Accounting to remove its entry first.', 422);
+        }
+
+        DB::transaction(function () use ($retakeRegistration, $batch) {
+            $retakeRegistration->update([
+                'payment_status'      => RetakeRegistration::PAYMENT_UNPAID,
+                'payment_batch_id'    => null,
+                'telegram_invited_at' => null,
+            ]);
+
+            if ($batch && ! $batch->registrations()->exists()) {
+                $batch->delete();
+            }
+        });
+
+        return new RetakeRegistrationResource($this->reload($retakeRegistration));
     }
 
     /**

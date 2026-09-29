@@ -2,7 +2,7 @@ import { CONFIG } from './config.js';
 import { buildDom, state, openModal, closeModal, Toast } from './core.js';
 import { createApiService } from './api-service.js';
 import { loadRegistrations } from './list.js';
-import { openPayModal, openEditPayModal, submitPayForm, setPayFile, clearPayFile } from './actions.js';
+import { openPayModal, openEditPayModal, submitPayForm, setPayFile, clearPayFile, handleMarkUnpaid } from './actions.js';
 import { getRenderedRow } from './table-render.js';
 import { bindPagination } from './pagination.js';
 
@@ -204,6 +204,8 @@ function initTable(dom, ApiService, refresh) {
 
         if (btn.dataset.action === 'mark-paid') {
             openPayModal(dom, [id]);
+        } else if (btn.dataset.action === 'mark-unpaid') {
+            await handleMarkUnpaid(ApiService, id, refresh);
         } else if (btn.dataset.action === 'edit-payment') {
             await openEditPayModal(dom, ApiService, id, btn.dataset.paymentBatchId);
         }

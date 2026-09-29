@@ -205,3 +205,32 @@ async function submitEditPayForm(dom, ApiService, onDone) {
     clearPayFile(dom);
     onDone();
 }
+
+/**
+ * Undoes a payment marked by mistake (see
+ * RetakeRegistrationController::markUnpaid for what's blocked and why).
+ */
+export async function handleMarkUnpaid(ApiService, id, onDone) {
+    const row = getRenderedRow(id);
+    const who = escapeHtml(studentDisplayName(row?.student) || '—');
+    const subject = escapeHtml(row?.subject?.name || row?.subject?.code || '—');
+
+    const confirmation = await Swal.fire({
+        title: 'ប្តូរទៅមិនទាន់បង់? (Mark as unpaid?)',
+        html: `<strong>${who}</strong> — ${subject}<br><span style="font-size:13px;color:#6b7280">ការបង់ប្រាក់ និងការអញ្ជើញ Telegram នៃមុខវិជ្ជានេះនឹងត្រូវលុបចោល។<br>This subject's payment and Telegram invite will be undone.</span>`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#e11d48',
+        confirmButtonText: 'បាទ/ចាស (Yes, mark unpaid)',
+        cancelButtonText: 'បោះបង់ (Cancel)',
+    });
+    if (!confirmation.isConfirmed) return;
+
+    const { error, data } = await ApiService.request(`${CONFIG.REGISTRATIONS_API}/${id}/mark-unpaid`, { method: 'PATCH' });
+    if (error) {
+        Toast.fire({ icon: 'error', title: data?.message || 'មិនអាចផ្លាស់ប្តូរបានទេ' });
+        return;
+    }
+    Toast.fire({ icon: 'success', title: 'បានប្តូរទៅមិនទាន់បង់ (Marked unpaid)' });
+    onDone();
+}
