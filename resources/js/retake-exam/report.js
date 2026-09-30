@@ -12,6 +12,7 @@ const TERMS_URL = window.RETAKE_TERMS_URL;
 const els = {
     termFilter: document.getElementById('reportTermFilter'),
     kpiTotal: document.getElementById('kpiTotalConfirmed'),
+    kpiStudents: document.getElementById('kpiTotalStudents'),
     kpiPassed: document.getElementById('kpiPassed'),
     kpiStillNeedRetake: document.getElementById('kpiStillNeedRetake'),
     kpiPaymentRate: document.getElementById('kpiPaymentRate'),
@@ -48,6 +49,7 @@ function renderKpis(report) {
     const paymentRate = total > 0 ? Math.round((paid / total) * 100) : 0;
 
     if (els.kpiTotal) els.kpiTotal.textContent = total;
+    if (els.kpiStudents) els.kpiStudents.textContent = report.total_students ?? 0;
     if (els.kpiPassed) els.kpiPassed.textContent = passed;
     if (els.kpiStillNeedRetake) els.kpiStillNeedRetake.textContent = stillNeedRetake;
     if (els.kpiPaymentRate) els.kpiPaymentRate.textContent = `${paymentRate}%`;

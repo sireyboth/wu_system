@@ -33,7 +33,7 @@
 </div>
 
 {{-- KPI cards --}}
-<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+<div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
     <div class="p-5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-2xl shadow-sm">
         <div class="flex items-center justify-between mb-2">
             <span class="text-[11px] font-bold uppercase tracking-wide text-neutral-400">ចុះឈ្មោះសរុប</span>
@@ -43,6 +43,18 @@
         </div>
         <div id="kpiTotalConfirmed" class="text-2xl font-black text-neutral-900 dark:text-white">—</div>
         <div class="text-xs text-neutral-400">Total Confirmed Registrations</div>
+    </div>
+
+    {{-- Per person: a student registered for 4 subjects counts once here. --}}
+    <div class="p-5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-2xl shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+            <span class="text-[11px] font-bold uppercase tracking-wide text-neutral-400">និស្សិតសរុប</span>
+            <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-500/10 text-sky-600 dark:text-sky-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>
+            </div>
+        </div>
+        <div id="kpiTotalStudents" class="text-2xl font-black text-sky-600 dark:text-sky-400">—</div>
+        <div class="text-xs text-neutral-400">Total Students (per person)</div>
     </div>
 
     <div class="p-5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-2xl shadow-sm">

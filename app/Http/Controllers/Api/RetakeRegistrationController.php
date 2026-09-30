@@ -80,6 +80,9 @@ class RetakeRegistrationController extends Controller
         }
 
         $totalConfirmed = (clone $base)->count();
+        // Per person, not per subject — one student registered for 4
+        // subjects counts once here but 4 times in total_confirmed.
+        $totalStudents  = (clone $base)->distinct()->count('student_id');
         $outcomeCounts  = (clone $base)->selectRaw('outcome, count(*) as total')->groupBy('outcome')->pluck('total', 'outcome');
         $paymentCounts  = (clone $base)->selectRaw('payment_status, count(*) as total')->groupBy('payment_status')->pluck('total', 'payment_status');
 
@@ -111,6 +114,7 @@ class RetakeRegistrationController extends Controller
 
         return has_data([
             'total_confirmed' => $totalConfirmed,
+            'total_students'  => $totalStudents,
             'outcome_counts'  => $outcomeCounts,
             'payment_counts'  => $paymentCounts,
             'by_exam_type'    => $byExamType,
