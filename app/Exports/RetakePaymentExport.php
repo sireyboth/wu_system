@@ -44,9 +44,12 @@ class RetakePaymentExport extends IExport
 
     public function query()
     {
+        // Same "confirmed" as the page and the report: registered_at alone
+        // isn't enough — confirm() stamps it on unticked subjects too.
         $query = RetakeRegistration::query()
             ->with($this->relationships)
-            ->whereNotNull('registered_at');
+            ->whereNotNull('registered_at')
+            ->where('is_selected', true);
 
         if ($examTypeId = $this->filters['exam_type_id'] ?? null) {
             $query->where('exam_type_id', $examTypeId);
