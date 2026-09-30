@@ -30,9 +30,23 @@ document.addEventListener('DOMContentLoaded', () => {
         submitPayForm(dom, ApiService, refresh);
     });
     initPayImagePicker(dom);
+    dom.exportBtn?.addEventListener('click', () => exportCurrentFilters());
 
     loadTermsAndExamTypes(dom, ApiService).then(refresh);
 });
+
+/**
+ * Plain browser navigation, not a fetch — same session-cookie auth as the
+ * rest of the page (see retake-exam/index.js's exportCurrentFilters()).
+ */
+function exportCurrentFilters() {
+    const params = new URLSearchParams();
+    if (state.search) params.set('search', state.search);
+    Object.entries(state.filters).forEach(([key, value]) => {
+        if (value) params.set(key, value);
+    });
+    window.open(`${CONFIG.PAYMENTS_EXPORT_API}?${params.toString()}`, '_blank');
+}
 
 /**
  * Ways to stage an image on the Mark Paid modal: click-to-browse,

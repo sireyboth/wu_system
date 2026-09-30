@@ -122,6 +122,16 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         ->get('/retake-registrations-export', [RetakeRegistrationController::class, 'exportList'])
         ->name('retake-registrations.export');
 
+    // SA's Payments page export and ACC's Reconciliation page export —
+    // same flat-sibling reasoning, gated by each page's own permission.
+    Route::middleware('permission:retake-payment.edit')
+        ->get('/retake-payments-export', [RetakeRegistrationController::class, 'exportPayments'])
+        ->name('retake-payments.export');
+
+    Route::middleware('permission:payment-entry.view')
+        ->get('/payment-batches-export', [PaymentBatchController::class, 'exportList'])
+        ->name('payment-batches.export');
+
     // REG's report page — same flat-sibling reasoning as export above.
     Route::middleware('permission:retake-registration.view')
         ->get('/retake-registrations-report', [RetakeRegistrationController::class, 'report'])

@@ -40,6 +40,7 @@ export function buildDom() {
         statusFilter: document.getElementById('retakePaymentStatusFilter'),
         markPaidSelectedBtn: document.getElementById('retakeMarkPaidSelectedBtn'),
         selectedCountLabel: document.getElementById('retakeSelectedCountLabel'),
+        exportBtn: document.getElementById('retakePaymentExportBtn'),
 
         // Mark Paid modal
         payModal: document.getElementById('retakePayModal'),

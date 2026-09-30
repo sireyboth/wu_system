@@ -13,6 +13,7 @@ export function buildDom() {
     return {
         tableBody: document.getElementById('retake-entry-table-body'),
         loader: document.getElementById('loading-overlay'),
+        exportBtn: document.getElementById('retakeEntryExportBtn'),
 
         entryModal: document.getElementById('retakeEntryModal'),
         entryModalTitle: document.getElementById('retakeEntryModalTitle'),

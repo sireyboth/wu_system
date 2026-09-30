@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Api;
 
+use App\Exports\PaymentBatchExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PaymentBatchRequest;
 use App\Http\Resources\PaymentBatchResource;
@@ -70,6 +71,15 @@ class PaymentBatchController extends Controller
         }
 
         return Storage::disk('public')->response($path);
+    }
+
+    /**
+     * ACC's reconciliation export — every payment batch with its entry.
+     * Named exportList, not export — see RetakeRegistrationController.
+     */
+    public function exportList()
+    {
+        return $this->export(new PaymentBatchExport(), 'payment-reconciliation');
     }
 
     public function show(PaymentBatch $paymentBatch)

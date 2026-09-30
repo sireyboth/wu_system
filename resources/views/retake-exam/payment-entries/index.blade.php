@@ -6,6 +6,16 @@
         subtitle="កត់ត្រាការផ្គូផ្គងវិក័យបត្រជាមួយប្រព័ន្ធគណនេយ្យ (Record reconciliation entries against SA's payment batches)" />
 
     <div class="space-y-4">
+        <div class="flex justify-end">
+            <button type="button" id="retakeEntryExportBtn" title="Export all payment batches and their reconciliation entries to Excel"
+                class="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
+                <svg class="w-4 h-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>
+                នាំចេញ (Export)
+            </button>
+        </div>
+
         <x-ui.data-table :headers="[
             'N.O',
             'Student',

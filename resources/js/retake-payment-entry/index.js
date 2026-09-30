@@ -1,3 +1,4 @@
+import { CONFIG } from './config.js';
 import { buildDom, state, openModal, closeModal } from './core.js';
 import { createApiService } from './api-service.js';
 import { loadBatches } from './list.js';
@@ -22,6 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         submitEntryForm(dom, ApiService, refresh);
     });
+
+    // Plain navigation download — same session-cookie auth as the page.
+    dom.exportBtn?.addEventListener('click', () => window.open(CONFIG.EXPORT_API, '_blank'));
 
     bindPagination((page) => {
         state.page = page;

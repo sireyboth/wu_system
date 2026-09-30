@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Api;
 
+use App\Exports\RetakePaymentExport;
 use App\Exports\RetakeRegistrationExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RetakeRegistrationRequest;
@@ -141,6 +142,20 @@ class RetakeRegistrationController extends Controller
                 'batch_id', 'exam_type_id', 'retake_term_id', 'payment_status', 'outcome',
             ])),
             'retake-registrations'
+        );
+    }
+
+    /**
+     * SA's payments export — whatever the Payments page is currently
+     * showing (confirmed registrations, same filters + search).
+     */
+    public function exportPayments(Request $request)
+    {
+        return $this->export(
+            new RetakePaymentExport($request->only([
+                'exam_type_id', 'retake_term_id', 'payment_status', 'search',
+            ])),
+            'retake-payments'
         );
     }
 
