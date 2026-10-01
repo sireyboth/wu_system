@@ -52,11 +52,23 @@ Route::get('/retake-exam', [RetakeExamPublicController::class, 'index'])->name('
 // The scan action itself lives in routes/api.php's attend-public group.
 Route::get('/attend', [\App\Http\Controllers\AttendancePublicController::class, 'index'])->name('attend.index');
 
+// Public — what an invigilator card's QR opens, no login. Keyed by an
+// unguessable token (not the id); throttled so tokens can't be brute-forced.
+Route::get('/invigilator/card/{token}', [\App\Http\Controllers\InvigilatorController::class, 'show'])
+    ->middleware('throttle:60,1')
+    ->name('invigilator.public');
+Route::get('/invigilator/card/{token}/photo', [\App\Http\Controllers\InvigilatorController::class, 'photo'])
+    ->middleware('throttle:120,1')
+    ->name('invigilator.photo');
+
 Route::middleware(['auth'])->group(function () {
     // This is the missing piece that connects to your Controller
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('lecturer', LecturerController::class)->only('index')->middleware('can:lecturer.view');
+    Route::get('/invigilator', [\App\Http\Controllers\InvigilatorController::class, 'index'])
+        ->name('invigilator.index')
+        ->middleware('can:invigilator.view');
     Route::resource('shift', ShiftController::class)->only('index')->middleware('can:shift.view');
     Route::resource('faculty', FacultyController::class)->only('index')->middleware('can:faculty.view');
     Route::resource('major', MajorController::class)->only('index')->middleware('can:major.view');

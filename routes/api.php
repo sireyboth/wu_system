@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\LecturerPortalController;
 use App\Http\Controllers\Api\MajorController;
 use App\Http\Controllers\Api\PaymentBatchController;
 use App\Http\Controllers\Api\PaymentEntryController;
+use App\Http\Controllers\Api\InvigilatorController;
 use App\Http\Controllers\Api\RetakeBatchController;
 use App\Http\Controllers\Api\RetakeExamPublicController;
 use App\Http\Controllers\Api\RetakeRegistrationController;
@@ -350,6 +351,14 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         ->delete('/statuses-bulk-destroy', [StatusController::class, 'bulkDestroy'])
         ->name('statuses.bulk-destroy');
 
+    // Invigilator photo — separate multipart endpoint (the main form is
+    // JSON). The page uploads right after creating OR editing, so either
+    // permission is enough.
+    Route::middleware('permission:invigilator.create|invigilator.edit')->group(function () {
+        Route::post('/invigilators/{invigilator}/photo', [InvigilatorController::class, 'uploadPhoto'])->name('invigilators.photo.upload');
+        Route::delete('/invigilators/{invigilator}/photo', [InvigilatorController::class, 'deletePhoto'])->name('invigilators.photo.delete');
+    });
+
     // Register API resource routes for various controllers
     api_routes([
         'faculties'       => FacultyController::class,
@@ -369,6 +378,7 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         'retake-batches'  => RetakeBatchController::class,
         'payment-batches' => PaymentBatchController::class,
         'payment-entries' => PaymentEntryController::class,
+        'invigilators'    => InvigilatorController::class,
         'terms'           => TermController::class,
         'users'           => UserController::class,
         'rooms'               => RoomController::class,
@@ -396,6 +406,7 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         'retake-batches'  => 'retake-batch',
         'payment-batches' => 'payment-batch',
         'payment-entries' => 'payment-entry',
+        'invigilators'    => 'invigilator',
         // 'exam-states' registered separately above, fully public.
         'terms'           => 'term',
         'users'           => 'role',

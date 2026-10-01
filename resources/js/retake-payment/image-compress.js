@@ -5,8 +5,9 @@
  * page feel laggy. Resizes to a reasonable max dimension and re-encodes as
  * JPEG; falls back to the original file if decoding fails or compression
  * doesn't actually help (e.g. a small image, or one already a JPEG).
+ * Pass type: 'image/webp' to keep transparency (JPEG drops it).
  */
-export async function compressImage(file, { maxDimension = 1600, quality = 0.82 } = {}) {
+export async function compressImage(file, { maxDimension = 1600, quality = 0.82, type = 'image/jpeg' } = {}) {
     if (!file || !file.type?.startsWith('image/')) return file;
 
     let bitmap;
@@ -27,9 +28,12 @@ export async function compressImage(file, { maxDimension = 1600, quality = 0.82 
     ctx.drawImage(bitmap, 0, 0, width, height);
     bitmap.close?.();
 
-    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality));
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, type, quality));
     if (!blob || blob.size >= file.size) return file;
 
-    const name = (file.name || 'image').replace(/\.[^.]+$/, '') + '.jpg';
-    return new File([blob], name, { type: 'image/jpeg' });
+    // Browsers that can't encode the requested type fall back to PNG — name
+    // the file after what was actually produced.
+    const ext = { 'image/jpeg': 'jpg', 'image/webp': 'webp', 'image/png': 'png' }[blob.type] ?? 'jpg';
+    const name = (file.name || 'image').replace(/\.[^.]+$/, '') + '.' + ext;
+    return new File([blob], name, { type: blob.type || type });
 }

@@ -45,6 +45,9 @@ class PermissionSeeder extends Seeder
         'retake-cs'           => 'Retake Customer Service',
         'payment-batch'       => 'Payment Batch',
         'payment-entry'       => 'Payment Entry',
+
+        // Standalone invigilator register + public QR card (2026-10)
+        'invigilator'         => 'Invigilator',
     ];
 
     protected const ACTIONS = ['view', 'create', 'edit', 'delete'];
