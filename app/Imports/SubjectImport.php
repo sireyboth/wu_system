@@ -61,7 +61,7 @@ class SubjectImport implements ToCollection, WithHeadingRow, WithCustomCsvSettin
 
     protected function processRow(int $rowNumber, Collection $row): void
     {
-        $code        = trim((string) ($row['code'] ?? ''));
+        $code        = clean_code((string) ($row['code'] ?? ''));
         $nameKh      = trim((string) ($row['name_kh'] ?? ''));
         $nameEn      = trim((string) ($row['name_en'] ?? ''));
         $facultyName = trim((string) ($row['faculty'] ?? ''));

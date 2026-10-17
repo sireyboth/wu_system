@@ -3,6 +3,13 @@ namespace App\Http\Requests;
 
 class SubjectRequest extends IRequest
 {
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('code')) {
+            $this->merge(['code' => clean_code($this->input('code'))]);
+        }
+    }
+
     protected function formData(): array
     {
         return array_merge(
