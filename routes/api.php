@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\MajorController;
 use App\Http\Controllers\Api\PaymentBatchController;
 use App\Http\Controllers\Api\PaymentEntryController;
 use App\Http\Controllers\Api\InvigilatorController;
+use App\Http\Controllers\Api\TranscriptController;
 use App\Http\Controllers\Api\RetakeBatchController;
 use App\Http\Controllers\Api\RetakeExamPublicController;
 use App\Http\Controllers\Api\RetakeRegistrationController;
@@ -379,6 +380,7 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         'payment-batches' => PaymentBatchController::class,
         'payment-entries' => PaymentEntryController::class,
         'invigilators'    => InvigilatorController::class,
+        'transcripts'     => TranscriptController::class,
         'terms'           => TermController::class,
         'users'           => UserController::class,
         'rooms'               => RoomController::class,
@@ -407,6 +409,7 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         'payment-batches' => 'payment-batch',
         'payment-entries' => 'payment-entry',
         'invigilators'    => 'invigilator',
+        'transcripts'     => 'certificate',
         // 'exam-states' registered separately above, fully public.
         'terms'           => 'term',
         'users'           => 'role',

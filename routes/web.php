@@ -128,6 +128,12 @@ Route::middleware(['auth'])->group(function () {
         ->name('student-history.index')
         ->middleware('can:student.view');
     Route::resource('certificate', StudentStatusController::class)->only('index')->middleware('can:certificate.view');
+    Route::get('/transcript', [\App\Http\Controllers\TranscriptController::class, 'index'])
+        ->name('transcript.index')
+        ->middleware('can:certificate.view');
+    Route::get('/transcript/{transcript}/print', [\App\Http\Controllers\TranscriptController::class, 'print'])
+        ->name('transcript.print')
+        ->middleware('can:certificate.view');
     Route::resource('app-status', StatusController::class)->only('index')->middleware('can:app-status.view');
 
     Route::resource('class', \App\Http\Controllers\ClassSectionController::class)->only('index')->middleware('can:class.view');
