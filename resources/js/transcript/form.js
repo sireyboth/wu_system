@@ -171,8 +171,8 @@ function pickSubject(dom, rowEl, subject) {
     field(rowEl, 'subject_id').value = subject.id;
     field(rowEl, 'subject_search').value = subjectLabel(subject);
     rowEl.querySelector('[data-role="subject-code"]').textContent = subject.code || '—';
-    const credit = field(rowEl, 'credit');
-    if (credit.value === '') credit.value = subject.credit || 3;
+    // Always take the picked subject's credit (still editable afterwards).
+    field(rowEl, 'credit').value = subject.credit || 3;
     rowEl.querySelector('[data-role="subject-options"]').classList.add('hidden');
     recalc(dom);
     field(rowEl, 'score').focus();
