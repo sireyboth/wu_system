@@ -117,10 +117,10 @@
         .info .full {
             grid-column: 1 / -1;
         }
-
+/*
         .info .address b {
             margin-left: 5mm;
-        }
+        } */
 
         table.courses {
             width: 100%;
