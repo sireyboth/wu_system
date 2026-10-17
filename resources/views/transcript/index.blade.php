@@ -50,7 +50,7 @@
     {{-- Create / Edit --}}
     <x-ui.modal id="transcriptModal" card-id="transcriptModalCard" title-id="transcriptModalTitle"
         title="បង្កើតព្រឹត្តិប័ត្រ (New Transcript)" form-id="transcriptForm"
-        close-fn="TranscriptModal" fullscreen>
+        close-fn="TranscriptModal" max-width="max-w-6xl" max-height="h-[calc(100vh-4rem)]">
 
         {{-- 1. Student --}}
         <section class="space-y-4">
