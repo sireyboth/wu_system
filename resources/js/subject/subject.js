@@ -96,7 +96,8 @@
         modal: document.getElementById('subjectModal'),
         modalCard: document.getElementById('subjectModalCard'),
         modalTitle: document.getElementById('subjectModalTitle'),
-        submitBtn: document.getElementById('subjectForm')?.querySelector('button[type="submit"]'),
+        // Footer (and its submit button) renders outside <form> in <x-ui.modal>.
+        submitBtn: document.querySelector('button[type="submit"][form="subjectForm"]'),
 
         exportBtn: document.getElementById('subjectExportBtn'),
         destroyAllBtn: document.getElementById('subjectDestroyAllBtn'),
