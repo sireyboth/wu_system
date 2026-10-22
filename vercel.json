@@ -10,7 +10,15 @@
         { "handle": "filesystem" },
         {
             "src": "/(.*)",
-            "dest": "/api/index.php"
+            "dest": "api/index.php"
+        },
+        {
+            "src": "/build/(.*)",
+            "dest": "build/$1"
+        },
+        {
+            "src": "/(.*\\.(?:css|ico|png|jpg|jpeg|gif|svg|webp|avif|mp4|webm|ogg|mp3|wav|flac|aac))$",
+            "dest": "/public/$1"
         }
     ],
     "outputDirectory": "public",
