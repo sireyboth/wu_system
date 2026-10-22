@@ -16,7 +16,7 @@ class Faculty extends IModel
 
         $this->fillable   = array_merge($base);
         $this->searchable = array_merge($this->fillable, [
-            'majors.name', 'majors.name_kh', 'majors.name_en', 'majors.shortcut',
+            'majors.name_kh', 'majors.name_en', 'majors.shortcut',
         ]);
     }
 

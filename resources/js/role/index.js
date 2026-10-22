@@ -29,6 +29,7 @@
         'state-exam': '<path stroke-linecap="round" stroke-linejoin="round" d="M3 8l9-5 9 5-9 5-9-5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M5 10v5c0 1.5 3.1 3 7 3s7-1.5 7-3v-5"/><path stroke-linecap="round" stroke-linejoin="round" d="M19 10v6"/>',
         certificate: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>',
         role: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12a3 3 0 100-6 3 3 0 000 6zM17.804 21c.512-.75.79-1.638.79-2.556C18.594 15.36 15.964 13 12.75 13H12a4.5 4.5 0 00-4.5 4.5c0 .918.278 1.806.79 2.556M15 6a3 3 0 11-6 0 3 3 0 016 0z"/>',
+        invigilator: '<path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z"/>',
     };
     const DEFAULT_ICON = '<path stroke-linecap="round" stroke-linejoin="round" d="M3 7a2 2 0 012-2h4l2 2h6a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/>';
 
@@ -68,6 +69,14 @@
         permissionGrid: document.getElementById('permission-grid'),
         submitBtn: document.getElementById('roleSubmitBtn'),
         toggleAllBtn: document.getElementById('toggleAllPermissions'),
+
+        pwModal: document.getElementById('resetPasswordModal'),
+        pwModalCard: document.getElementById('resetPasswordModalCard'),
+        pwForm: document.getElementById('resetPasswordForm'),
+        pwUserLabel: document.getElementById('resetPasswordUserLabel'),
+        pwInput: document.getElementById('resetPasswordInput'),
+        pwSubmitBtn: document.getElementById('resetPasswordSubmitBtn'),
+        pwToggleVisibility: document.getElementById('toggleResetPasswordVisibility'),
     };
 
     const Toast = typeof Swal !== 'undefined' ? Swal.mixin({
@@ -207,20 +216,34 @@
         DOM.usersGrid.innerHTML = filtered.map((user) => {
             const [bg, text] = avatarColor(user.name || user.email);
             const currentRole = (user.roles ?? [])[0] ?? '';
+            const isSelf = String(user.id) === String(window.CURRENT_USER_ID);
 
             return `
                 <div class="p-5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-2xl shadow-sm hover:shadow-md transition-all">
-                    <div class="flex items-center gap-3 mb-4">
-                        <span class="flex items-center justify-center w-11 h-11 rounded-full ${bg} ${text} font-bold text-sm shrink-0">
-                            ${escapeHtml(initials(user.name))}
-                        </span>
-                        <div class="min-w-0">
-                            <p class="font-bold text-neutral-900 dark:text-white truncate">${escapeHtml(user.name)}</p>
-                            <p class="text-xs text-neutral-400 truncate flex items-center gap-1">
-                                ${escapeHtml(user.email)}
-                                ${user.verified ? '<svg class="w-3.5 h-3.5 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20" title="Verified"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>' : ''}
-                            </p>
+                    <div class="flex items-start justify-between gap-2 mb-4">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <span class="flex items-center justify-center w-11 h-11 rounded-full ${bg} ${text} font-bold text-sm shrink-0">
+                                ${escapeHtml(initials(user.name))}
+                            </span>
+                            <div class="min-w-0">
+                                <p class="font-bold text-neutral-900 dark:text-white truncate">${escapeHtml(user.name)}</p>
+                                <p class="text-xs text-neutral-400 truncate flex items-center gap-1">
+                                    ${escapeHtml(user.email)}
+                                    ${user.verified ? '<svg class="w-3.5 h-3.5 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20" title="Verified"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>' : ''}
+                                </p>
+                            </div>
                         </div>
+                        ${!isSelf && (window.CAN_RESET_PASSWORD || window.CAN_DELETE_USER) ? `
+                        <div class="flex gap-1 shrink-0">
+                            ${window.CAN_RESET_PASSWORD ? `
+                            <button data-action="reset-password" data-id="${user.id}" data-name="${escapeHtml(user.name)}" class="p-1.5 text-neutral-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition-colors" title="Reset Password">
+                                <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                            </button>` : ''}
+                            ${window.CAN_DELETE_USER ? `
+                            <button data-action="delete-user" data-id="${user.id}" data-name="${escapeHtml(user.name)}" class="p-1.5 text-neutral-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-colors" title="Delete Account">
+                                <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            </button>` : ''}
+                        </div>` : ''}
                     </div>
                     <label class="block text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-1.5">Role</label>
                     <div class="relative">
@@ -394,6 +417,91 @@
         }
     }
 
+    async function handleDeleteUser(userId, userName) {
+        const confirmation = await Swal.fire({
+            title: 'តើអ្នកប្រាកដជាចង់លុបគណនីនេះមែនទេ?',
+            html: `Permanently delete <strong>${escapeHtml(userName)}</strong>'s account? This cannot be undone.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#e11d48',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'បាទ/ចាស លុបវា!',
+            cancelButtonText: 'បោះបង់',
+        });
+        if (!confirmation.isConfirmed) return;
+
+        const { error, data } = await request(`${CONFIG.USERS_API}/${userId}`, { method: 'DELETE' });
+        if (!error) {
+            Toast.fire({ icon: 'success', title: 'Account deleted' });
+            state.users = state.users.filter((u) => String(u.id) !== String(userId));
+            renderUsers();
+        } else {
+            Toast.fire({ icon: 'error', title: data?.message || 'Failed to delete account' });
+        }
+    }
+
+    // ---- Reset password modal ----
+
+    function togglePasswordModal(forceOpen = null) {
+        if (!DOM.pwModal || !DOM.pwModalCard) return;
+        const isOpen = DOM.pwModal.classList.contains('flex');
+        const makeOpen = forceOpen !== null ? forceOpen : !isOpen;
+
+        if (makeOpen) {
+            DOM.pwModal.classList.remove('invisible');
+            DOM.pwModal.classList.add('flex');
+            requestAnimationFrame(() => {
+                DOM.pwModal.classList.remove('opacity-0');
+                DOM.pwModalCard.classList.remove('scale-90', 'opacity-0');
+                DOM.pwModalCard.classList.add('scale-100', 'opacity-100');
+            });
+        } else {
+            DOM.pwModal.classList.add('opacity-0');
+            DOM.pwModalCard.classList.remove('scale-100', 'opacity-100');
+            DOM.pwModalCard.classList.add('scale-90', 'opacity-0');
+            setTimeout(() => {
+                DOM.pwModal.classList.add('invisible');
+                DOM.pwModal.classList.remove('flex');
+                DOM.pwForm?.reset();
+            }, 300);
+        }
+    }
+
+    function openResetPassword(userId, userName) {
+        if (!DOM.pwForm) return;
+        DOM.pwForm.reset();
+        DOM.pwForm.querySelector('[name="user_id"]').value = userId;
+        if (DOM.pwUserLabel) DOM.pwUserLabel.textContent = `សម្រាប់ (For): ${userName}`;
+        togglePasswordModal(true);
+    }
+
+    async function handleResetPasswordSubmit(e) {
+        e.preventDefault();
+        if (!DOM.pwForm || !DOM.pwSubmitBtn) return;
+
+        DOM.pwSubmitBtn.disabled = true;
+        const userId = DOM.pwForm.querySelector('[name="user_id"]').value;
+        const password = DOM.pwInput?.value ?? '';
+
+        const { error, status, data } = await request(`${CONFIG.USERS_API}/${userId}/reset-password`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password }),
+        });
+
+        if (!error) {
+            Toast.fire({ icon: 'success', title: 'Password reset' });
+            togglePasswordModal(false);
+        } else if (status === 422 && data?.errors) {
+            const messages = Object.values(data.errors).flat();
+            Toast.fire({ icon: 'warning', title: messages[0] || 'Validation failed' });
+        } else {
+            Toast.fire({ icon: 'error', title: data?.message || 'Failed to reset password' });
+        }
+
+        DOM.pwSubmitBtn.disabled = false;
+    }
+
     function escapeHtml(str) {
         const div = document.createElement('div');
         div.textContent = str ?? '';
@@ -405,8 +513,15 @@
     function initEvents() {
         window.AppModal = { toggle: (open) => toggleModal(open) };
         window.RolesModule = { openCreate };
+        window.ResetPasswordModal = { toggle: (open) => togglePasswordModal(open) };
 
         DOM.form?.addEventListener('submit', handleFormSubmit);
+        DOM.pwForm?.addEventListener('submit', handleResetPasswordSubmit);
+
+        DOM.pwToggleVisibility?.addEventListener('click', () => {
+            if (!DOM.pwInput) return;
+            DOM.pwInput.type = DOM.pwInput.type === 'password' ? 'text' : 'password';
+        });
 
         DOM.rolesGrid?.addEventListener('click', (e) => {
             const btn = e.target.closest('button[data-action]');
@@ -414,6 +529,15 @@
             const id = btn.getAttribute('data-id');
             if (btn.getAttribute('data-action') === 'edit-role') openEdit(id);
             if (btn.getAttribute('data-action') === 'delete-role') handleDeleteRole(id);
+        });
+
+        DOM.usersGrid?.addEventListener('click', (e) => {
+            const btn = e.target.closest('button[data-action]');
+            if (!btn) return;
+            const id = btn.getAttribute('data-id');
+            const name = btn.getAttribute('data-name');
+            if (btn.getAttribute('data-action') === 'delete-user') handleDeleteUser(id, name);
+            if (btn.getAttribute('data-action') === 'reset-password') openResetPassword(id, name);
         });
 
         DOM.usersGrid?.addEventListener('change', (e) => {

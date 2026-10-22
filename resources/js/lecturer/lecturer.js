@@ -8,6 +8,9 @@
     // 1. CONFIGURATION & CONSTANTS
     const CONFIG = {
         API_BASE: '/api/v1/lecturers',
+        EXPORT_URL: '/api/v1/lecturers-export',
+        IMPORT_URL: '/api/v1/lecturers-import',
+        BULK_DESTROY_URL: '/api/v1/lecturers-bulk-destroy',
         DEBOUNCE_DELAY: 300,
         LOCALE: 'en-GB'
     };
@@ -21,7 +24,26 @@
         modal: document.getElementById('lecturerModal'),
         modalCard: document.getElementById('modalCard'),
         modalTitle: document.getElementById('modalTitle'),
-        submitBtn: document.getElementById('addlecturerForm')?.querySelector('button[type="submit"]')
+        submitBtn: document.getElementById('addlecturerForm')?.querySelector('button[type="submit"]'),
+
+        exportBtn: document.getElementById('lecturerExportBtn'),
+        destroyAllBtn: document.getElementById('lecturerDestroyAllBtn'),
+
+        importBtn: document.getElementById('lecturerImportBtn'),
+        importModal: document.getElementById('lecturerImportModal'),
+        importModalCard: document.getElementById('lecturerImportModalCard'),
+        importForm: document.getElementById('lecturerImportForm'),
+        importDropzone: document.getElementById('lecturerImportDropzone'),
+        importFileInput: document.getElementById('lecturerImportFile'),
+        importFileName: document.getElementById('lecturerImportFileName'),
+        importClearBtn: document.getElementById('lecturerImportClearBtn'),
+        importSubmitBtn: document.getElementById('lecturerImportSubmitBtn'),
+        importSpinner: document.getElementById('lecturerImportSpinner'),
+        importSubmitLabel: document.getElementById('lecturerImportSubmitLabel'),
+
+        importResultsModal: document.getElementById('lecturerImportResultsModal'),
+        importResultsModalCard: document.getElementById('lecturerImportResultsModalCard'),
+        importResultsBody: document.getElementById('lecturerImportResultsBody'),
     };
 
     // Third-party instance verification
@@ -45,10 +67,18 @@
         async request(url, options = {}) {
             this.toggleLoader(true);
             try {
+                // headers is pulled out first: spreading ...options after a
+                // `headers:` key replaces the whole object, silently dropping
+                // Accept: application/json whenever a caller passes its own
+                // Content-Type. Without Accept, Laravel answers a failed
+                // validation with a 302 redirect instead of a 422, fetch
+                // follows it to a 200 HTML page, and the caller reports a
+                // save that never happened as a success.
+                const { headers, ...restOptions } = options;
                 const response = await fetch(url, {
                     credentials: 'same-origin',
-                    headers: { 'Accept': 'application/json', ...options.headers },
-                    ...options
+                    headers: { 'Accept': 'application/json', ...headers },
+                    ...restOptions
                 });
 
                 const contentType = response.headers.get("content-type");
@@ -133,6 +163,46 @@
         } else {
             Toast.fire({ icon: 'error', title: 'មានបញ្ហាមិនអាចលុបទិន្នន័យនេះបាន' });
         }
+    }
+
+    async function handleCreateAccount(id, code) {
+        const { value: formValues } = await Swal.fire({
+            title: `Create login for ${escapeHtml(code) || 'this lecturer'}`,
+            html:
+                `<p style="font-size:13px;margin:0 0 8px;color:#64748b">They can sign in with their <b>Lecturer ID (${escapeHtml(code) || '—'})</b> and this password. Email is optional.</p>` +
+                '<input id="swal-account-email" type="email" class="swal2-input" placeholder="Email (optional)">' +
+                '<input id="swal-account-password" type="password" class="swal2-input" placeholder="Password (min 8 chars)">',
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: 'Create',
+            confirmButtonColor: '#4f46e5',
+            preConfirm: () => {
+                const email = document.getElementById('swal-account-email').value.trim();
+                const password = document.getElementById('swal-account-password').value;
+                if (!password || password.length < 8) {
+                    Swal.showValidationMessage('Enter a password of at least 8 characters.');
+                    return false;
+                }
+                return { email: email || null, password };
+            },
+        });
+
+        if (!formValues) return;
+
+        const { error, data } = await ApiService.request(`${CONFIG.API_BASE}/${id}/create-account`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formValues),
+        });
+
+        if (error) {
+            const messages = data?.errors ? Object.values(data.errors).flat() : [data?.message || 'Failed to create login.'];
+            Toast.fire({ icon: 'error', title: messages[0] });
+            return;
+        }
+
+        Toast.fire({ icon: 'success', title: data?.message || 'Login created.' });
+        loadLecturers(DOM.searchInput?.value || '');
     }
 
     async function handleFormSubmit(e) {
@@ -220,7 +290,10 @@
                     </td>
                     <td class="px-6 py-4 text-xs text-neutral-500 font-mono">${formattedDate}</td>
                     <td class="px-6 py-4 text-right">
-                        <div class="flex justify-end gap-2">
+                        <div class="flex justify-end items-center gap-2">
+                            ${lecturer.has_account
+                                ? '<span class="text-xs font-semibold text-emerald-600 mr-1">Has login</span>'
+                                : `<button data-action="create-account" data-id="${lecturer.id}" data-code="${lecturer.code ?? ''}" class="px-2 py-1.5 text-xs font-semibold text-sky-600 hover:bg-sky-100 dark:hover:bg-sky-500/20 rounded-lg transition-colors">Create Login</button>`}
                             <button data-action="edit" data-id="${lecturer.id}" class="p-2 text-amber-600 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 rounded-lg transition-colors" title="Edit Lecturer">
                                 <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                             </button>
@@ -234,36 +307,40 @@
     }
 
     // 7. INTERACTIVE & MODAL TRANSLATION ENGINE
-    function toggleModal(forceOpen = null) {
-        if (!DOM.modal || !DOM.modalCard) return;
+    // Generic open/close animation, shared by the create/edit modal and the
+    // two import-related modals added alongside it (same markup shape:
+    // invisible/opacity-0 backdrop + scale-90 card).
+    function toggleModalEl(modalEl, cardEl, forceOpen = null, onOpen = null, onClose = null) {
+        if (!modalEl || !cardEl) return;
 
-        const isOpen = DOM.modal.classList.contains('flex');
+        const isOpen = modalEl.classList.contains('flex');
         const makeOpen = forceOpen !== null ? forceOpen : !isOpen;
 
         if (makeOpen) {
-            DOM.modal.classList.remove('invisible');
-            DOM.modal.classList.add('flex');
-
+            modalEl.classList.remove('invisible');
+            modalEl.classList.add('flex');
             requestAnimationFrame(() => {
-                DOM.modal.classList.remove('opacity-0');
-                DOM.modalCard.classList.remove('scale-90', 'opacity-0');
-                DOM.modalCard.classList.add('scale-100', 'opacity-100');
+                modalEl.classList.remove('opacity-0');
+                cardEl.classList.remove('scale-90', 'opacity-0');
+                cardEl.classList.add('scale-100', 'opacity-100');
             });
-
-            setTimeout(() => {
-                DOM.form?.querySelector('[name="name_kh"]')?.focus();
-            }, 250);
+            onOpen?.();
         } else {
-            DOM.modal.classList.add('opacity-0');
-            DOM.modalCard.classList.remove('scale-100', 'opacity-100');
-            DOM.modalCard.classList.add('scale-90', 'opacity-0');
-
+            modalEl.classList.add('opacity-0');
+            cardEl.classList.remove('scale-100', 'opacity-100');
+            cardEl.classList.add('scale-90', 'opacity-0');
             setTimeout(() => {
-                DOM.modal.classList.add('invisible');
-                DOM.modal.classList.remove('flex');
-                resetFormState();
+                modalEl.classList.add('invisible');
+                modalEl.classList.remove('flex');
+                onClose?.();
             }, 300);
         }
+    }
+
+    function toggleModal(forceOpen = null) {
+        toggleModalEl(DOM.modal, DOM.modalCard, forceOpen, () => {
+            setTimeout(() => DOM.form?.querySelector('[name="name_kh"]')?.focus(), 250);
+        }, resetFormState);
     }
 
     function resetFormState() {
@@ -279,10 +356,215 @@
         });
     }
 
+    // --- Import / Export (mirrors resources/js/subject/subject.js) --------
+
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;');
+    }
+
+    function setImportFile(file) {
+        if (!file) return;
+        const transfer = new DataTransfer();
+        transfer.items.add(file);
+        if (DOM.importFileInput) DOM.importFileInput.files = transfer.files;
+        if (DOM.importFileName) DOM.importFileName.textContent = file.name;
+        DOM.importClearBtn?.classList.remove('hidden');
+    }
+
+    function clearImportFile() {
+        if (DOM.importFileInput) DOM.importFileInput.value = '';
+        if (DOM.importFileName) DOM.importFileName.textContent = '';
+        DOM.importClearBtn?.classList.add('hidden');
+    }
+
+    function setImportSubmitting(isSubmitting) {
+        if (DOM.importSubmitBtn) DOM.importSubmitBtn.disabled = isSubmitting;
+        DOM.importSpinner?.classList.toggle('hidden', !isSubmitting);
+        if (DOM.importSubmitLabel) {
+            DOM.importSubmitLabel.textContent = isSubmitting ? 'កំពុងនាំចូល... (Importing...)' : 'នាំចូល (Import)';
+        }
+    }
+
+    function importIssueTable(title, rows, headers, mapRow) {
+        if (!Array.isArray(rows) || rows.length === 0) return '';
+
+        return `
+            <div>
+                <h4 class="text-xs font-bold uppercase tracking-wide text-rose-600 dark:text-rose-400 mb-2">${title} (${rows.length})</h4>
+                <div class="overflow-x-auto border border-rose-200/70 dark:border-rose-500/20 rounded-xl">
+                    <table class="w-full text-xs text-left">
+                        <thead class="bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400">
+                            <tr>${headers.map((h) => `<th class="px-3 py-2 font-bold">${h}</th>`).join('')}</tr>
+                        </thead>
+                        <tbody class="divide-y divide-rose-100 dark:divide-rose-500/10">
+                            ${rows.map((r) => `<tr>${mapRow(r).map((v) => `<td class="px-3 py-2 text-neutral-600 dark:text-neutral-300">${escapeHtml(v)}</td>`).join('')}</tr>`).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>`;
+    }
+
+    function renderImportResults(report) {
+        if (!DOM.importResultsBody) return;
+
+        const summary = `
+            <div class="flex items-center gap-3 px-4 py-3.5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200/70 dark:border-emerald-500/20 rounded-xl">
+                <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+                <span class="text-sm font-bold text-emerald-800 dark:text-emerald-300">${report.created_count ?? 0} row(s) created/updated</span>
+            </div>`;
+
+        const skippedTable = importIssueTable(
+            'របាំងឆ្លងកាត់ (Skipped rows)',
+            report.skipped,
+            ['Row', 'Code', 'Reason'],
+            (r) => [r.row, r.code, r.reason]
+        );
+
+        DOM.importResultsBody.innerHTML = summary + skippedTable;
+        toggleModalEl(DOM.importResultsModal, DOM.importResultsModalCard, true);
+    }
+
+    async function submitImportForm(e) {
+        e.preventDefault();
+        if (DOM.importSubmitBtn?.disabled) return;
+
+        const file = DOM.importFileInput?.files[0];
+        if (!file) {
+            Toast.fire({ icon: 'warning', title: 'សូមជ្រើសរើសឯកសារ (Please choose a file)' });
+            return;
+        }
+
+        const body = new FormData();
+        body.append('file', file);
+
+        setImportSubmitting(true);
+        try {
+            const { error, data } = await ApiService.request(CONFIG.IMPORT_URL, { method: 'POST', body });
+
+            if (error) {
+                Toast.fire({ icon: 'error', title: data?.message || 'ការនាំចូលបរាជ័យ (Import failed)' });
+                return;
+            }
+
+            toggleModalEl(DOM.importModal, DOM.importModalCard, false);
+            clearImportFile();
+
+            const report = data?.data?.report ?? {};
+            Toast.fire({ icon: 'success', title: `នាំចូលជោគជ័យ! (${report.created_count ?? 0} row(s))` });
+
+            renderImportResults(report);
+            loadLecturers(DOM.searchInput?.value || '');
+        } finally {
+            setImportSubmitting(false);
+        }
+    }
+
+    function exportCurrentFilters() {
+        const params = new URLSearchParams();
+        if (DOM.searchInput?.value) params.set('search', DOM.searchInput.value);
+        window.open(`${CONFIG.EXPORT_URL}?${params.toString()}`, '_blank');
+    }
+
+    // Permanent hard-delete of every lecturer — bypasses soft-delete
+    // entirely (see LecturerController::bulkDestroy), so this asks for a
+    // typed confirmation rather than a plain OK/Cancel dialog.
+    async function handleDestroyAll() {
+        const confirmation = await Swal.fire({
+            title: 'លុបសាស្ត្រាចារ្យទាំងអស់ជាអចិន្ត្រៃយ៍?',
+            html: 'សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ។ វាយ <b>DELETE</b> ដើម្បីបញ្ជាក់។<br><span class="text-xs text-neutral-400">This permanently deletes ALL lecturers and cannot be undone. Type DELETE to confirm.</span>',
+            icon: 'warning',
+            input: 'text',
+            inputPlaceholder: 'DELETE',
+            showCancelButton: true,
+            confirmButtonColor: '#e11d48',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'លុបទាំងអស់ (Destroy All)',
+            cancelButtonText: 'បោះបង់',
+            preConfirm: (value) => {
+                if (value !== 'DELETE') {
+                    Swal.showValidationMessage('Type DELETE exactly to confirm.');
+                    return false;
+                }
+                return true;
+            },
+        });
+
+        if (!confirmation.isConfirmed) return;
+
+        const { error, data } = await ApiService.request(CONFIG.BULK_DESTROY_URL, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ all: true }),
+        });
+
+        if (!error) {
+            Toast.fire({ icon: 'success', title: data?.message || 'លុបទិន្នន័យទាំងអស់បានជោគជ័យ!' });
+            loadLecturers('');
+        } else {
+            Toast.fire({ icon: 'error', title: data?.message || 'មិនអាចលុបទិន្នន័យទាំងអស់បានទេ' });
+        }
+    }
+
+    function initImportDropzone() {
+        DOM.importDropzone?.addEventListener('click', () => DOM.importFileInput?.click());
+        DOM.importDropzone?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                DOM.importFileInput?.click();
+            }
+        });
+
+        DOM.importFileInput?.addEventListener('change', () => {
+            const file = DOM.importFileInput.files?.[0];
+            if (file) setImportFile(file);
+        });
+
+        DOM.importClearBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            clearImportFile();
+        });
+
+        ['dragover', 'dragleave', 'drop'].forEach((eventName) => {
+            DOM.importDropzone?.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
+        DOM.importDropzone?.addEventListener('dragover', () => {
+            DOM.importDropzone.classList.add('border-indigo-400', 'dark:border-indigo-500/50');
+        });
+        DOM.importDropzone?.addEventListener('dragleave', () => {
+            DOM.importDropzone.classList.remove('border-indigo-400', 'dark:border-indigo-500/50');
+        });
+        DOM.importDropzone?.addEventListener('drop', (e) => {
+            DOM.importDropzone.classList.remove('border-indigo-400', 'dark:border-indigo-500/50');
+            const file = e.dataTransfer?.files?.[0];
+            if (file) setImportFile(file);
+        });
+    }
+
     // 8. EVENT ATTACHMENTS PIPELINE
     function initEvents() {
         // Expose toggleModal securely only for explicit HTML elements like header close/open triggers
         window.AppModal = { toggle: (open) => toggleModal(open) };
+        window.LecturerImportModal = {
+            toggle: (open) => toggleModalEl(DOM.importModal, DOM.importModalCard, open, null, clearImportFile),
+        };
+        window.LecturerImportResultsModal = {
+            toggle: (open) => toggleModalEl(DOM.importResultsModal, DOM.importResultsModalCard, open),
+        };
+
+        DOM.importBtn?.addEventListener('click', () => window.LecturerImportModal.toggle(true));
+        DOM.exportBtn?.addEventListener('click', exportCurrentFilters);
+        DOM.destroyAllBtn?.addEventListener('click', handleDestroyAll);
+        DOM.importForm?.addEventListener('submit', submitImportForm);
+        initImportDropzone();
 
         // Search Input Engine with Clean Debouncing
         DOM.searchInput?.addEventListener('input', (e) => {
@@ -305,6 +587,7 @@
 
             if (action === 'edit') handleEditAction(targetId);
             if (action === 'delete') handleDeleteAction(targetId);
+            if (action === 'create-account') handleCreateAccount(targetId, targetBtn.getAttribute('data-code'));
         });
 
         // Interactive Tooltips Hint Dynamic Engine

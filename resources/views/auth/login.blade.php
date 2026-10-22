@@ -243,8 +243,8 @@
 
 
                     <div class="rp-field">
-                        <label for="email">Staff Email</label>
-                        <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username" placeholder="staff.id@university.edu">
+                        <label for="email">Staff Email or Lecturer ID</label>
+                        <input id="email" type="text" name="email" value="{{ old('email') }}" required autofocus autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="staff.id@university.edu or Lecturer ID">
                         @error('email')<div class="rp-error">{{ $message }}</div>@enderror
                     </div>
 

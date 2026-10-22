@@ -54,6 +54,28 @@ class User extends Authenticatable
      * technically hashed already, it has no business sitting in an
      * otherwise-readable audit trail.
      */
+    public function lecturer()
+    {
+        return $this->hasOne(Lecturer::class);
+    }
+
+    /**
+     * Where a login should land after auth — a Lecturer has no reason to
+     * see the full-school Dashboard (every batch/major/status, 1000+
+     * students) on their way to their own two or three classes, so they
+     * skip straight to their portal. Admin keeps the Dashboard even if
+     * somehow also tagged Lecturer, same "Admin sees everything" rule as
+     * every permission check elsewhere.
+     */
+    public function homeRouteName(): string
+    {
+        if ($this->hasRole('Lecturer') && ! $this->hasRole('Admin')) {
+            return 'lecturer-portal.index';
+        }
+
+        return 'dashboard';
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

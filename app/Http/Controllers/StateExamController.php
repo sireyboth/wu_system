@@ -1,6 +1,8 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\ExamTerm;
+
 class StateExamController extends Controller
 {
     public function index()
@@ -9,23 +11,43 @@ class StateExamController extends Controller
     }
 
     /**
-     * Public landing page: 3 session cards. No auth — on-site staff use this.
+     * Public landing page — lists every ACTIVE exam term (State Exam,
+     * Scholarship, whatever's currently live) as a card. A deactivated
+     * term simply never appears here; on-site staff pick the exam
+     * they're actually working today, then that term's own real time
+     * slots on the next screen.
      */
     public function attendance()
     {
-        return view('state-exam.attendance.index', ['rounds' => $this->rounds]);
+        $examTerms = ExamTerm::active()->with('category')->orderByDesc('exam_date')->get();
+
+        return view('state-exam.attendance.index', compact('examTerms'));
     }
 
     /**
-     * Public search dashboard for a single session/round.
+     * Public — this exam term's own time slots, however many it has.
      */
-    public function attendanceSearch(int $round)
+    public function attendanceTerm(ExamTerm $examTerm)
     {
-        abort_unless($round >= 1 && $round <= count($this->rounds), 404);
+        abort_unless($examTerm->is_active, 404);
+
+        return view('state-exam.attendance.term', compact('examTerm'));
+    }
+
+    /**
+     * Public search dashboard for one specific term + time slot.
+     */
+    public function attendanceSearch(ExamTerm $examTerm, int $slot)
+    {
+        abort_unless($examTerm->is_active, 404);
+
+        $slots = $examTerm->time_slots ?? [];
+        abort_unless($slot >= 1 && $slot <= count($slots), 404);
 
         return view('state-exam.attendance.search', [
-            'round'      => $round,
-            'roundLabel' => $this->rounds[$round - 1],
+            'examTerm'  => $examTerm,
+            'slot'      => $slot,
+            'slotLabel' => $slots[$slot - 1],
         ]);
     }
 

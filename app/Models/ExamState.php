@@ -4,7 +4,7 @@ namespace App\Models;
 class ExamState extends IModel
 {
     protected $fillable = [
-        'no', 'room', 'major', 'student_total', 'shift', 'invigilators',
+        'exam_term_id', 'no', 'room', 'major', 'student_total', 'shift', 'invigilators',
         'degree', 'majors', 'remark', 'absences', 'exam_date',
     ];
 
@@ -16,6 +16,11 @@ class ExamState extends IModel
     ];
 
     protected $appends = ['floor'];
+
+    public function examTerm()
+    {
+        return $this->belongsTo(ExamTerm::class);
+    }
 
     public function getFloorAttribute(): ?int
     {

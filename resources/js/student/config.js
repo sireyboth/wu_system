@@ -18,6 +18,7 @@ CONFIG.API_LOOKUPS = {
     villages: baseUri("villages"),
     batches: baseUri("batches"),
     majors: baseUri("majors"),
+    campuses: baseUri("campuses"),
     statuses: baseUri("statuses"),
     groups: baseUri("groups"),
     shifts: baseUri("shifts"),

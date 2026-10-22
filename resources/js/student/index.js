@@ -6,6 +6,12 @@ import { toggleModal, togglePreviewModal, registerModalCloser, closeModalByName,
 import { handlePreviewAction } from './preview.js';
 import { loadStudents, handleEditAction, handleDeleteAction, handleFormSubmit } from './student-form.js';
 import { bindPagination } from './student-pagination.js';
+import { initStudentImportExport } from './import-export.js';
+import { initStudentBulkDestroy } from './bulk-destroy.js';
+import { initAdvanceSemester } from './advance-semester.js';
+import { initBulkSelect } from './bulk-select.js';
+import { initBulkAdvanceSemester } from './bulk-advance-semester.js';
+import { initFilterBar, populateFilterBar } from './filters.js';
 
 /**
  * THE single DOMContentLoaded listener for this page.
@@ -37,6 +43,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     bindPagination((page) => loadStudents(dom, ApiService, dom.searchInput?.value || '', page));
     initEvents(dom, ApiService);
+    initStudentImportExport(ApiService, () => loadStudents(dom, ApiService, dom.searchInput?.value || ''));
+    initStudentBulkDestroy(ApiService, () => loadStudents(dom, ApiService, dom.searchInput?.value || ''));
+    initAdvanceSemester(ApiService, () => loadStudents(dom, ApiService, dom.searchInput?.value || ''));
+    initBulkSelect();
+    initBulkAdvanceSemester(ApiService, () => loadStudents(dom, ApiService, dom.searchInput?.value || ''));
+    initFilterBar(() => loadStudents(dom, ApiService, dom.searchInput?.value || ''));
+    populateFilterBar(ApiService);
     loadStudents(dom, ApiService);
 });
 

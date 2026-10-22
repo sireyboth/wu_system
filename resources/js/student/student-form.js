@@ -5,6 +5,7 @@ import { renderTable } from "./table-render.js";
 import { toggleModal, switchTab } from "./ui.js";
 import { populateAddressCascade, initFormLookups } from "./address-cascade.js";
 import { renderPagination } from "./student-pagination.js";
+import { activeFiltersQueryString } from "./filters.js";
 import { getById, toList } from "../app.js";
 
 /**
@@ -16,7 +17,8 @@ export async function loadStudents(dom, ApiService, searchQuery = "", page = 1) 
     state.searchAbortController?.abort();
     state.searchAbortController = new AbortController();
 
-    const url = `${CONFIG.API_BASE}?search=${encodeURIComponent(searchQuery)}&page=${page}&per_page=${CONFIG.PER_PAGE}`;
+    const filterParams = activeFiltersQueryString();
+    const url = `${CONFIG.API_BASE}?search=${encodeURIComponent(searchQuery)}&page=${page}&per_page=${CONFIG.PER_PAGE}${filterParams ? `&${filterParams}` : ""}`;
     const { error, aborted, data } = await ApiService.request(url, {
         signal: state.searchAbortController.signal,
     });
@@ -35,6 +37,7 @@ export async function loadStudents(dom, ApiService, searchQuery = "", page = 1) 
               : [];
     renderTable(dom, records);
     renderPagination(data?.meta);
+    document.dispatchEvent(new CustomEvent("students:meta", { detail: data?.meta }));
 }
 
 /**
@@ -50,7 +53,8 @@ export async function handleEditAction(dom, ApiService, id) {
     }
 
     const payload = data.data || data;
-    const { person, batch, status, group, shift, major, guardians } = payload;
+    const { person, batch, status, group, shift, major, campus, guardians } =
+        payload;
     const { addresses, nationality } = payload.person;
 
     state.isEditMode = true;
@@ -78,6 +82,8 @@ export async function handleEditAction(dom, ApiService, id) {
         intake: payload.intake,
         scholarship: payload.scholarship,
         admission_date: payload.admission_date,
+        year_level: payload.year_level,
+        semester: payload.semester,
         remark: payload.remark,
     };
     toList(scalarFields, dom);
@@ -93,6 +99,7 @@ export async function handleEditAction(dom, ApiService, id) {
         group_id: payload.group,
         shift_id: payload.shift,
         major_id: payload.major,
+        campus_id: payload.campus,
     };
     toList(relationalFields, dom, true);
 

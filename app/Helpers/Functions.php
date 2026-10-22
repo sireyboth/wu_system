@@ -61,6 +61,27 @@ if (! function_exists('to_list')) {
     }
 }
 
+/**
+ * Trims a code and removes invisible characters — zero-width space/joiners
+ * and BOM (the Khmer keyboard's space bar types U+200B, and Excel/Telegram
+ * pastes carry them) — and turns non-breaking spaces into normal ones.
+ * Without this "MGT​101" looks identical to "MGT101" but is a different
+ * value, so uniqueness checks and searches misbehave.
+ */
+if (! function_exists('clean_code')) {
+    function clean_code(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $value = preg_replace('/[\x{200B}-\x{200D}\x{2060}\x{FEFF}]/u', '', $value);
+        $value = str_replace("\u{00A0}", ' ', $value);
+
+        return trim($value);
+    }
+}
+
 if (! function_exists('to_name')) {
     function to_name(object $object): string
     {
@@ -119,11 +140,12 @@ if (! function_exists('has_data')) {
 }
 
 if (! function_exists('no_data')) {
-    function no_data(string $message, int $code = 400): JsonResponse
+    function no_data(string $message, int $code = 400, array $extra = []): JsonResponse
     {
         return response()->json([
             'success' => false,
             'message' => $message,
+            ...$extra,
         ], $code);
     }
 }

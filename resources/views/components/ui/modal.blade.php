@@ -23,18 +23,25 @@
     'title' => 'Modal',
     'formId' => null,
     'maxWidth' => 'max-w-lg',
+    'maxHeight' => 'max-h-[85vh]',
+    // Global JS object whose .toggle(false) closes this modal — override
+    // when a page has more than one modal (each needs its own toggle fn),
+    // defaults to the shared 'AppModal' every single-modal page already uses.
+    'closeFn' => 'AppModal',
+    // Fills the whole screen (ignores maxWidth) — for long, wide forms.
+    'fullscreen' => false,
 ])
 
 <div id="{{ $id }}"
-     class="fixed inset-0 z-50 invisible opacity-0 bg-neutral-900/40 dark:bg-black/60 backdrop-blur-sm transition-all duration-300 items-start justify-center overflow-y-auto p-4 py-8">
+     class="fixed inset-0 z-50 invisible opacity-0 bg-neutral-900/40 dark:bg-black/60 backdrop-blur-sm transition-all duration-300 items-start justify-center overflow-y-auto {{ $fullscreen ? 'p-0' : 'p-4 py-8' }}">
 
     <div id="{{ $cardId }}"
-         class="w-full {{ $maxWidth }} max-h-[85vh] my-auto flex flex-col bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-100 dark:border-white/5 transform scale-90 opacity-0 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] overflow-hidden">
+         class="w-full {{ $fullscreen ? 'h-full max-w-none rounded-none' : $maxWidth . ' ' . $maxHeight . ' my-auto rounded-2xl' }} flex flex-col bg-white dark:bg-neutral-900 shadow-2xl border border-neutral-100 dark:border-white/5 transform scale-90 opacity-0 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] overflow-hidden">
 
         {{-- Header (fixed) --}}
         <div class="shrink-0 px-6 py-4 border-b border-neutral-100 dark:border-white/5 flex items-center justify-between bg-white dark:bg-neutral-900">
             <h3 id="{{ $titleId }}" class="text-lg font-bold text-neutral-900 dark:text-white">{{ $title }}</h3>
-            <button type="button" onclick="AppModal.toggle(false)"
+            <button type="button" onclick="{{ $closeFn }}.toggle(false)"
                     class="text-neutral-400 hover:text-neutral-600 dark:hover:text-white transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>

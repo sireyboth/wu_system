@@ -23,10 +23,12 @@ class Student extends IModel
             'major_id',
             'group_id',
             'shift_id',
+            'campus_id',
             'status_id',
             'code',
             'payment_as',
             'year_level',
+            'semester',
             'from_school',
             'admission_date',
             'degree_type',
@@ -60,7 +62,7 @@ class Student extends IModel
 
     protected function casts(): array
     {
-        return ['admission_date' => 'date', 'degree_type' => Degree::class,];
+        return ['admission_date' => 'date', 'degree_type' => Degree::class, 'is_restudy' => 'boolean'];
     }
 
     public function person()
@@ -98,6 +100,11 @@ class Student extends IModel
         return $this->belongsTo(Group::class);
     }
 
+    public function campus()
+    {
+        return $this->belongsTo(Campus::class);
+    }
+
     public function certificates()
     {
         return $this->hasMany(Certificate::class);
@@ -121,5 +128,31 @@ class Student extends IModel
     public function scopeSemester(Builder $query)
     {
         return $this->getBy($query, self::SEMESTER);
+    }
+
+    public function academicHistories()
+    {
+        return $this->hasMany(StudentAcademicHistory::class);
+    }
+
+    public function currentAcademicHistory()
+    {
+        return $this->hasOne(StudentAcademicHistory::class)->where('is_current', true);
+    }
+
+    public function leaves()
+    {
+        return $this->hasMany(StudentLeave::class);
+    }
+
+    public function attendanceRecords()
+    {
+        return $this->hasMany(AttendanceRecord::class);
+    }
+
+    /** Whether this student's current status is allowed to scan attendance. See statuses.can_attend. */
+    public function canAttend(): bool
+    {
+        return (bool) ($this->status?->can_attend ?? false);
     }
 }

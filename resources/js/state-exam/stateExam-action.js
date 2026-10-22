@@ -3,6 +3,7 @@ import { state, Toast } from './core.js';
 import { loadStateExam } from './stateExam-list.js';
 import { loadMajorsRows, resetMajorsRows, collectMajorsRows } from './stateExam-majors.js';
 import { loadAbsenceInputs, resetAbsenceInputs, collectAbsences } from './stateExam-absences.js';
+import { applySelectedTermSlots } from './exam-term.js';
 
 /**
  * Opens the modal pre-filled for editing an existing exam room.
@@ -25,6 +26,8 @@ export async function handleEditAction(dom, ApiService, id) {
         const el = dom.form?.querySelector(`[name="${field}"]`);
         if (el) el.value = room[field] ?? '';
     });
+    if (dom.roomExamTermSelect) dom.roomExamTermSelect.value = room.exam_term_id ?? '';
+    applySelectedTermSlots(dom);
     loadMajorsRows(dom, room.majors, room.invigilators);
     loadAbsenceInputs(dom, room.absences);
 
@@ -141,6 +144,7 @@ export function closeStateExamModal(dom) {
         dom.modal?.classList.add('invisible');
         dom.modal?.classList.remove('flex');
         dom.form?.reset();
+        applySelectedTermSlots(dom);
         resetMajorsRows(dom);
         resetAbsenceInputs(dom);
         state.isEditMode = false;

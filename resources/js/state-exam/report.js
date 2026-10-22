@@ -6,7 +6,8 @@
  */
 
 const REPORT_URL = window.EXAM_STATE_REPORT_URL;
-const ROOMS_URL = '/api/v1/exam-states?per_page=1000';
+const TERMS_URL = window.EXAM_TERMS_URL;
+const ROOMS_BASE_URL = '/api/v1/exam-states';
 
 const els = {
     kpiRooms: document.getElementById('kpiTotalRooms'),
@@ -16,6 +17,7 @@ const els = {
     tableBody: document.getElementById('sessionTableBody'),
     refreshBtn: document.getElementById('refreshReportBtn'),
     refreshIcon: document.getElementById('refreshReportIcon'),
+    termSelect: document.getElementById('reportTermSelect'),
 };
 
 let sessionBarChart = null;
@@ -176,12 +178,30 @@ function renderMajorBarChart(rooms) {
     });
 }
 
+async function loadTermOptions() {
+    if (!els.termSelect || !TERMS_URL) return;
+    try {
+        const res = await fetchJson(`${TERMS_URL}?per_page=200`);
+        const terms = Array.isArray(res.data) ? res.data : [];
+        els.termSelect.innerHTML = '<option value="">គ្រប់រយៈពេល (All terms)</option>' + terms
+            .map((t) => `<option value="${t.id}">${t.title}${t.category?.name_en ? ` — ${t.category.name_en}` : ''}</option>`)
+            .join('');
+    } catch (err) {
+        console.error('[stateExam report] failed to load terms:', err);
+    }
+}
+
 async function loadReport() {
     els.refreshIcon?.classList.add('animate-spin');
     try {
+        const termId = els.termSelect?.value || '';
+        const termQuery = termId ? `exam_term_id=${encodeURIComponent(termId)}` : '';
+        const reportUrl = termQuery ? `${REPORT_URL}?${termQuery}` : REPORT_URL;
+        const roomsUrl = `${ROOMS_BASE_URL}?per_page=1000${termQuery ? `&${termQuery}` : ''}`;
+
         const [sessions, roomsResponse] = await Promise.all([
-            fetchJson(REPORT_URL),
-            fetchJson(ROOMS_URL),
+            fetchJson(reportUrl),
+            fetchJson(roomsUrl),
         ]);
 
         const rooms = Array.isArray(roomsResponse.data) ? roomsResponse.data : [];
@@ -199,7 +219,9 @@ async function loadReport() {
 }
 
 els.refreshBtn?.addEventListener('click', loadReport);
+els.termSelect?.addEventListener('change', loadReport);
 
+loadTermOptions();
 loadReport();
 
 // Keep the report current for whoever's leaving this page open (e.g. on a display screen).

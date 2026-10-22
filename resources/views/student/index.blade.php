@@ -31,10 +31,7 @@
             </div>
             <!-- Button -->
             <div class="flex items-center gap-2">
-                <!-- <button type="button" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-neutral-700 bg-white border border-neutral-200 rounded-xl hover:bg-neutral-50 dark:bg-neutral-900 dark:text-neutral-300 dark:border-white/10 dark:hover:bg-white/5 transition-all">
-                        <svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2.586a1 1 0 0 1-.293.707l-6.414 6.414a1 1 0 0 0-.293.707V17l-4 4v-6.586a1 1 0 0 0-.293-.707L3.293 7.293A1 1 0 0 1 3 6.586V4Z"/></svg>
-                        Filters
-                    </button> -->
+                <x-ui.import-export-buttons prefix="student" />
                 <button type="button" onclick="AppModal.toggle(true)"
                     class="inline-flex items-center px-4 py-2.5 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition-all active:scale-95">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -43,8 +40,84 @@
                     </svg>
                     Create New student
                 </button>
+                {{-- Temporary — hide/remove once done testing (bulk hard-delete). --}}
+                @can('student.delete')
+                <button type="button" id="studentDestroyAllBtn" title="Permanently delete ALL students — cannot be undone"
+                    class="inline-flex items-center px-4 py-2.5 text-sm font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-xl hover:bg-rose-100 dark:hover:bg-rose-500/20 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                    លុបទាំងអស់ (Destroy All)
+                </button>
+                @endcan
 
             </div>
+        </div>
+
+        <div class="flex flex-wrap items-end gap-3 p-4 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-2xl">
+            <div class="min-w-[150px]">
+                <label class="block text-[11px] font-bold text-neutral-400 uppercase tracking-wider mb-1">Major</label>
+                <select id="filter_major_id" class="w-full px-3 py-2 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-lg text-neutral-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/30">
+                    <option value="">All Majors</option>
+                </select>
+            </div>
+            <div class="min-w-[150px]">
+                <label class="block text-[11px] font-bold text-neutral-400 uppercase tracking-wider mb-1">Batch</label>
+                <select id="filter_batch_id" class="w-full px-3 py-2 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-lg text-neutral-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/30">
+                    <option value="">All Batches</option>
+                </select>
+            </div>
+            <div class="min-w-[130px]">
+                <label class="block text-[11px] font-bold text-neutral-400 uppercase tracking-wider mb-1">Shift</label>
+                <select id="filter_shift_id" class="w-full px-3 py-2 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-lg text-neutral-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/30">
+                    <option value="">All Shifts</option>
+                </select>
+            </div>
+            <div class="min-w-[130px]">
+                <label class="block text-[11px] font-bold text-neutral-400 uppercase tracking-wider mb-1">Group</label>
+                <select id="filter_group_id" class="w-full px-3 py-2 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-lg text-neutral-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/30">
+                    <option value="">All Groups</option>
+                </select>
+            </div>
+            <div class="min-w-[130px]">
+                <label class="block text-[11px] font-bold text-neutral-400 uppercase tracking-wider mb-1">Campus</label>
+                <select id="filter_campus_id" class="w-full px-3 py-2 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-lg text-neutral-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/30">
+                    <option value="">All Campuses</option>
+                </select>
+            </div>
+            <div class="min-w-[150px]">
+                <label class="block text-[11px] font-bold text-neutral-400 uppercase tracking-wider mb-1">Status</label>
+                <select id="filter_status_id" class="w-full px-3 py-2 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-lg text-neutral-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/30">
+                    <option value="">All Statuses</option>
+                </select>
+            </div>
+            <div class="min-w-[130px]">
+                <label class="block text-[11px] font-bold text-neutral-400 uppercase tracking-wider mb-1">Semester</label>
+                <select id="filter_semester" class="w-full px-3 py-2 text-sm bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-white/10 rounded-lg text-neutral-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/30">
+                    <option value="">All Semesters</option>
+                    <option value="1">Semester 1</option>
+                    <option value="2">Semester 2</option>
+                </select>
+            </div>
+            <button type="button" id="filterClearBtn"
+                class="px-3 py-2 text-xs font-semibold text-neutral-500 hover:text-neutral-800 dark:hover:text-white transition-colors">
+                Clear filters
+            </button>
+        </div>
+
+        <div id="bulkActionBar" class="hidden items-center gap-3 px-4 py-3 bg-teal-50 dark:bg-teal-500/10 border border-teal-200 dark:border-teal-500/20 rounded-2xl">
+            <span id="bulkSelectedCount" class="text-sm font-bold text-teal-700 dark:text-teal-300">0 selected</span>
+            <button type="button" id="bulkSelectAllFilteredBtn" class="text-xs font-medium text-teal-700 dark:text-teal-300 underline hover:no-underline"></button>
+            <span id="bulkFilterRequiredHint" class="hidden text-xs text-amber-700 dark:text-amber-400 font-medium">
+                Filter by Batch and Campus to enable bulk advance
+            </span>
+            <button type="button" id="bulkAdvanceSemesterBtn" disabled
+                class="ml-auto inline-flex items-center px-4 py-2 text-sm font-bold text-white bg-teal-600 rounded-xl hover:bg-teal-700 shadow-md shadow-teal-500/20 transition-all active:scale-95 disabled:hover:bg-teal-600 disabled:active:scale-100">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5M9 15.75l2.25 2.25L15 13.5"/>
+                </svg>
+                Advance Selected to New Semester
+            </button>
         </div>
 
         <div
@@ -62,6 +135,9 @@
                     <thead
                         class="hidden md:table-header-group sticky top-0 z-20 text-xs text-neutral-700 uppercase bg-neutral-50 dark:bg-neutral-800/50 dark:text-neutral-300 backdrop-blur-md border-b border-neutral-200 dark:border-white/5">
                         <tr>
+                            <th scope="col" class="px-4 py-4 w-10">
+                                <input type="checkbox" id="selectAllCheckbox" class="w-4 h-4 rounded border-neutral-300 dark:border-white/20 text-teal-600 focus:ring-2 focus:ring-teal-500/30">
+                            </th>
                             <th scope="col" class="px-6 py-4 font-bold tracking-wider w-12">N.O</th>
                             <th scope="col" class="px-6 py-4">Student Identity (ឈ្មោះ/អត្តសញ្ញាណ)</th>
                             <th scope="col" class="px-6 py-4">Student ID (កូដសម្គាល់)</th>
@@ -75,7 +151,7 @@
                     </thead>
                     <tbody id="student-table-body" class="divide-y divide-neutral-200 dark:divide-white/5">
                         <tr>
-                            <td colspan="9" class="px-6 py-10 text-center">
+                            <td colspan="10" class="px-6 py-10 text-center">
                                 <span class="text-neutral-500">Loading student registry records...</span>
                             </td>
                         </tr>
@@ -90,6 +166,9 @@
 
     @include('student.partials.studentModal')
     @include('student.partials.preview')
+    @include('student.partials.importModal')
+    @include('student.partials.advanceSemesterModal')
+    @include('student.partials.bulkAdvanceSemesterModal')
 @endsection
 
 @push('scripts')

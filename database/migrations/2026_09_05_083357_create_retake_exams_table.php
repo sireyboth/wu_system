@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('major');
             $table->string('shift');
             $table->boolean('status')->default(false);
-            $table->dateTime('status_note')->nullable();
+            $table->dateTime('status_note')->nullable(); //wrong datatype
             $table->dateTime('registered_at')->nullable();
             $table->string('payment_status')->nullable();
             $table->string('payment_number')->nullable();

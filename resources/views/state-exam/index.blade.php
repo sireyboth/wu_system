@@ -31,9 +31,29 @@
                 </form>
 
             </div>
-            <!-- Button -->
-            <div class="flex flex-wrap items-center gap-3">
-                <!-- Trash / Recycled Items Toggle -->
+            <!-- Toolbar -->
+            <div class="flex flex-wrap items-center gap-x-4 gap-y-3">
+                <!-- Group: Exam Term (filter / new / edit) -->
+                <div class="flex items-center gap-1.5 pe-4 border-e border-neutral-200 dark:border-white/10">
+                    <select id="examTermFilterSelect" title="Filter rooms by exam term"
+                        class="text-sm rounded-xl border-neutral-200 dark:border-white/10 bg-white dark:bg-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="">គ្រប់រយៈពេល (All terms)</option>
+                    </select>
+                    <button type="button" id="editExamTermBtn" title="Edit the selected exam term"
+                        class="shrink-0 p-2 text-neutral-500 dark:text-neutral-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-xl transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
+                        </svg>
+                    </button>
+                    <button type="button" id="newExamTermBtn" title="Create a new exam term"
+                        class="shrink-0 p-2 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-xl transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Group: Trash toggle -->
                 <button type="button" id="toggleTrashBtn"
                     class="group relative inline-flex items-center justify-center px-4 py-2.5 text-sm font-semibold text-rose-700 dark:text-rose-400 bg-rose-50/80 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/50 rounded-xl hover:bg-rose-100 dark:hover:bg-rose-900/50 hover:border-rose-300 dark:hover:border-rose-800 focus:outline-none focus:ring-2 focus:ring-rose-500/20 active:scale-95 transition-all duration-200 shadow-sm">
                     <svg class="w-4 h-4 mr-2 text-rose-600 dark:text-rose-400 transition-transform duration-200 group-hover:rotate-12"
@@ -44,16 +64,52 @@
                     <span id="toggleTrashLabel">ធុងសំរាម (Trash)</span>
                 </button>
 
-                <!-- Analytics Report Link -->
-                <a href="{{ route('state-exam.report') }}"
-                    class="inline-flex items-center justify-center px-4 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400/20 active:scale-95 transition-all duration-200 shadow-sm">
-                    <svg class="w-4 h-4 mr-2 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
-                    </svg>
-                    <span>របាយការណ៍ (Report)</span>
-                </a>
+                <!-- Spacer pushes the remaining groups to the right on wide screens -->
+                <div class="hidden md:block md:flex-1"></div>
+
+                <!-- Group: More actions (Report / Export / Import) -->
+                <div class="relative" x-data="{ open: false }" @click.outside="open = false">
+                    <button type="button" @click="open = !open"
+                        class="inline-flex items-center justify-center px-4 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400/20 active:scale-95 transition-all duration-200 shadow-sm">
+                        <svg class="w-4 h-4 mr-2 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6h.008v.008H12V6zm0 6h.008v.008H12V12zm0 6h.008v.008H12V18z" />
+                        </svg>
+                        <span>More</span>
+                    </button>
+
+                    <div x-show="open" x-transition
+                        style="display: none;"
+                        class="absolute right-0 z-30 mt-2 w-60 overflow-hidden rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-neutral-900 shadow-xl">
+                        <a href="{{ route('state-exam.report') }}"
+                            class="flex items-center gap-2.5 px-4 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                            <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+                            </svg>
+                            <span>របាយការណ៍ (Report)</span>
+                        </a>
+                        <button type="button" id="examStatesExportBtn" title="Export the rooms currently shown to Excel"
+                            @click="open = false"
+                            class="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm font-semibold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-colors">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                            </svg>
+                            <span>Export</span>
+                        </button>
+                        <button type="button" id="examStatesImportBtn" title="Bulk create/fix rooms for the selected term"
+                            @click="open = false"
+                            class="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm font-semibold text-sky-700 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-500/10 transition-colors">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M7.5 7.5L12 3m0 0l4.5 4.5M12 3v13.5" />
+                            </svg>
+                            <span>Import</span>
+                        </button>
+                    </div>
+                    <input type="file" id="examStatesImportFileInput" accept=".xlsx,.xls,.csv" class="hidden" />
+                </div>
 
                 <!-- Primary Action: Create New State Exam -->
                 <button type="button" id="createRoomBtn" onclick="AppModal.toggle(true)"
@@ -62,7 +118,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"
                             d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
-                    <span>Create New State Exam</span>
+                    <span>Create New Room</span>
                 </button>
             </div>
         </div>
@@ -81,6 +137,7 @@
     </div>
 
     @include('state-exam.partials.stateExamModal')
+    @include('state-exam.partials.examTermModal')
 @endsection
 
 @push('scripts')

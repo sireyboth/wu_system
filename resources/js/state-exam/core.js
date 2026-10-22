@@ -17,6 +17,11 @@ export const state = {
     showingTrash: false,
     sortKey: 'room',
     sortDir: 'asc', // 'asc' | 'desc'
+
+    examTerms: [],      // every exam term (any category, active or not) — admin sees all
+    examCategories: [], // manageable list: State Exam, Scholarship, etc.
+    termFilterId: '',   // '' = all terms, on the exam-rooms table
+    editingTermId: null, // set while the Exam Term modal is editing an existing term (separate from isEditMode/editingId, which are the room modal's)
 };
 
 /**
@@ -40,6 +45,34 @@ export function buildDom() {
         // footer) and is wired to it via the HTML `form` attribute, so the form
         // body can scroll independently while the footer stays pinned.
         submitBtn: document.querySelector('button[type="submit"][form="stateExamForm"]'),
+
+        // Term filter on the exam-rooms table
+        termFilterSelect: document.getElementById('examTermFilterSelect'),
+
+        // Exam Term select inside the room create/edit modal
+        roomExamTermSelect: document.getElementById('roomExamTermSelect'),
+
+        // "+ New Exam Term" / edit modal
+        newExamTermBtn: document.getElementById('newExamTermBtn'),
+        editExamTermBtn: document.getElementById('editExamTermBtn'),
+        examTermModal: document.getElementById('examTermModal'),
+        examTermModalCard: document.getElementById('examTermModalCard'),
+        examTermModalTitle: document.getElementById('examTermModalTitle'),
+        examTermForm: document.getElementById('examTermForm'),
+        examTermCategoryInput: document.getElementById('examTermCategoryInput'),
+        examTermCategoryList: document.getElementById('examTermCategoryList'),
+        examTermCampusSelect: document.getElementById('examTermCampusSelect'),
+        examTermTitleInput: document.getElementById('examTermTitleInput'),
+        examTermDateInput: document.getElementById('examTermDateInput'),
+        examTermActiveInput: document.getElementById('examTermActiveInput'),
+        examTermSlotsContainer: document.getElementById('examTermSlotsContainer'),
+        addSlotBtn: document.getElementById('addSlotBtn'),
+        examTermSubmitBtn: document.getElementById('examTermSubmitBtn'),
+
+        // Export / Import
+        exportBtn: document.getElementById('examStatesExportBtn'),
+        importBtn: document.getElementById('examStatesImportBtn'),
+        importFileInput: document.getElementById('examStatesImportFileInput'),
     };
 }
 

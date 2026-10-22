@@ -127,27 +127,41 @@ abstract class Controller
         );
     }
 
-    public function summarize(?string $from = null, ?string $to = null): array
+    /**
+     * $examTermId scopes both which rooms count AND which time-slot
+     * labels the summary is built against — every exam term can have a
+     * different number of slots now, so there's no longer one fixed
+     * global list to fall back on. Without an exam_term_id (e.g. a
+     * report spanning terms with different slot counts), this falls back
+     * to $this->rounds purely as a legacy safety net — pass an explicit
+     * term whenever the caller actually has one.
+     */
+    public function summarize(?string $from = null, ?string $to = null, ?int $examTermId = null): array
     {
-        $rooms = ExamState::query()
+        $examTerm = $examTermId ? \App\Models\ExamTerm::find($examTermId) : null;
+        $labels   = $examTerm?->time_slots ?: $this->rounds;
+
+        $query = ExamState::query()
             ->when($from, fn($q) => $q->whereDate('exam_date', '>=', $from))
             ->when($to, fn($q) => $q->whereDate('exam_date', '<=', $to))
-            ->get(['student_total', 'absences']);
+            ->when($examTerm, fn($q) => $q->where('exam_term_id', $examTerm->id));
 
-        $summary = array_fill(0, count($this->rounds), ['total' => 0, 'absent' => 0]);
+        $rooms = $query->get(['student_total', 'absences']);
 
-        // absences is one entry per session/round, positionally: absences[0] = round 1, etc.
+        $summary = array_fill(0, count($labels), ['total' => 0, 'absent' => 0]);
+
+        // absences is one entry per time slot, positionally: absences[0] = slot 1, etc.
         foreach ($rooms as $room) {
-            foreach ($this->rounds as $round => $label) {
-                $summary[$round]['total']  += $room->student_total ?? 0;
-                $summary[$round]['absent'] += $room->absences[$round]['total'] ?? 0;
+            foreach ($labels as $slot => $label) {
+                $summary[$slot]['total']  += $room->student_total ?? 0;
+                $summary[$slot]['absent'] += $room->absences[$slot]['total'] ?? 0;
             }
         }
 
-        return collect($summary)->map(function ($data, $i) {
+        return collect($summary)->map(function ($data, $i) use ($labels) {
             $present = $data['total'] - $data['absent'];
             return [
-                'label'   => $this->rounds[$i],
+                'label'   => $labels[$i],
                 'total'   => $data['total'],
                 'present' => $present,
                 'absent'  => $data['absent'],

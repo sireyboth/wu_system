@@ -1,0 +1,467 @@
+<?php
+namespace App\Http\Controllers\Api;
+
+use App\Exports\RetakePaymentExport;
+use App\Exports\RetakeRegistrationExport;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\RetakeRegistrationRequest;
+use App\Http\Resources\RetakeRegistrationResource;
+use App\Models\Lecturer;
+use App\Models\RetakeBatch;
+use App\Models\RetakeRegistration;
+use App\Models\Student;
+use App\Models\Subject;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+class RetakeRegistrationController extends Controller
+{
+    public function __construct()
+    {
+        $this->name          = 'Retake Registration';
+        $this->model         = RetakeRegistration::class;
+        $this->resource      = RetakeRegistrationResource::class;
+        $this->relationships = ['student.person.nationality', 'term', 'examType', 'subject', 'lecturer', 'score', 'paymentBatch'];
+    }
+
+    /**
+     * REG's main list — every filter is optional so the same endpoint
+     * serves the unfiltered Main List and any narrowed view.
+     */
+    public function index(Request $request)
+    {
+        return $this->list($request, function ($query) use ($request) {
+            $query->withSubjectCount();
+
+            if ($batchId = $request->input('batch_id')) {
+                $query->where('batch_id', $batchId);
+            }
+            if ($examTypeId = $request->input('exam_type_id')) {
+                $query->where('exam_type_id', $examTypeId);
+            }
+            if ($termId = $request->input('retake_term_id')) {
+                $query->where('retake_term_id', $termId);
+            }
+            if ($paymentStatus = $request->input('payment_status')) {
+                $query->where('payment_status', $paymentStatus);
+            }
+            if ($outcome = $request->input('outcome')) {
+                $query->where('outcome', $outcome);
+            }
+            // SA only ever acts on confirmed registrations (payment can't
+            // happen against a selection that might still change) — this
+            // lets their page ask for just those instead of the full list.
+            // is_selected too: confirm() stamps registered_at on every open
+            // row, including subjects the student unticked, so registered_at
+            // alone doesn't mean "registered".
+            if ($request->boolean('confirmed_only')) {
+                $query->whereNotNull('registered_at')->where('is_selected', true);
+            }
+
+            return $query;
+        });
+    }
+
+    /**
+     * REG's report page — aggregate counts only (outcome/payment, overall
+     * and per exam type), scoped to confirmed registrations (registered_at
+     * set) same as every other reporting/payment view in this module.
+     * Optional retake_term_id narrows to one cohort's term.
+     */
+    public function report(Request $request)
+    {
+        $validated = $request->validate([
+            'retake_term_id' => 'nullable|integer|exists:retake_terms,id',
+        ]);
+
+        $base = RetakeRegistration::query()->whereNotNull('registered_at')->where('is_selected', true);
+        if ($termId = $validated['retake_term_id'] ?? null) {
+            $base->where('retake_term_id', $termId);
+        }
+
+        $totalConfirmed = (clone $base)->count();
+        // Per person, not per subject — one student registered for 4
+        // subjects counts once here but 4 times in total_confirmed.
+        $totalStudents  = (clone $base)->distinct()->count('student_id');
+        $outcomeCounts  = (clone $base)->selectRaw('outcome, count(*) as total')->groupBy('outcome')->pluck('total', 'outcome');
+        $paymentCounts  = (clone $base)->selectRaw('payment_status, count(*) as total')->groupBy('payment_status')->pluck('total', 'payment_status');
+
+        $byExamType = (clone $base)
+            ->join('exam_types', 'exam_types.id', '=', 'retake_registrations.exam_type_id')
+            ->selectRaw('
+                exam_types.id as exam_type_id,
+                exam_types.name_en as exam_type_name,
+                exam_types.code as exam_type_code,
+                count(*) as total,
+                sum(case when retake_registrations.outcome = ? then 1 else 0 end) as passed,
+                sum(case when retake_registrations.outcome = ? then 1 else 0 end) as failed,
+                sum(case when retake_registrations.outcome = ? then 1 else 0 end) as absent,
+                sum(case when retake_registrations.outcome = ? then 1 else 0 end) as pending,
+                sum(case when retake_registrations.payment_status = ? then 1 else 0 end) as paid,
+                sum(case when retake_registrations.payment_status = ? then 1 else 0 end) as unpaid
+            ', [
+                RetakeRegistration::OUTCOME_PASSED, RetakeRegistration::OUTCOME_FAILED,
+                RetakeRegistration::OUTCOME_ABSENT, RetakeRegistration::OUTCOME_PENDING,
+                RetakeRegistration::PAYMENT_PAID, RetakeRegistration::PAYMENT_UNPAID,
+            ])
+            ->groupBy('exam_types.id', 'exam_types.name_en', 'exam_types.code')
+            // These rows aren't real registrations — hide status_note (an
+            // appended per-row accessor) so it doesn't fire its own
+            // extra lookup query and leak a meaningless value into the
+            // aggregate output.
+            ->get()
+            ->makeHidden('status_note');
+
+        return has_data([
+            'total_confirmed' => $totalConfirmed,
+            'total_students'  => $totalStudents,
+            'outcome_counts'  => $outcomeCounts,
+            'payment_counts'  => $paymentCounts,
+            'by_exam_type'    => $byExamType,
+        ]);
+    }
+
+    /**
+     * Customer Service's read-only view — students who have actually
+     * registered (registered_at set). Gated by its own 'retake-cs.view'
+     * permission, separate from REG's 'retake-registration.view'.
+     */
+    public function customerService(Request $request)
+    {
+        return $this->list($request, fn($query) => $query->withSubjectCount()->whereNotNull('registered_at')->where('is_selected', true));
+    }
+
+    /**
+     * REG's "prepare schedule" export — an Excel download of whatever the
+     * Main List is currently filtered to (same filter params as index()).
+     * Named exportList, not export, since export(object, string) is a
+     * reserved method name on the base Controller (see importFile() on
+     * RetakeBatchController for the same reasoning — reusing a base method
+     * name with an incompatible signature is a fatal error, not a warning).
+     */
+    public function exportList(Request $request)
+    {
+        return $this->export(
+            new RetakeRegistrationExport($request->only([
+                'batch_id', 'exam_type_id', 'retake_term_id', 'payment_status', 'outcome',
+            ])),
+            'retake-registrations'
+        );
+    }
+
+    /**
+     * SA's payments export — whatever the Payments page is currently
+     * showing (confirmed registrations, same filters + search).
+     */
+    public function exportPayments(Request $request)
+    {
+        return $this->export(
+            new RetakePaymentExport($request->only([
+                'exam_type_id', 'retake_term_id', 'payment_status', 'search',
+            ])),
+            'retake-payments'
+        );
+    }
+
+    /**
+     * REG manually adds one registration to an existing batch (e.g. a
+     * Special-type row, or a student missed during import).
+     */
+    public function store(RetakeRegistrationRequest $request)
+    {
+        $data  = $request->validated();
+        $batch = RetakeBatch::findOrFail($data['batch_id']);
+
+        if ($this->isDuplicate($batch->id, $data['student_id'], $data['subject_id'])) {
+            return no_data('This student already has this subject in this batch.', 422);
+        }
+
+        return $this->save($request, [
+            'retake_term_id' => $batch->retake_term_id,
+            'exam_type_id'   => $batch->exam_type_id,
+            // Opt-in, same as import/carry-forward: the student ticks it
+            // themselves on the public page.
+            'is_selected'    => $data['is_selected'] ?? false,
+        ]);
+    }
+
+    /**
+     * REG corrects a registration — wrong student, subject, lecturer or
+     * remark. The batch is fixed: moving a row between batches would mean
+     * re-deriving its term/exam type and breaks carry-forward lineage, so
+     * that's delete + re-add instead. Student/subject are also frozen once
+     * paid, since the payment was taken against that exact pairing.
+     */
+    public function update(RetakeRegistrationRequest $request, RetakeRegistration $retakeRegistration)
+    {
+        $data    = $request->validated();
+        $batchId = $retakeRegistration->batch_id;
+
+        $pairingChanged = (int) $data['student_id'] !== $retakeRegistration->student_id
+            || (int) $data['subject_id'] !== $retakeRegistration->subject_id;
+
+        if ($pairingChanged && $retakeRegistration->payment_status === RetakeRegistration::PAYMENT_PAID) {
+            return no_data('This registration is already paid — the student and subject can no longer be changed.', 422);
+        }
+
+        if ($pairingChanged && $this->isDuplicate($batchId, $data['student_id'], $data['subject_id'], $retakeRegistration->id)) {
+            return no_data('This student already has this subject in this batch.', 422);
+        }
+
+        return $this->release($request, $retakeRegistration, ['batch_id' => $batchId]);
+    }
+
+    /**
+     * Searchable options for the add/edit modal's student/subject/lecturer
+     * pickers — at most 20 {id, label} pairs per call.
+     */
+    public function options(Request $request)
+    {
+        $validated = $request->validate([
+            'type'   => 'required|in:student,subject,lecturer',
+            'search' => 'nullable|string|max:100',
+        ]);
+        $search = $validated['search'] ?? null;
+
+        $items = match ($validated['type']) {
+            'student' => Student::query()->with('person')->search($search)->orderBy('code')->limit(20)->get()
+                ->map(function (Student $s) {
+                    $p    = $s->person;
+                    $name = trim(($p?->first_name_kh ?? '') . ' ' . ($p?->last_name_kh ?? ''))
+                        ?: trim(($p?->first_name ?? '') . ' ' . ($p?->last_name ?? ''));
+
+                    return ['id' => $s->id, 'label' => $name !== '' ? "{$s->code} — {$name}" : $s->code];
+                }),
+            'subject' => Subject::query()->search($search)->orderBy('name_en')->limit(20)->get()
+                ->map(fn(Subject $s) => ['id' => $s->id, 'label' => $s->code ? "{$s->code} — {$s->name_en}" : $s->name_en]),
+            'lecturer' => Lecturer::query()->search($search)->orderBy('name_en')->limit(20)->get()
+                ->map(fn(Lecturer $l) => ['id' => $l->id, 'label' => $l->code ? "{$l->code} — {$l->name_en}" : $l->name_en]),
+        };
+
+        return has_data($items->values());
+    }
+
+    /**
+     * Mirrors the uq_reg_batch_student_subject unique index — which also
+     * covers soft-deleted rows, hence withTrashed() — so a clash comes back
+     * as a readable 422 instead of a database error.
+     */
+    protected function isDuplicate(int $batchId, int $studentId, int $subjectId, ?int $ignoreId = null): bool
+    {
+        return RetakeRegistration::withTrashed()
+            ->where('batch_id', $batchId)
+            ->where('student_id', $studentId)
+            ->where('subject_id', $subjectId)
+            ->when($ignoreId, fn($q) => $q->whereKeyNot($ignoreId))
+            ->exists();
+    }
+
+    public function show(RetakeRegistration $retakeRegistration)
+    {
+        return $this->view($retakeRegistration);
+    }
+
+    public function destroy(RetakeRegistration $retakeRegistration)
+    {
+        return $this->disable($retakeRegistration);
+    }
+
+    public function restore(RetakeRegistration $retakeRegistration)
+    {
+        return $this->enable($retakeRegistration);
+    }
+
+    public function force_destroy(RetakeRegistration $retakeRegistration)
+    {
+        return $this->clear($retakeRegistration);
+    }
+
+    /**
+     * SA: attaches a payment_batch and marks paid. Only ever touches the
+     * one registration passed in — an older stage's row is never mutated
+     * (decision #14). Requires the student to have already confirmed this
+     * registration themselves (registered_at set) — payment can't happen
+     * against a selection that might still change on the public page.
+     */
+    public function markPaid(Request $request, RetakeRegistration $retakeRegistration)
+    {
+        $validated = $request->validate([
+            'payment_batch_id' => 'required|integer|exists:payment_batches,id',
+        ]);
+
+        if (! $retakeRegistration->registered_at) {
+            return no_data('This student has not confirmed their registration yet — cannot mark it paid.', 422);
+        }
+        if (! $retakeRegistration->is_selected) {
+            return no_data('The student did not select this subject — cannot mark it paid.', 422);
+        }
+
+        $retakeRegistration->update([
+            'payment_status'   => RetakeRegistration::PAYMENT_PAID,
+            'payment_batch_id' => $validated['payment_batch_id'],
+        ]);
+
+        return new RetakeRegistrationResource($this->reload($retakeRegistration));
+    }
+
+    /**
+     * SA: same as markPaid, for the partial-payment case — a student who
+     * paid for 2 of their 4 failed subjects against one invoice. Same
+     * registered_at requirement as markPaid — unconfirmed ids are skipped
+     * rather than failing the whole batch, and reported back so SA can see
+     * which ones still need the student to confirm first.
+     */
+    public function bulkMarkPaid(Request $request)
+    {
+        $validated = $request->validate([
+            'payment_batch_id' => 'required|integer|exists:payment_batches,id',
+            'ids'              => 'required|array|min:1',
+            'ids.*'            => 'integer|exists:retake_registrations,id',
+        ]);
+
+        $unconfirmed = RetakeRegistration::whereIn('id', $validated['ids'])
+            ->where(fn($q) => $q->whereNull('registered_at')->orWhere('is_selected', false))
+            ->pluck('id');
+
+        $count = RetakeRegistration::whereIn('id', $validated['ids'])
+            ->whereNotNull('registered_at')
+            ->where('is_selected', true)
+            ->update([
+                'payment_status'   => RetakeRegistration::PAYMENT_PAID,
+                'payment_batch_id' => $validated['payment_batch_id'],
+            ]);
+
+        $message = "{$count} registration(s) marked paid.";
+        if ($unconfirmed->isNotEmpty()) {
+            $message .= " {$unconfirmed->count()} skipped — not confirmed or not selected by the student.";
+        }
+
+        return has_data(['skipped_ids' => $unconfirmed->values()], $message);
+    }
+
+    /**
+     * SA: undoes a payment marked by mistake. Blocked once Accounting has
+     * reconciled the payment_batch (a payment_entry exists) — undoing it
+     * here would leave ACC's books pointing at a payment that no longer
+     * exists, so ACC removes its entry first. The Telegram invite goes too,
+     * since it's only ever handed out after payment.
+     *
+     * One payment_batch can cover several subjects paid together; this
+     * only unpays the one row. If that leaves the batch covering nothing,
+     * it's soft-deleted so it stops showing on ACC's reconciliation list
+     * as a phantom invoice (soft, so the proof image is kept).
+     */
+    public function markUnpaid(RetakeRegistration $retakeRegistration)
+    {
+        if ($retakeRegistration->payment_status !== RetakeRegistration::PAYMENT_PAID) {
+            return no_data('This registration is not marked paid.', 422);
+        }
+
+        $batch = $retakeRegistration->paymentBatch;
+        if ($batch && $batch->entries()->exists()) {
+            return no_data('Accounting has already reconciled this payment — ask Accounting to remove its entry first.', 422);
+        }
+
+        DB::transaction(function () use ($retakeRegistration, $batch) {
+            $retakeRegistration->update([
+                'payment_status'      => RetakeRegistration::PAYMENT_UNPAID,
+                'payment_batch_id'    => null,
+                'telegram_invited_at' => null,
+            ]);
+
+            if ($batch && ! $batch->registrations()->exists()) {
+                $batch->delete();
+            }
+        });
+
+        return new RetakeRegistrationResource($this->reload($retakeRegistration));
+    }
+
+    /**
+     * SA: stamps telegram_invited_at once this registration is paid and
+     * the student's been handed the batch's Telegram QR.
+     */
+    public function inviteTelegram(RetakeRegistration $retakeRegistration)
+    {
+        $retakeRegistration->update(['telegram_invited_at' => now()]);
+
+        return new RetakeRegistrationResource($this->reload($retakeRegistration));
+    }
+
+    /**
+     * Score: enters (or corrects) this registration's score. One score per
+     * registration — updateOrCreate keeps it that way.
+     *
+     * Also auto-sets outcome (Leng's call, 2026-09-08): score >=
+     * PASSING_SCORE -> passed, otherwise failed. Skipped if the outcome is
+     * already 'absent' — a score showing up for a student flagged absent
+     * is itself the edge case, not something to silently overwrite; REG
+     * resolves that by hand via setOutcome() below, same as any other
+     * case this rule doesn't cover.
+     */
+    public function setScore(Request $request, RetakeRegistration $retakeRegistration)
+    {
+        $validated = $request->validate([
+            'score'  => 'required|numeric|min:0|max:100',
+            'remark' => 'nullable|string|max:500',
+        ]);
+
+        $retakeRegistration->score()->updateOrCreate([], [
+            'score'      => $validated['score'],
+            'remark'     => $validated['remark'] ?? null,
+            'entered_by' => auth()->id(),
+            'entered_at' => now(),
+        ]);
+
+        if ($retakeRegistration->outcome !== RetakeRegistration::OUTCOME_ABSENT) {
+            $retakeRegistration->update([
+                'outcome' => $validated['score'] >= RetakeRegistration::PASSING_SCORE
+                    ? RetakeRegistration::OUTCOME_PASSED
+                    : RetakeRegistration::OUTCOME_FAILED,
+            ]);
+        }
+
+        return new RetakeRegistrationResource($this->reload($retakeRegistration));
+    }
+
+    /**
+     * REG: manual override of outcome — required before
+     * RetakeBatch::carryForwardTo() can find failed/absent rows to move on
+     * to the next stage. Normally outcome is set automatically by
+     * setScore() above; this exists for whatever that rule doesn't cover
+     * (absent students, corrections, policy exceptions).
+     */
+    public function setOutcome(Request $request, RetakeRegistration $retakeRegistration)
+    {
+        $validated = $request->validate([
+            'outcome' => 'required|in:pending,passed,failed,absent',
+        ]);
+
+        $retakeRegistration->update($validated);
+
+        return new RetakeRegistrationResource($this->reload($retakeRegistration));
+    }
+
+    /**
+     * Manual SA/REG override of a selection after registered_at has
+     * already locked it in (decision #15) — self-service can't do this,
+     * only staff, since it has payment implications.
+     */
+    public function updateSelection(Request $request, RetakeRegistration $retakeRegistration)
+    {
+        $validated = $request->validate([
+            'is_selected' => 'required|boolean',
+        ]);
+
+        // Unselecting a paid subject would drop money already taken out of
+        // every SA/report view — refund/reverse the payment first.
+        if (! $validated['is_selected'] && $retakeRegistration->payment_status === RetakeRegistration::PAYMENT_PAID) {
+            return no_data('This subject is already paid — it cannot be unselected.', 422);
+        }
+        $validated['selection_saved_at'] = now();
+
+        $retakeRegistration->update($validated);
+
+        return new RetakeRegistrationResource($this->reload($retakeRegistration));
+    }
+}

@@ -8,6 +8,10 @@ class ExamStateRequest extends IRequest
     protected function formData(): array
     {
         return [
+            // Nullable, not required — some pre-v2 rows (backfilled) may
+            // still be mid-migration, and the public attendance/manual-mark
+            // endpoints only ever touch absences/invigilators, never this.
+            'exam_term_id'   => 'nullable|integer|exists:exam_terms,id',
             'no'             => 'nullable|integer',
             'room'           => 'required|string|max:50',
             'shift'          => 'nullable|string|max:50',

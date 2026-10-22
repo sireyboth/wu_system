@@ -73,3 +73,16 @@ function formatRelative(date) {
 
     return "just now";
 }
+
+/**
+ * Display name for a student record that has its person loaded — Khmer
+ * name first, English as fallback, both family-name-first like the
+ * student module's own table. Never composed server-side (see
+ * PersonResource), so every page builds it from the raw parts here.
+ */
+export function studentName(student) {
+    const p = student?.person ?? {};
+    const kh = `${p.last_name_kh ?? ''} ${p.first_name_kh ?? ''}`.trim();
+    const en = `${p.last_name ?? ''} ${p.first_name ?? ''}`.trim();
+    return kh || en || student?.name || student?.code || '';
+}
