@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\Degree;
 use App\Helpers\Grade;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TranscriptRequest;
@@ -8,6 +9,7 @@ use App\Http\Resources\TranscriptResource;
 use App\Models\Subject;
 use App\Models\Transcript;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class TranscriptController extends Controller
 {
@@ -69,6 +71,74 @@ class TranscriptController extends Controller
     public function force_destroy(Transcript $transcript)
     {
         return $this->clear($transcript);
+    }
+
+    /**
+     * Summary for the Report modal: status counts, GPA spread of the final
+     * transcripts, and breakdowns by major and degree. All filters optional.
+     * "printable" / "blocked" = final with / without the entrance exam passed.
+     */
+    public function report(Request $request)
+    {
+        $filters = $request->validate([
+            'major_id'  => 'nullable|integer',
+            'doc_type'  => ['nullable', Rule::in(array_keys(Transcript::DOC_TYPES))],
+            'degree'    => ['nullable', Rule::enum(Degree::class)],
+            'status'    => 'nullable|in:final,draft,printable,blocked',
+            'date_from' => 'nullable|date',
+            'date_to'   => 'nullable|date|after_or_equal:date_from',
+        ]);
+
+        $rows = Transcript::query()
+            ->with('major:id,name_en,name_kh')
+            ->when($filters['major_id'] ?? null, fn ($q, $id) => $q->where('major_id', $id))
+            ->when($filters['doc_type'] ?? null, fn ($q, $type) => $q->where('doc_type', $type))
+            ->when($filters['degree'] ?? null, fn ($q, $degree) => $q->where('degree', $degree))
+            ->when($filters['date_from'] ?? null, fn ($q, $date) => $q->whereDate('issue_date', '>=', $date))
+            ->when($filters['date_to'] ?? null, fn ($q, $date) => $q->whereDate('issue_date', '<=', $date))
+            ->when($filters['status'] ?? null, fn ($q, $status) => match ($status) {
+                'draft'     => $q->where('status', Transcript::DRAFT),
+                'final'     => $q->where('status', Transcript::FINAL),
+                'printable' => $q->where('status', Transcript::FINAL)->where('entrance_exam', true),
+                'blocked'   => $q->where('status', Transcript::FINAL)->where('entrance_exam', false),
+            })
+            ->get(['id', 'status', 'entrance_exam', 'degree', 'major_id', 'total_gpa']);
+
+        $isFinal = fn ($t) => $t->status === Transcript::FINAL;
+        $final   = $rows->filter($isFinal);
+        $average = fn ($items) => $items->isEmpty() ? null : round((float) $items->avg('total_gpa'), 2);
+
+        $bands = [
+            '3.50 – 4.00' => [3.5, 4.01],
+            '3.00 – 3.49' => [3.0, 3.5],
+            '2.00 – 2.99' => [2.0, 3.0],
+            'Below 2.00'  => [0, 2.0],
+        ];
+
+        return response()->json([
+            'total'       => $rows->count(),
+            'final'       => $final->count(),
+            'draft'       => $rows->count() - $final->count(),
+            'printable'   => $final->where('entrance_exam', true)->count(),
+            'blocked'     => $final->where('entrance_exam', false)->count(),
+            'average_gpa' => $average($final),
+            'gpa_bands'   => collect($bands)->map(fn ($range, $label) => [
+                'label' => $label,
+                'total' => $final->filter(fn ($t) => (float) $t->total_gpa >= $range[0] && (float) $t->total_gpa < $range[1])->count(),
+            ])->values(),
+            'by_degree'   => $rows->groupBy('degree')->map(fn ($group, $degree) => [
+                'label' => Degree::tryFrom((string) $degree)?->labelEn() ?? ucfirst((string) $degree),
+                'total' => $group->count(),
+            ])->sortByDesc('total')->values(),
+            'by_major'    => $rows->groupBy(fn ($t) => $t->major_id ?? 0)->map(fn ($group) => [
+                'name'        => $group->first()->major?->name_en ?? '— No major —',
+                'total'       => $group->count(),
+                'final'       => $group->filter($isFinal)->count(),
+                'draft'       => $group->reject($isFinal)->count(),
+                'blocked'     => $group->filter($isFinal)->where('entrance_exam', false)->count(),
+                'average_gpa' => $average($group->filter($isFinal)),
+            ])->sortByDesc('total')->values(),
+        ]);
     }
 
     /** Header columns from the validated input; the draft flag becomes the status. */

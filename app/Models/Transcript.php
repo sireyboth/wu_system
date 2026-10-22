@@ -8,18 +8,29 @@ class Transcript extends IModel
     public const DRAFT = 'draft';
     public const FINAL = 'final';
 
-    protected $fillable = [
-        'status',
-        'issue_no', 'name', 'surname', 'dob', 'pob', 'address', 'student_code', 'sex',
-        'nationality', 'degree', 'major_id', 'academic_year', 'date_kh', 'issue_date',
-        'person_in_charge', 'person_role', 'entrance_exam', 'entrance_exam_description', 'remark',
+    /** Request Docs — which printout the record produces. */
+    public const TRANSCRIPT  = 'transcript';
+    public const PROVISIONAL = 'provisional';
+
+    public const DOC_TYPES = [
+        self::TRANSCRIPT  => 'Transcript',
+        self::PROVISIONAL => 'Provisional Certificate',
     ];
 
-    protected array $searchable = ['issue_no', 'name', 'surname', 'student_code', 'academic_year'];
+    protected $fillable = [
+        'status', 'doc_type',
+        'issue_no', 'name', 'surname', 'name_kh', 'dob', 'pob', 'pob_kh', 'address', 'student_code', 'sex',
+        'nationality', 'degree', 'major_id', 'academic_year', 'exam_date', 'date_kh', 'issue_date',
+        'person_in_charge', 'person_role', 'person_in_charge_kh', 'person_role_kh',
+        'entrance_exam', 'entrance_exam_description', 'remark',
+    ];
+
+    protected array $searchable = ['issue_no', 'name', 'surname', 'name_kh', 'student_code', 'academic_year'];
 
     protected $casts = [
         'dob'           => 'date',
         'issue_date'    => 'date',
+        'exam_date'     => 'date',
         'entrance_exam' => 'boolean',
         'total_gpa'     => 'decimal:2',
     ];
@@ -45,6 +56,16 @@ class Transcript extends IModel
     public function getDegreeLabelAttribute(): string
     {
         return Degree::tryFrom((string) $this->degree)?->name ?? ucfirst((string) $this->degree);
+    }
+
+    public function getDocTypeLabelAttribute(): string
+    {
+        return self::DOC_TYPES[$this->doc_type] ?? ucfirst((string) $this->doc_type);
+    }
+
+    public function isProvisional(): bool
+    {
+        return $this->doc_type === self::PROVISIONAL;
     }
 
     public function isDraft(): bool

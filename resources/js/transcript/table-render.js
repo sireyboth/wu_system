@@ -15,7 +15,7 @@ export function renderTable(dom, rows, meta) {
     if (!rows || rows.length === 0) {
         dom.tableBody.className = 'divide-y divide-neutral-200 dark:divide-white/5';
         dom.tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-10 text-neutral-500">
-            រកមិនឃើញព្រឹត្តិប័ត្រទេ (No transcripts found).
+            រកមិនឃើញឯកសារទេ (No documents found).
         </td></tr>`;
         return;
     }
@@ -33,6 +33,9 @@ function renderRow(row, number) {
         : '';
     const fullName = escapeHtml(`${row.surname ?? ''} ${row.name ?? ''}`.trim() || '(no name yet)') + draftBadge;
     const issueNo = escapeHtml(row.issue_no || '—');
+    const typeBadge = row.doc_type === 'provisional'
+        ? '<span class="inline-flex px-2 py-0.5 text-[10px] font-bold uppercase rounded-full bg-sky-100 text-sky-700 dark:bg-sky-500/10 dark:text-sky-400">Provisional</span>'
+        : '<span class="inline-flex px-2 py-0.5 text-[10px] font-bold uppercase rounded-full bg-violet-100 text-violet-700 dark:bg-violet-500/10 dark:text-violet-400">Transcript</span>';
     const code = escapeHtml(row.student_code || '—');
     const major = escapeHtml(row.major?.name_en || '—');
     const year = escapeHtml(row.academic_year || '');
@@ -71,6 +74,7 @@ function renderRow(row, number) {
                     <div>
                         <div class="font-bold text-neutral-900 dark:text-neutral-100 text-[15px] leading-tight">${fullName}</div>
                         <div class="text-xs font-mono text-neutral-400 mt-0.5">${issueNo} · ID ${code}</div>
+                        <div class="mt-1">${typeBadge}</div>
                         <div class="text-xs text-neutral-500 mt-0.5">${major} ${year ? `· ${year}` : ''}</div>
                     </div>
                     ${entrance}
@@ -80,7 +84,12 @@ function renderRow(row, number) {
             </td>
 
             <!-- DESKTOP ROW -->
-            <td class="hidden md:table-cell px-6 py-4 font-mono text-xs text-neutral-700 dark:text-neutral-300">${issueNo}</td>
+            <td class="hidden md:table-cell px-6 py-4">
+                <div class="flex flex-col items-start gap-1">
+                    <span class="font-mono text-xs text-neutral-700 dark:text-neutral-300">${issueNo}</span>
+                    ${typeBadge}
+                </div>
+            </td>
             <td class="hidden md:table-cell px-6 py-4">
                 <div class="flex flex-col gap-0.5">
                     <span class="font-bold text-neutral-900 dark:text-neutral-100 text-sm">${fullName}</span>

@@ -5,10 +5,25 @@ import { getRenderedRow } from './table-render.js';
 import { gradeOf, gpaOf } from './grade.js';
 
 const FIELDS = [
-    'issue_no', 'name', 'surname', 'dob', 'pob', 'address', 'student_code', 'sex', 'nationality',
-    'degree', 'major_id', 'academic_year', 'date_kh', 'issue_date', 'person_in_charge', 'person_role',
+    'doc_type', 'issue_no', 'name', 'surname', 'name_kh', 'dob', 'pob', 'pob_kh', 'address', 'student_code',
+    'sex', 'nationality', 'degree', 'major_id', 'academic_year', 'exam_date', 'date_kh', 'issue_date',
+    'person_in_charge', 'person_role', 'person_in_charge_kh', 'person_role_kh',
     'entrance_exam_description', 'remark',
 ];
+
+const DOC_TITLES = {
+    transcript: 'ព្រឹត្តិប័ត្រពិន្ទុ (Transcript)',
+    provisional: 'វិញ្ញាបនបត្របណ្ដោះអាសន្ន (Provisional Certificate)',
+};
+
+const docType = (dom) => dom.form.elements.doc_type.value || 'transcript';
+
+/** Shows only the fields the chosen document prints ([data-only="transcript|provisional"]). */
+export function applyDocType(dom) {
+    const type = docType(dom);
+    dom.form.querySelectorAll('[data-only]').forEach((el) => el.classList.toggle('hidden', el.dataset.only !== type));
+    dom.form.elements.name_kh.required = type === 'provisional';
+}
 
 const blockKey = (year, semester) => `${year}-${semester}`;
 const subjectLabel = (s) => (s ? [s.code, s.name_en].filter(Boolean).join(' — ') : '');
@@ -24,6 +39,7 @@ export function openForm(dom, id = null) {
     state.editingId = row ? row.id : null;
 
     dom.form.reset();
+    keepOption(dom.form.elements.pob, row?.pob);
     FIELDS.forEach((name) => {
         const input = dom.form.elements[name];
         if (input && row) input.value = row[name] ?? '';
@@ -35,15 +51,33 @@ export function openForm(dom, id = null) {
 
     if (dom.modalTitle) {
         dom.modalTitle.textContent = !row
-            ? 'បង្កើតព្រឹត្តិប័ត្រ (New Transcript)'
+            ? 'បង្កើតឯកសារ (New Request)'
             : row.is_draft
                 ? 'បន្តសេចក្ដីព្រាង (Continue Draft)'
-                : 'កែសម្រួលព្រឹត្តិប័ត្រ (Edit Transcript)';
+                : `កែសម្រួល — ${DOC_TITLES[row.doc_type] ?? DOC_TITLES.transcript}`;
     }
 
+    applyDocType(dom);
     showYear(dom, 1);
     recalc(dom);
     window.TranscriptModal.toggle(true);
+}
+
+/** A value saved before the field became a dropdown (typed by hand) gets its own option so editing doesn't drop it. */
+function keepOption(select, value) {
+    select.querySelectorAll('option[data-legacy]').forEach((o) => o.remove());
+    if (!value || [...select.options].some((o) => o.value === value)) return;
+    const option = new Option(value, value);
+    option.dataset.legacy = '1';
+    select.add(option);
+}
+
+/** Province picked → Khmer place of birth follows (still editable). */
+export function bindPlaceOfBirth(dom) {
+    dom.form.elements.pob?.addEventListener('change', (e) => {
+        const kh = e.target.selectedOptions[0]?.dataset.kh;
+        if (kh) dom.form.elements.pob_kh.value = kh;
+    });
 }
 
 /** Clones the <template> into a semester block — refuses past the per-semester limit. */
@@ -65,6 +99,7 @@ export function addCourseRow(dom, year, semester, course = {}) {
     rowEl.querySelector('[data-role="subject-code"]').textContent = subject?.code || course.code || '—';
     field(rowEl, 'credit').value = course.credit ?? '';
     field(rowEl, 'score').value = course.score ?? '';
+    toggleEditSubject(rowEl);
 
     list.appendChild(fragment);
     recalc(dom);
@@ -73,6 +108,14 @@ export function addCourseRow(dom, year, semester, course = {}) {
 
 function field(rowEl, name) {
     return rowEl.querySelector(`[data-field="${name}"]`);
+}
+
+/** The pencil only shows for a row whose subject still exists in the master list. */
+function toggleEditSubject(rowEl) {
+    const show = state.permissions.subject_edit && Boolean(findSubject(field(rowEl, 'subject_id').value));
+    const button = rowEl.querySelector('[data-action="edit-subject"]');
+    button?.classList.toggle('hidden', !show);
+    button?.classList.toggle('inline-flex', show);
 }
 
 /** Year tabs: only one year's two semesters visible at a time. */
@@ -174,6 +217,7 @@ function pickSubject(dom, rowEl, subject) {
     // Always take the picked subject's credit (still editable afterwards).
     field(rowEl, 'credit').value = subject.credit || 3;
     rowEl.querySelector('[data-role="subject-options"]').classList.add('hidden');
+    toggleEditSubject(rowEl);
     recalc(dom);
     field(rowEl, 'score').focus();
 }
@@ -197,11 +241,82 @@ function moveActive(rowEl, step) {
     options[index].scrollIntoView({ block: 'nearest' });
 }
 
+/**
+ * Fixes a wrong code/title in the master Subjects list from inside the modal.
+ * SubjectRequest validates the whole record, so the current one is fetched
+ * and only the edited fields are replaced. Saved transcripts keep their old
+ * snapshot until they are saved again (syncSubjects re-reads the master).
+ */
+const SUBJECT_EDIT_FIELDS = ['code', 'name_en', 'name_kh', 'credit'];
+
+async function openSubjectEdit(dom, ApiService, rowEl) {
+    const id = field(rowEl, 'subject_id').value;
+    const { error, data } = await ApiService.request(`${CONFIG.SUBJECTS_API}/${id}`);
+    const record = data?.data ?? data;
+    if (error || !record?.id) {
+        Toast.fire({ icon: 'error', title: data?.message || 'Cannot load the subject' });
+        return;
+    }
+
+    state.editingSubject = record;
+    SUBJECT_EDIT_FIELDS.forEach((name) => (dom.subjectForm.elements[name].value = record[name] ?? ''));
+    window.SubjectEditModal.toggle(true);
+    setTimeout(() => dom.subjectForm.elements.code.focus(), 250);
+}
+
+async function saveSubjectEdit(dom, ApiService) {
+    const record = state.editingSubject;
+    if (!record) return;
+
+    const values = {};
+    SUBJECT_EDIT_FIELDS.forEach((name) => (values[name] = dom.subjectForm.elements[name].value.trim()));
+    values.credit = values.credit === '' ? null : Number(values.credit);
+
+    const { error, data } = await ApiService.request(`${CONFIG.SUBJECTS_API}/${record.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            faculty_id: record.faculty?.id ?? record.faculty_id ?? null,
+            level: record.level,
+            lecturer_hour: record.lecturer_hour ?? null,
+            remark: record.remark ?? null,
+            ...values,
+        }),
+    });
+    if (error) {
+        const firstError = data?.errors ? Object.values(data.errors)[0]?.[0] : null;
+        Toast.fire({ icon: 'error', title: firstError || data?.message || 'មិនអាចរក្សាទុកបានទេ' });
+        return;
+    }
+
+    const subject = findSubject(record.id);
+    if (subject) Object.assign(subject, values);
+    dom.form.querySelectorAll('.course-row').forEach((r) => {
+        if (field(r, 'subject_id').value !== String(record.id)) return;
+        field(r, 'subject_search').value = subjectLabel(subject ?? values);
+        r.querySelector('[data-role="subject-code"]').textContent = values.code || '—';
+    });
+
+    state.editingSubject = null;
+    window.SubjectEditModal.toggle(false);
+    Toast.fire({ icon: 'success', title: 'Subject updated — Save the transcript to update its printout' });
+}
+
+export function bindSubjectEdit(dom, ApiService) {
+    dom.subjectForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        saveSubjectEdit(dom, ApiService);
+    });
+}
+
 /** All course-row interaction, delegated once on the form. */
-export function bindCourses(dom) {
+export function bindCourses(dom, ApiService) {
     dom.form.addEventListener('click', (e) => {
         const tab = e.target.closest('[data-year-tab]');
         if (tab) return showYear(dom, tab.dataset.yearTab);
+
+        const edit = e.target.closest('[data-action="edit-subject"]');
+        if (edit) return openSubjectEdit(dom, ApiService, edit.closest('.course-row'));
 
         const add = e.target.closest('[data-action="add-course"]');
         if (add) {
@@ -282,6 +397,11 @@ function collectPayload(dom) {
     payload.entrance_exam = dom.form.elements.entrance_exam.checked;
 
     payload.subjects = [];
+    // A provisional certificate prints no courses — leave any saved ones untouched.
+    if (payload.doc_type === 'provisional') {
+        delete payload.subjects;
+        return payload;
+    }
     for (let year = 1; year <= CONFIG.YEARS; year++) {
         for (const semester of [1, 2]) {
             listFor(dom, year, semester).querySelectorAll('.course-row').forEach((rowEl) => {
@@ -309,7 +429,7 @@ function findIncompleteRow(dom) {
 }
 
 export async function submitForm(dom, ApiService, onDone, { draft = false } = {}) {
-    const problem = draft ? null : findIncompleteRow(dom);
+    const problem = draft || docType(dom) === 'provisional' ? null : findIncompleteRow(dom);
     if (problem) {
         showYear(dom, problem.rowEl.closest('[data-year-panel]').dataset.yearPanel);
         field(problem.rowEl, 'subject_id').value ? field(problem.rowEl, 'credit').focus() : field(problem.rowEl, 'subject_search').focus();
@@ -345,7 +465,7 @@ export async function submitForm(dom, ApiService, onDone, { draft = false } = {}
         Swal.fire({
             icon: 'info',
             title: 'Saved',
-            text: 'Entrance exam is not passed, so this transcript cannot be printed until it is marked as passed.',
+            text: 'Entrance exam is not passed, so this document cannot be printed until it is marked as passed.',
         });
     }
 }

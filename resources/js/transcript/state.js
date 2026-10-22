@@ -6,6 +6,8 @@ export const state = {
     // Id of the transcript open in the form modal; null means "New".
     editingId: null,
     activeYear: 1,
+    // Full subject record open in the "Edit Subject" modal.
+    editingSubject: null,
     subjects: window.TRANSCRIPT_DATA?.subjects ?? [],
-    permissions: window.TRANSCRIPT_PERMISSIONS ?? { edit: false, delete: false },
+    permissions: window.TRANSCRIPT_PERMISSIONS ?? { edit: false, delete: false, subject_edit: false },
 };

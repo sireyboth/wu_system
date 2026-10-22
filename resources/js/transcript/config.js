@@ -2,6 +2,7 @@ import { baseUri } from "../app";
 
 export const CONFIG = {
     TRANSCRIPTS_API: baseUri('transcripts'),
+    SUBJECTS_API: baseUri('subjects'),
     DEBOUNCE_DELAY: 300,
     PER_PAGE: 15,
     // Must match TranscriptRequest::MAX_PER_SEMESTER / MAX_YEAR.

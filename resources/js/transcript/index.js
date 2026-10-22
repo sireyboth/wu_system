@@ -4,7 +4,8 @@ import { openModal, closeModal, Toast } from '../invigilator/core.js';
 import { createApiService } from '../invigilator/api-service.js';
 import { renderPagination, bindPagination } from '../invigilator/pagination.js';
 import { renderTable } from './table-render.js';
-import { openForm, bindCourses, bindKhmerDate, submitForm, handleDelete } from './form.js';
+import { openReport, bindReport } from './report.js';
+import { openForm, applyDocType, bindPlaceOfBirth, bindCourses, bindSubjectEdit, bindKhmerDate, submitForm, handleDelete } from './form.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const dom = {
@@ -19,15 +20,29 @@ document.addEventListener('DOMContentLoaded', () => {
         courseTemplate: document.getElementById('transcriptCourseTemplate'),
         totalCredits: document.getElementById('transcriptTotalCredits'),
         totalGpa: document.getElementById('transcriptTotalGpa'),
+        subjectModal: document.getElementById('subjectEditModal'),
+        subjectForm: document.getElementById('subjectEditForm'),
+        reportBtn: document.getElementById('transcriptReportBtn'),
+        reportModal: document.getElementById('transcriptReportModal'),
+        reportFilters: document.getElementById('transcriptReportFilters'),
+        reportReset: document.getElementById('transcriptReportReset'),
     };
     const ApiService = createApiService(dom);
     const refresh = () => loadTranscripts(dom, ApiService);
 
     window.TranscriptModal = { toggle: (open) => (open ? openModal(dom.modal) : closeModal(dom.modal)) };
+    window.SubjectEditModal = { toggle: (open) => (open ? openModal(dom.subjectModal) : closeModal(dom.subjectModal)) };
+    window.TranscriptReportModal = { toggle: (open) => (open ? openModal(dom.reportModal) : closeModal(dom.reportModal)) };
+
+    dom.reportBtn?.addEventListener('click', () => openReport(dom, ApiService));
+    bindReport(dom, ApiService);
 
     dom.addBtn?.addEventListener('click', () => openForm(dom));
-    bindCourses(dom);
+    bindCourses(dom, ApiService);
+    bindSubjectEdit(dom, ApiService);
     bindKhmerDate(dom);
+    bindPlaceOfBirth(dom);
+    dom.form?.addEventListener('change', (e) => e.target.name === 'doc_type' && applyDocType(dom));
 
     dom.form?.addEventListener('submit', (e) => {
         e.preventDefault();

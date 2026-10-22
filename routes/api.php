@@ -105,6 +105,12 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         Route::get('/report', [CertificateController::class, 'report'])->name('report');
     });
 
+    // Before api_routes()'s /transcripts/{transcript} wildcard, which would
+    // otherwise treat "report" as an id.
+    Route::middleware('permission:certificate.view')
+        ->get('/transcripts/report', [TranscriptController::class, 'report'])
+        ->name('transcripts.report');
+
     // Retake Exam module — rebuilt on the normalized schema (retake_terms,
     // exam_types, retake_batches, retake_registrations, payment_batches,
     // payment_entries, scores, deletion_log). See the design doc in the WU
