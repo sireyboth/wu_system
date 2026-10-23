@@ -110,6 +110,9 @@ Route::prefix('v1')->middleware('auth')->group(function () {
     Route::middleware('permission:certificate.view')
         ->get('/transcripts/report', [TranscriptController::class, 'report'])
         ->name('transcripts.report');
+    Route::middleware('permission:certificate.view')
+        ->post('/transcripts/{transcript}/prints', [TranscriptController::class, 'print'])
+        ->name('transcripts.print');
 
     // Retake Exam module — rebuilt on the normalized schema (retake_terms,
     // exam_types, retake_batches, retake_registrations, payment_batches,

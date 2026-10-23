@@ -18,7 +18,7 @@ class TranscriptController extends Controller
         $this->name          = 'Transcript';
         $this->model         = Transcript::class;
         $this->resource      = TranscriptResource::class;
-        $this->relationships = ['major', 'subjects'];
+        $this->relationships = ['major', 'subjects', 'payments.verifier:id,name', 'prints.printer:id,name'];
     }
 
     public function index(Request $request)
@@ -34,6 +34,7 @@ class TranscriptController extends Controller
             $transcript = Transcript::create($this->header($data));
 
             $this->syncSubjects($transcript, $data['subjects'] ?? []);
+            $this->syncPayments($transcript, $data['payments'] ?? []);
 
             return new TranscriptResource($this->reload($transcript));
         });
@@ -53,6 +54,9 @@ class TranscriptController extends Controller
             if (array_key_exists('subjects', $data)) {
                 $this->syncSubjects($transcript, $data['subjects']);
             }
+            if (array_key_exists('payments', $data)) {
+                $this->syncPayments($transcript, $data['payments']);
+            }
 
             return new TranscriptResource($this->reload($transcript));
         });
@@ -61,6 +65,27 @@ class TranscriptController extends Controller
     public function destroy(Transcript $transcript)
     {
         return $this->disable($transcript);
+    }
+
+    /**
+     * Logs one print of the chosen layout and hands back its URL. The
+     * client asks for confirmation first when that layout was printed
+     * before; the print page itself only re-checks the gates.
+     */
+    public function print(Request $request, Transcript $transcript)
+    {
+        $data = $request->validate([
+            'doc_type' => ['required', Rule::in(array_keys(Transcript::DOC_TYPES))],
+        ]);
+
+        $transcript->load(['subjects', 'payments']);
+        abort_unless($transcript->canPrint(), 422, 'Cannot print — ' . implode(' · ', $transcript->printBlockers()));
+
+        $transcript->prints()->create(['doc_type' => $data['doc_type'], 'printed_by' => auth()->id()]);
+
+        return response()->json([
+            'print_url' => route('transcript.print', ['transcript' => $transcript->id, 'type' => $data['doc_type']]),
+        ]);
     }
 
     public function restore(Transcript $transcript)
@@ -75,8 +100,10 @@ class TranscriptController extends Controller
 
     /**
      * Summary for the Report modal: status counts, GPA spread of the final
-     * transcripts, and breakdowns by major and degree. All filters optional.
-     * "printable" / "blocked" = final with / without the entrance exam passed.
+     * transcripts, and breakdowns by major and degree. All filters optional;
+     * doc_type keeps the records that have been printed as that layout.
+     * "printable" / "blocked" = final records that do / don't pass every
+     * print gate (Transcript::canPrint) — worked out on the loaded rows.
      */
     public function report(Request $request)
     {
@@ -90,22 +117,27 @@ class TranscriptController extends Controller
         ]);
 
         $rows = Transcript::query()
-            ->with('major:id,name_en,name_kh')
+            ->with(['major:id,name_en,name_kh', 'subjects:id,transcript_id,year,semester,score,grade', 'payments:id,transcript_id,year,semester'])
             ->when($filters['major_id'] ?? null, fn ($q, $id) => $q->where('major_id', $id))
-            ->when($filters['doc_type'] ?? null, fn ($q, $type) => $q->where('doc_type', $type))
+            ->when($filters['doc_type'] ?? null, fn ($q, $type) => $q->whereHas('prints', fn ($p) => $p->where('doc_type', $type)))
             ->when($filters['degree'] ?? null, fn ($q, $degree) => $q->where('degree', $degree))
             ->when($filters['date_from'] ?? null, fn ($q, $date) => $q->whereDate('issue_date', '>=', $date))
             ->when($filters['date_to'] ?? null, fn ($q, $date) => $q->whereDate('issue_date', '<=', $date))
             ->when($filters['status'] ?? null, fn ($q, $status) => match ($status) {
-                'draft'     => $q->where('status', Transcript::DRAFT),
-                'final'     => $q->where('status', Transcript::FINAL),
-                'printable' => $q->where('status', Transcript::FINAL)->where('entrance_exam', true),
-                'blocked'   => $q->where('status', Transcript::FINAL)->where('entrance_exam', false),
+                'draft'  => $q->where('status', Transcript::DRAFT),
+                default  => $q->where('status', Transcript::FINAL),
             })
             ->get(['id', 'status', 'entrance_exam', 'degree', 'major_id', 'total_gpa']);
 
-        $isFinal = fn ($t) => $t->status === Transcript::FINAL;
-        $final   = $rows->filter($isFinal);
+        $rows = match ($filters['status'] ?? null) {
+            'printable' => $rows->filter(fn ($t) => $t->canPrint())->values(),
+            'blocked'   => $rows->reject(fn ($t) => $t->canPrint())->values(),
+            default     => $rows,
+        };
+
+        $isFinal   = fn ($t) => $t->status === Transcript::FINAL;
+        $isBlocked = fn ($t) => ! $t->canPrint();
+        $final     = $rows->filter($isFinal);
         $average = fn ($items) => $items->isEmpty() ? null : round((float) $items->avg('total_gpa'), 2);
 
         $bands = [
@@ -119,8 +151,8 @@ class TranscriptController extends Controller
             'total'       => $rows->count(),
             'final'       => $final->count(),
             'draft'       => $rows->count() - $final->count(),
-            'printable'   => $final->where('entrance_exam', true)->count(),
-            'blocked'     => $final->where('entrance_exam', false)->count(),
+            'printable'   => $final->reject($isBlocked)->count(),
+            'blocked'     => $final->filter($isBlocked)->count(),
             'average_gpa' => $average($final),
             'gpa_bands'   => collect($bands)->map(fn ($range, $label) => [
                 'label' => $label,
@@ -135,7 +167,7 @@ class TranscriptController extends Controller
                 'total'       => $group->count(),
                 'final'       => $group->filter($isFinal)->count(),
                 'draft'       => $group->reject($isFinal)->count(),
-                'blocked'     => $group->filter($isFinal)->where('entrance_exam', false)->count(),
+                'blocked'     => $group->filter($isFinal)->filter($isBlocked)->count(),
                 'average_gpa' => $average($group->filter($isFinal)),
             ])->sortByDesc('total')->values(),
         ]);
@@ -145,7 +177,7 @@ class TranscriptController extends Controller
     protected function header(array $data): array
     {
         return [
-            ...collect($data)->except(['subjects', 'draft'])->all(),
+            ...collect($data)->except(['subjects', 'payments', 'draft'])->all(),
             'status' => ($data['draft'] ?? false) ? Transcript::DRAFT : Transcript::FINAL,
         ];
     }
@@ -201,5 +233,30 @@ class TranscriptController extends Controller
             'total_credits' => $credits,
             'total_gpa'     => Grade::gpa($points),
         ])->save();
+    }
+
+    /**
+     * Makes the paid semesters match the submitted checkboxes. Rows that
+     * stay checked are left alone so their verified_by/verified_at keep
+     * pointing at whoever first ticked them.
+     */
+    protected function syncPayments(Transcript $transcript, array $rows): void
+    {
+        $checked = collect($rows)->map(fn ($row) => "{$row['year']}-{$row['semester']}")->unique();
+        $current = $transcript->payments()->get()->keyBy(fn ($p) => "{$p->year}-{$p->semester}");
+
+        // reject(), not except(): an Eloquent collection's except() matches model ids, not these keys.
+        $unchecked = $current->reject(fn ($payment, $block) => $checked->contains($block));
+        $transcript->payments()->whereKey($unchecked->modelKeys())->delete();
+
+        foreach ($checked->diff($current->keys()) as $block) {
+            [$year, $semester] = explode('-', $block);
+            $transcript->payments()->create([
+                'year'        => $year,
+                'semester'    => $semester,
+                'verified_by' => auth()->id(),
+                'verified_at' => now(),
+            ]);
+        }
     }
 }

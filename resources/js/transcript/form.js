@@ -5,24 +5,33 @@ import { getRenderedRow } from './table-render.js';
 import { gradeOf, gpaOf } from './grade.js';
 
 const FIELDS = [
-    'doc_type', 'issue_no', 'name', 'surname', 'name_kh', 'dob', 'pob', 'pob_kh', 'address', 'student_code',
+    'issue_no', 'name', 'surname', 'name_kh', 'dob', 'pob', 'pob_kh', 'address', 'student_code',
     'sex', 'nationality', 'degree', 'major_id', 'academic_year', 'exam_date', 'date_kh', 'issue_date',
     'person_in_charge', 'person_role', 'person_in_charge_kh', 'person_role_kh',
     'entrance_exam_description', 'remark',
 ];
 
-const DOC_TITLES = {
-    transcript: 'ព្រឹត្តិប័ត្រពិន្ទុ (Transcript)',
-    provisional: 'វិញ្ញាបនបត្របណ្ដោះអាសន្ន (Provisional Certificate)',
-};
+/** Program length in years — must match App\Helpers\Degree::years(). */
+const programYears = (dom) => CONFIG.DEGREE_YEARS[dom.form.elements.degree.value] ?? CONFIG.YEARS;
 
-const docType = (dom) => dom.form.elements.doc_type.value || 'transcript';
+/** Year tabs and payment boxes stop at the degree's length (Associate 2 years, Bachelor 4, …). */
+export function applyDegree(dom) {
+    const years = programYears(dom);
+    dom.form.querySelectorAll('[data-year-tab]').forEach((tab) => tab.classList.toggle('hidden', Number(tab.dataset.yearTab) > years));
+    dom.form.querySelectorAll('[data-pay-year]').forEach((box) => box.classList.toggle('hidden', Number(box.dataset.payYear) > years));
+    if (state.activeYear > years) showYear(dom, 1);
+}
 
-/** Shows only the fields the chosen document prints ([data-only="transcript|provisional"]). */
-export function applyDocType(dom) {
-    const type = docType(dom);
-    dom.form.querySelectorAll('[data-only]').forEach((el) => el.classList.toggle('hidden', el.dataset.only !== type));
-    dom.form.elements.name_kh.required = type === 'provisional';
+const paymentBoxes = (dom) => [...dom.form.querySelectorAll('input[name="payments"]')];
+
+/** Ticks the saved semesters; hovering a box tells who verified it and when. */
+function fillPayments(dom, payments = []) {
+    const saved = new Map(payments.map((p) => [`${p.year}-${p.semester}`, p]));
+    paymentBoxes(dom).forEach((box) => {
+        const payment = saved.get(box.value);
+        box.checked = Boolean(payment);
+        box.closest('label').title = payment ? `Verified by ${payment.verified_by ?? '—'} · ${payment.verified_at ?? ''}` : '';
+    });
 }
 
 const blockKey = (year, semester) => `${year}-${semester}`;
@@ -45,6 +54,7 @@ export function openForm(dom, id = null) {
         if (input && row) input.value = row[name] ?? '';
     });
     dom.form.elements.entrance_exam.checked = Boolean(row?.entrance_exam);
+    fillPayments(dom, row?.payments);
 
     dom.form.querySelectorAll('[data-course-list]').forEach((list) => (list.innerHTML = ''));
     (row?.subjects ?? []).forEach((s) => addCourseRow(dom, s.year, s.semester, s));
@@ -54,11 +64,11 @@ export function openForm(dom, id = null) {
             ? 'បង្កើតឯកសារ (New Request)'
             : row.is_draft
                 ? 'បន្តសេចក្ដីព្រាង (Continue Draft)'
-                : `កែសម្រួល — ${DOC_TITLES[row.doc_type] ?? DOC_TITLES.transcript}`;
+                : 'កែសម្រួលឯកសារ (Edit Request)';
     }
 
-    applyDocType(dom);
     showYear(dom, 1);
+    applyDegree(dom);
     recalc(dom);
     window.TranscriptModal.toggle(true);
 }
@@ -396,12 +406,16 @@ function collectPayload(dom) {
     ['name', 'surname'].forEach((k) => payload[k] && (payload[k] = payload[k].toUpperCase()));
     payload.entrance_exam = dom.form.elements.entrance_exam.checked;
 
+    // Boxes past the degree's length are hidden and never count as paid.
+    const years = programYears(dom);
+    payload.payments = paymentBoxes(dom)
+        .filter((box) => box.checked)
+        .map((box) => box.value.split('-').map(Number))
+        .filter(([year]) => year <= years)
+        .map(([year, semester]) => ({ year, semester }));
+
+    // Every doc type stores its courses and scores, even if its layout doesn't print them.
     payload.subjects = [];
-    // A provisional certificate prints no courses — leave any saved ones untouched.
-    if (payload.doc_type === 'provisional') {
-        delete payload.subjects;
-        return payload;
-    }
     for (let year = 1; year <= CONFIG.YEARS; year++) {
         for (const semester of [1, 2]) {
             listFor(dom, year, semester).querySelectorAll('.course-row').forEach((rowEl) => {
@@ -429,7 +443,7 @@ function findIncompleteRow(dom) {
 }
 
 export async function submitForm(dom, ApiService, onDone, { draft = false } = {}) {
-    const problem = draft || docType(dom) === 'provisional' ? null : findIncompleteRow(dom);
+    const problem = draft ? null : findIncompleteRow(dom);
     if (problem) {
         showYear(dom, problem.rowEl.closest('[data-year-panel]').dataset.yearPanel);
         field(problem.rowEl, 'subject_id').value ? field(problem.rowEl, 'credit').focus() : field(problem.rowEl, 'subject_search').focus();
@@ -457,15 +471,16 @@ export async function submitForm(dom, ApiService, onDone, { draft = false } = {}
     state.editingId = null;
     onDone();
 
+    const blockers = (data?.data ?? data)?.print_blockers ?? [];
     if (draft) {
         Toast.fire({ icon: 'success', title: 'រក្សាទុកព្រាងហើយ (Draft saved) — open it with Edit to continue' });
-    } else if (payload.entrance_exam) {
+    } else if (!blockers.length) {
         Toast.fire({ icon: 'success', title: 'រក្សាទុកជោគជ័យ!' });
     } else {
         Swal.fire({
             icon: 'info',
-            title: 'Saved',
-            text: 'Entrance exam is not passed, so this document cannot be printed until it is marked as passed.',
+            title: 'Saved — cannot print yet',
+            html: `<ul class="text-left list-disc ps-6">${blockers.map((b) => `<li>${escapeHtml(b)}</li>`).join('')}</ul>`,
         });
     }
 }

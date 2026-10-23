@@ -29,6 +29,17 @@ enum Degree: string
         };
     }
 
+    /** Program length — one payment box per year × semester on Request Docs. */
+    public function years(): int
+    {
+        return match ($this) {
+            self::Associate => 2,
+            self::Bachelor => 4,
+            self::Master => 2,
+            self::PhD => 3,
+        };
+    }
+
     // generic accessor if you want to switch on locale dynamically
     public function label(string $locale = 'en'): string
     {

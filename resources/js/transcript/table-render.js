@@ -33,9 +33,13 @@ function renderRow(row, number) {
         : '';
     const fullName = escapeHtml(`${row.surname ?? ''} ${row.name ?? ''}`.trim() || '(no name yet)') + draftBadge;
     const issueNo = escapeHtml(row.issue_no || '—');
-    const typeBadge = row.doc_type === 'provisional'
-        ? '<span class="inline-flex px-2 py-0.5 text-[10px] font-bold uppercase rounded-full bg-sky-100 text-sky-700 dark:bg-sky-500/10 dark:text-sky-400">Provisional</span>'
-        : '<span class="inline-flex px-2 py-0.5 text-[10px] font-bold uppercase rounded-full bg-violet-100 text-violet-700 dark:bg-violet-500/10 dark:text-violet-400">Transcript</span>';
+    // How often each layout has been printed, e.g. "Transcript 2× · Provisional 1×".
+    const printed = Object.entries(row.print_counts ?? {})
+        .map(([type, count]) => `${state.docTypes[type] ?? type} ${count}×`)
+        .join(' · ');
+    const typeBadge = printed
+        ? `<span title="Last: ${escapeHtml(row.last_print?.printed_by ?? '—')} · ${escapeHtml(row.last_print?.printed_at ?? '')}" class="inline-flex px-2 py-0.5 text-[10px] font-bold uppercase rounded-full bg-sky-100 text-sky-700 dark:bg-sky-500/10 dark:text-sky-400">${escapeHtml(printed)}</span>`
+        : '<span class="inline-flex px-2 py-0.5 text-[10px] font-bold uppercase rounded-full bg-neutral-100 text-neutral-500 dark:bg-white/5 dark:text-neutral-400">Not printed</span>';
     const code = escapeHtml(row.student_code || '—');
     const major = escapeHtml(row.major?.name_en || '—');
     const year = escapeHtml(row.academic_year || '');
@@ -48,11 +52,9 @@ function renderRow(row, number) {
         : '<span class="inline-flex px-2 py-0.5 text-xs font-bold rounded-full bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400">Failed</span>';
 
     const btn = 'inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-colors';
-    const blockedReason = row.is_draft
-        ? 'Draft — open with Edit, finish it and press Save to print'
-        : 'Entrance exam not passed — cannot print';
+    const blockedReason = escapeHtml((row.print_blockers ?? []).join(' · ') || 'Cannot print');
     const printBtn = row.can_print
-        ? `<a href="${escapeHtml(row.print_url)}" target="_blank" rel="noopener" class="${btn} text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20">បោះពុម្ព (Print)</a>`
+        ? `<button data-action="print" data-id="${row.id}" class="${btn} text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20">បោះពុម្ព (Print)</button>`
         : `<span title="${blockedReason}" class="${btn} cursor-not-allowed text-neutral-400 bg-neutral-100 dark:bg-white/5">បោះពុម្ព (Print)</span>`;
     const actions = [
         printBtn,

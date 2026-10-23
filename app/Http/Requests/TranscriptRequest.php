@@ -2,7 +2,6 @@
 namespace App\Http\Requests;
 
 use App\Helpers\Degree;
-use App\Models\Transcript;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
@@ -21,13 +20,10 @@ class TranscriptRequest extends IRequest
             check_unique('transcripts', 'issue_no', ! $this->boolean('draft'), 100),
             [
                 'draft'                     => 'sometimes|boolean',
-                'doc_type'                  => ['required', Rule::in(array_keys(Transcript::DOC_TYPES))],
                 'name'                      => "{$required}|string|max:100",
                 'surname'                   => "{$required}|string|max:100",
-                // The provisional certificate prints the name in Khmer as well.
-                'name_kh'                   => $this->boolean('draft')
-                    ? 'nullable|string|max:150'
-                    : 'nullable|required_if:doc_type,' . Transcript::PROVISIONAL . '|string|max:150',
+                // Any record can be printed as the provisional certificate, which prints the Khmer name.
+                'name_kh'                   => "{$required}|string|max:150",
                 'dob'                       => 'nullable|date',
                 'pob'                       => 'nullable|string|max:150',
                 'pob_kh'                    => 'nullable|string|max:150',
@@ -57,14 +53,30 @@ class TranscriptRequest extends IRequest
                 'subjects.*.semester'   => 'required|integer|between:1,2',
                 'subjects.*.credit'     => "{$required}|integer|between:0,30",
                 'subjects.*.score'      => 'nullable|numeric|between:0,100',
+
+                // Semesters checked as paid; the rest stay unpaid and block printing.
+                'payments'              => 'sometimes|array',
+                'payments.*.year'       => 'required|integer|between:1,' . self::MAX_YEAR,
+                'payments.*.semester'   => 'required|integer|between:1,2',
             ]
         );
     }
 
-    /** Each year/semester block holds at most MAX_PER_SEMESTER courses. */
+    /**
+     * Each year/semester block holds at most MAX_PER_SEMESTER courses, and
+     * neither courses nor payments may go past the degree's length.
+     */
     public function after(): array
     {
         return [
+            function (Validator $validator) {
+                $years = Degree::tryFrom((string) $this->input('degree'))?->years() ?? self::MAX_YEAR;
+                foreach (['subjects' => 'Courses', 'payments' => 'Payments'] as $key => $label) {
+                    if (collect($this->input($key, []))->contains(fn ($row) => (int) ($row['year'] ?? 0) > $years)) {
+                        $validator->errors()->add($key, "{$label} go past year {$years} — this degree only has {$years} years.");
+                    }
+                }
+            },
             function (Validator $validator) {
                 $counts = collect($this->input('subjects', []))
                     ->countBy(fn ($row) => ($row['year'] ?? '?') . '-' . ($row['semester'] ?? '?'));
@@ -86,7 +98,6 @@ class TranscriptRequest extends IRequest
     {
         return [
             'issue_no'              => 'N° Issue',
-            'doc_type'              => 'document type',
             'name_kh'               => 'name (Khmer)',
             'pob_kh'                => 'place of birth (Khmer)',
             'exam_date'             => 'exam date',

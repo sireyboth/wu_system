@@ -12,7 +12,7 @@
     <x-core.page-header title="ស្នើសុំឯកសារ (Request Docs)"
         subtitle="ព្រឹត្តិប័ត្រពិន្ទុ និងវិញ្ញាបនបត្របណ្ដោះអាសន្ន — បោះពុម្ពលើក្រដាសក្បាល (Transcript & Provisional Certificate, printed on letterhead)" />
 
-    {{-- Section badges count only the visible sections (Courses hides for a provisional certificate). --}}
+    {{-- Section badges number the form's sections in order. --}}
     <style>
         #transcriptForm { counter-reset: step; }
         #transcriptForm .step-no::before { counter-increment: step; content: counter(step); }
@@ -51,7 +51,7 @@
 
         <x-ui.data-table :headers="[
             'N.O',
-            'N° Issue / Type',
+            'N° Issue / Printed',
             'Student',
             'Major',
             'Credits / GPA',
@@ -64,29 +64,6 @@
     <x-ui.modal id="transcriptModal" card-id="transcriptModalCard" title-id="transcriptModalTitle"
         title="បង្កើតឯកសារ (New Request)" form-id="transcriptForm"
         close-fn="TranscriptModal" max-width="max-w-[min(96vw,1680px)]" max-height="max-h-[calc(100vh-4rem)]">
-
-        {{-- Document type — decides the print layout and which sections below show. --}}
-        <section class="space-y-4">
-            <h4 class="{{ $section }}">
-                <span class="flex items-center justify-center w-6 h-6 text-xs rounded-full bg-indigo-600 text-white step-no"></span>
-                ប្រភេទឯកសារ (Document Type)
-            </h4>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                @foreach ($docTypes as $value => $docLabel)
-                    <label class="flex items-center gap-3 p-4 rounded-2xl border border-neutral-200 dark:border-white/10 cursor-pointer has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-50 dark:has-[:checked]:bg-indigo-500/10 transition-colors">
-                        <input type="radio" name="doc_type" value="{{ $value }}" @checked($loop->first) class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
-                        <span>
-                            <span class="block text-sm font-bold text-neutral-900 dark:text-white">
-                                {{ $value === 'provisional' ? 'វិញ្ញាបនបត្របណ្ដោះអាសន្ន' : 'ព្រឹត្តិប័ត្រពិន្ទុ' }} ({{ $docLabel }})
-                            </span>
-                            <span class="block text-xs text-neutral-500">
-                                {{ $value === 'provisional' ? 'Bilingual certificate printed inside the pre-printed frame' : 'Courses, credits & GPA by year' }}
-                            </span>
-                        </span>
-                    </label>
-                @endforeach
-            </div>
-        </section>
 
         {{-- Student --}}
         <section class="space-y-4 pt-5 border-t border-neutral-100 dark:border-white/5">
@@ -103,9 +80,9 @@
                     <label class="{{ $label }}">Surname <span class="text-rose-500">*</span></label>
                     <input type="text" name="surname" required maxlength="100" autocomplete="off" placeholder="e.g. NUTH" class="{{ $input }} uppercase">
                 </div>
-                <div data-only="provisional">
+                <div>
                     <label class="{{ $label }}">Name (Khmer) <span class="text-rose-500">*</span></label>
-                    <input type="text" name="name_kh" maxlength="150" autocomplete="off" placeholder="e.g. កើតដា សុធាដេត" class="{{ $input }}">
+                    <input type="text" name="name_kh" required maxlength="150" autocomplete="off" placeholder="e.g. កើតដា សុធាដេត" class="{{ $input }}">
                 </div>
                 <div>
                     <label class="{{ $label }}">ID</label>
@@ -133,7 +110,7 @@
                         @endforeach
                     </select>
                 </div>
-                <div data-only="provisional">
+                <div>
                     <label class="{{ $label }}">Place of Birth (Khmer)</label>
                     <input type="text" name="pob_kh" maxlength="150" autocomplete="off" placeholder="e.g. ខេត្តកំពង់ឆ្នាំង" class="{{ $input }}">
                 </div>
@@ -181,15 +158,15 @@
                     <label class="{{ $label }}">Academic Year</label>
                     <input type="text" name="academic_year" maxlength="50" autocomplete="off" placeholder="e.g. 2022-2026" class="{{ $input }}">
                 </div>
-                <div data-only="provisional">
+                <div>
                     <label class="{{ $label }}">Comprehensive Exam Date</label>
                     <input type="date" name="exam_date" class="{{ $input }}">
                 </div>
             </div>
         </section>
 
-        {{-- Courses — transcript only --}}
-        <section data-only="transcript" class="space-y-4 pt-5 border-t border-neutral-100 dark:border-white/5">
+        {{-- Courses — filled for every record; only the transcript layout prints them. --}}
+        <section class="space-y-4 pt-5 border-t border-neutral-100 dark:border-white/5">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
                 <h4 class="{{ $section }}">
                     <span class="flex items-center justify-center w-6 h-6 text-xs rounded-full bg-indigo-600 text-white step-no"></span>
@@ -244,7 +221,28 @@
                 </div>
             @endforeach
             <p class="text-[11px] text-neutral-400">
-                Max 5 subjects per semester. Leave the score empty for <b>IP</b> (in progress) — it prints as IP and is not counted in credits or GPA.
+                Max 5 subjects per semester. Leave the score empty for <b>IP</b> (in progress) — it can be saved, but the document <b>cannot be printed</b> while any course is IP or F (below 50).
+            </p>
+        </section>
+
+        {{-- Payment verification — one box per year/semester of the degree (JS hides years past it). --}}
+        <section class="space-y-4 pt-5 border-t border-neutral-100 dark:border-white/5">
+            <h4 class="{{ $section }}">
+                <span class="flex items-center justify-center w-6 h-6 text-xs rounded-full bg-indigo-600 text-white step-no"></span>
+                ផ្ទៀងផ្ទាត់ការបង់ប្រាក់ (Payment Verification)
+            </h4>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                @foreach ($romans as $year => $roman)
+                    @foreach ([1 => 'I', 2 => 'II'] as $semester => $semRoman)
+                        <label data-pay-year="{{ $year }}" class="flex items-center gap-3 p-3 rounded-2xl border border-neutral-200 dark:border-white/10 cursor-pointer has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50 dark:has-[:checked]:bg-emerald-500/10 transition-colors">
+                            <input type="checkbox" name="payments" value="{{ $year }}-{{ $semester }}" class="w-5 h-5 rounded text-emerald-600 focus:ring-emerald-500">
+                            <span class="text-sm font-semibold text-neutral-800 dark:text-neutral-100">Year {{ $roman }} · Semester {{ $semRoman }}</span>
+                        </label>
+                    @endforeach
+                @endforeach
+            </div>
+            <p class="text-[11px] text-neutral-400">
+                Tick each semester once its payment is verified. If any box is left unticked, the document can be saved but <b>cannot be printed</b>.
             </p>
         </section>
 
@@ -275,11 +273,11 @@
                     <label class="{{ $label }}">Role</label>
                     <input type="text" name="person_role" maxlength="100" autocomplete="off" placeholder="e.g. PRESIDENT" class="{{ $input }}">
                 </div>
-                <div data-only="provisional">
+                <div>
                     <label class="{{ $label }}">Person in Charge (Khmer)</label>
                     <input type="text" name="person_in_charge_kh" maxlength="100" autocomplete="off" placeholder="e.g. បណ្ឌិត គៀង រតនា" class="{{ $input }}">
                 </div>
-                <div data-only="provisional">
+                <div>
                     <label class="{{ $label }}">Role (Khmer)</label>
                     <input type="text" name="person_role_kh" maxlength="100" autocomplete="off" placeholder="e.g. សាកលវិទ្យាធិការ" class="{{ $input }}">
                 </div>
@@ -374,9 +372,9 @@
         {{-- Filters — any change reloads the report. --}}
         <div id="transcriptReportFilters" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-3 items-end">
             <div>
-                <label class="{{ $label }}">Document Type</label>
+                <label class="{{ $label }}">Printed As</label>
                 <select name="doc_type" class="{{ $input }}">
-                    <option value="">All types</option>
+                    <option value="">Any / not printed</option>
                     @foreach ($docTypes as $value => $docLabel)
                         <option value="{{ $value }}">{{ $docLabel }}</option>
                     @endforeach
@@ -407,7 +405,7 @@
                     <option value="final">Final</option>
                     <option value="draft">Draft</option>
                     <option value="printable">Printable</option>
-                    <option value="blocked">Not printable (entrance exam)</option>
+                    <option value="blocked">Not printable</option>
                 </select>
             </div>
             <div>
@@ -529,7 +527,7 @@
     </template>
 
     <script>
-        window.TRANSCRIPT_DATA = @json(['subjects' => $subjects]);
+        window.TRANSCRIPT_DATA = @json(['subjects' => $subjects, 'docTypes' => $docTypes]);
         window.TRANSCRIPT_PERMISSIONS = {{ Js::from([
             'edit'         => auth()->user()->can('certificate.edit'),
             'delete'       => auth()->user()->can('certificate.delete'),

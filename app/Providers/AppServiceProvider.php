@@ -32,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
             return $user->hasRole('Admin') ? true : null;
         });
 
-        URL::forceHttps();
+        URL::forceHttps($this->app->isProduction());
 
         Builder::macro('whereLike', function ($attributes, string $searchTerm) {
             /** @var Builder $this */

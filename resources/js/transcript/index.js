@@ -5,7 +5,8 @@ import { createApiService } from '../invigilator/api-service.js';
 import { renderPagination, bindPagination } from '../invigilator/pagination.js';
 import { renderTable } from './table-render.js';
 import { openReport, bindReport } from './report.js';
-import { openForm, applyDocType, bindPlaceOfBirth, bindCourses, bindSubjectEdit, bindKhmerDate, submitForm, handleDelete } from './form.js';
+import { printDocument } from './print.js';
+import { openForm, applyDegree, bindPlaceOfBirth, bindCourses, bindSubjectEdit, bindKhmerDate, submitForm, handleDelete } from './form.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const dom = {
@@ -42,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     bindSubjectEdit(dom, ApiService);
     bindKhmerDate(dom);
     bindPlaceOfBirth(dom);
-    dom.form?.addEventListener('change', (e) => e.target.name === 'doc_type' && applyDocType(dom));
+    dom.form?.addEventListener('change', (e) => e.target.name === 'degree' && applyDegree(dom));
 
     dom.form?.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -58,6 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const { action, id } = btn.dataset;
         if (action === 'edit') openForm(dom, id);
         else if (action === 'delete') handleDelete(ApiService, id, refresh);
+        else if (action === 'print') printDocument(ApiService, id, refresh);
     });
 
     dom.searchInput?.addEventListener('input', (e) => {

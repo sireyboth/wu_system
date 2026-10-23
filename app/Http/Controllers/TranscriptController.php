@@ -41,22 +41,23 @@ class TranscriptController extends Controller
     /**
      * Content only — the university prints onto pre-printed letterhead,
      * so this page has no logo/frame, just the body placed inside the
-     * letterhead's blank area. Blocked until the entrance exam is passed.
-     * doc_type picks the layout: the transcript's course table, or the
-     * bilingual provisional certificate.
+     * letterhead's blank area. Every record shares the same print gates
+     * (Transcript::printBlockers); ?type= only picks the layout: the
+     * transcript's course table, or the bilingual provisional certificate.
+     * The print itself is logged by Api\TranscriptController::print.
      */
     public function print(Request $request, Transcript $transcript)
     {
-        abort_if($transcript->isDraft(), 403, 'This document is still a draft — finish it and Save before printing.');
-        abort_unless($transcript->canPrint(), 403, 'Entrance exam not passed — this document cannot be printed.');
+        $type = $request->query('type', Transcript::TRANSCRIPT);
+        abort_unless(array_key_exists($type, Transcript::DOC_TYPES), 404);
 
-        if ($transcript->isProvisional()) {
-            $transcript->load('major');
+        $transcript->load(['major', 'subjects', 'payments']);
 
+        abort_unless($transcript->canPrint(), 403, 'Cannot print — ' . implode(' · ', $transcript->printBlockers()));
+
+        if ($type === Transcript::PROVISIONAL) {
             return view('transcript.provisional', compact('transcript'));
         }
-
-        $transcript->load(['major', 'subjects']);
 
         // [year => [1 => rows, 2 => rows]], only years that have courses.
         $years = $transcript->subjects->groupBy('year')->sortKeys()

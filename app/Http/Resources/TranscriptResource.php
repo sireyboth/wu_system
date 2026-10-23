@@ -8,8 +8,6 @@ class TranscriptResource extends IResource
         return to_list($this, [
             'status'                    => $this->status,
             'is_draft'                  => $this->isDraft(),
-            'doc_type'                  => $this->doc_type,
-            'doc_type_label'            => $this->doc_type_label,
             'issue_no'                  => $this->issue_no,
             'name'                      => $this->name,
             'surname'                   => $this->surname,
@@ -41,8 +39,22 @@ class TranscriptResource extends IResource
             'entrance_exam_description' => $this->entrance_exam_description,
             'total_credits'             => $this->total_credits,
             'total_gpa'                 => $this->total_gpa,
+            'program_years'             => $this->program_years,
             'can_print'                 => $this->canPrint(),
-            'print_url'                 => route('transcript.print', $this->id),
+            'print_blockers'            => $this->printBlockers(),
+            // Times printed per layout + the latest print, for the reprint warning.
+            'print_counts'              => $this->whenLoaded('prints', fn () => $this->prints->countBy('doc_type')),
+            'last_print'                => $this->whenLoaded('prints', fn () => ($last = $this->prints->first()) ? [
+                'doc_type'   => $last->doc_type,
+                'printed_by' => $last->printer?->name,
+                'printed_at' => $last->created_at?->format('Y-m-d H:i'),
+            ] : null),
+            'payments'                  => $this->whenLoaded('payments', fn () => $this->payments->map(fn ($p) => [
+                'year'        => $p->year,
+                'semester'    => $p->semester,
+                'verified_by' => $p->verifier?->name,
+                'verified_at' => $p->verified_at?->format('Y-m-d H:i'),
+            ])),
             'subjects'                  => $this->whenLoaded('subjects', fn () => $this->subjects->map(fn ($s) => [
                 'id'          => $s->id,
                 'subject_id'  => $s->subject_id,
