@@ -127,6 +127,10 @@
                     <label class="{{ $label }}">Address</label>
                     <input type="text" name="address" maxlength="255" autocomplete="off" placeholder="e.g. Phnom Penh" class="{{ $input }}">
                 </div>
+                <div>
+                    <label class="{{ $label }}">Address (Khmer)</label>
+                    <input type="text" name="address_kh" maxlength="255" autocomplete="off" placeholder="e.g. រាជធានីភ្នំពេញ" class="{{ $input }}">
+                </div>
             </div>
         </section>
 
@@ -137,6 +141,15 @@
                 កម្មវិធីសិក្សា (Program)
             </h4>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {{-- Sets the print rules: Transcript & Status check only the semesters entered, Provisional the whole degree. --}}
+                <div>
+                    <label class="{{ $label }}">Requested Document <span class="text-rose-500">*</span></label>
+                    <select name="request_type" required class="{{ $input }}">
+                        @foreach ($requestTypes as $value => $text)
+                            <option value="{{ $value }}">{{ $text }}</option>
+                        @endforeach
+                    </select>
+                </div>
                 <div>
                     <label class="{{ $label }}">Degree <span class="text-rose-500">*</span></label>
                     <select name="degree" required class="{{ $input }}">
@@ -158,11 +171,34 @@
                     <label class="{{ $label }}">Academic Year</label>
                     <input type="text" name="academic_year" maxlength="50" autocomplete="off" placeholder="e.g. 2022-2026" class="{{ $input }}">
                 </div>
+                {{-- Only the Student Status Certification prints these: "currently pursuing year X, semester Y". --}}
                 <div>
-                    <label class="{{ $label }}">Comprehensive Exam Date</label>
+                    <label class="{{ $label }}">Study Status</label>
+                    <select name="study_status" class="{{ $input }}">
+                        <option value="studying">Studying · កំពុងសិក្សា</option>
+                        <option value="graduated">Graduated · បានបញ្ចប់ការសិក្សា</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="{{ $label }}">Current Year</label>
+                    <input type="text" name="current_year" maxlength="20" autocomplete="off" placeholder="e.g. 4" class="{{ $input }}">
+                </div>
+                <div>
+                    <label class="{{ $label }}">Current Semester</label>
+                    <input type="text" name="current_semester" maxlength="20" autocomplete="off" placeholder="e.g. 2" class="{{ $input }}">
+                </div>
+                <div data-request-only="provisional">
+                    <label class="{{ $label }}">Comprehensive Exam Date <span class="text-rose-500">*</span></label>
                     <input type="date" name="exam_date" class="{{ $input }}">
                 </div>
             </div>
+            <label data-request-only="provisional" class="flex items-start gap-3 p-4 rounded-2xl border border-neutral-200 dark:border-white/10 cursor-pointer">
+                <input type="checkbox" name="comprehensive_exam" value="1" class="mt-0.5 w-5 h-5 rounded text-emerald-600 focus:ring-emerald-500">
+                <span>
+                    <span class="block text-sm font-bold text-neutral-900 dark:text-white">បានជាប់ប្រឡងបញ្ចប់ការសិក្សា (Comprehensive exam passed)</span>
+                    <span class="block text-xs text-neutral-500">The Provisional Certificate <b>cannot be printed</b> without the exam date and this ticked.</span>
+                </span>
+            </label>
         </section>
 
         {{-- Courses — filled for every record; only the transcript layout prints them. --}}
@@ -221,7 +257,8 @@
                 </div>
             @endforeach
             <p class="text-[11px] text-neutral-400">
-                Max 5 subjects per semester. Leave the score empty for <b>IP</b> (in progress) — it can be saved, but the document <b>cannot be printed</b> while any course is IP or F (below 50).
+                Max 5 subjects per semester. Fill only the semesters requested for a Transcript or Student Status; a Provisional Certificate needs <b>every</b> year of the degree.
+                Leave the score empty for <b>IP</b> (in progress) — it can be saved, but the document <b>cannot be printed</b> while any course entered is IP or F (below 50).
             </p>
         </section>
 
@@ -242,7 +279,7 @@
                 @endforeach
             </div>
             <p class="text-[11px] text-neutral-400">
-                Tick each semester once its payment is verified. If any box is left unticked, the document can be saved but <b>cannot be printed</b>.
+                Tick each semester once its payment is verified. A semester with courses but no tick (any semester, for a Provisional Certificate) can be saved but <b>cannot be printed</b>.
             </p>
         </section>
 

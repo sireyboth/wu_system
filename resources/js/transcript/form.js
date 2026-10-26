@@ -5,8 +5,9 @@ import { getRenderedRow } from './table-render.js';
 import { gradeOf, gpaOf } from './grade.js';
 
 const FIELDS = [
-    'issue_no', 'name', 'surname', 'name_kh', 'dob', 'pob', 'pob_kh', 'address', 'student_code',
-    'sex', 'nationality', 'degree', 'major_id', 'academic_year', 'exam_date', 'date_kh', 'issue_date',
+    'request_type', 'issue_no', 'name', 'surname', 'name_kh', 'dob', 'pob', 'pob_kh', 'address', 'address_kh', 'student_code',
+    'sex', 'nationality', 'degree', 'major_id', 'academic_year', 'current_year', 'current_semester', 'study_status',
+    'exam_date', 'date_kh', 'issue_date',
     'person_in_charge', 'person_role', 'person_in_charge_kh', 'person_role_kh',
     'entrance_exam_description', 'remark',
 ];
@@ -20,6 +21,16 @@ export function applyDegree(dom) {
     dom.form.querySelectorAll('[data-year-tab]').forEach((tab) => tab.classList.toggle('hidden', Number(tab.dataset.yearTab) > years));
     dom.form.querySelectorAll('[data-pay-year]').forEach((box) => box.classList.toggle('hidden', Number(box.dataset.payYear) > years));
     if (state.activeYear > years) showYear(dom, 1);
+}
+
+/** Comprehensive exam fields only matter for a Provisional Certificate request. */
+export function applyRequestType(dom) {
+    const type = dom.form.elements.request_type.value;
+    dom.form.querySelectorAll('[data-request-only]').forEach((el) => el.classList.toggle('hidden', el.dataset.requestOnly !== type));
+}
+
+export function bindRequestType(dom) {
+    dom.form.elements.request_type?.addEventListener('change', () => applyRequestType(dom));
 }
 
 const paymentBoxes = (dom) => [...dom.form.querySelectorAll('input[name="payments"]')];
@@ -54,6 +65,7 @@ export function openForm(dom, id = null) {
         if (input && row) input.value = row[name] ?? '';
     });
     dom.form.elements.entrance_exam.checked = Boolean(row?.entrance_exam);
+    dom.form.elements.comprehensive_exam.checked = Boolean(row?.comprehensive_exam);
     fillPayments(dom, row?.payments);
 
     dom.form.querySelectorAll('[data-course-list]').forEach((list) => (list.innerHTML = ''));
@@ -69,6 +81,7 @@ export function openForm(dom, id = null) {
 
     showYear(dom, 1);
     applyDegree(dom);
+    applyRequestType(dom);
     recalc(dom);
     window.TranscriptModal.toggle(true);
 }
@@ -405,6 +418,7 @@ function collectPayload(dom) {
     });
     ['name', 'surname'].forEach((k) => payload[k] && (payload[k] = payload[k].toUpperCase()));
     payload.entrance_exam = dom.form.elements.entrance_exam.checked;
+    payload.comprehensive_exam = dom.form.elements.comprehensive_exam.checked;
 
     // Boxes past the degree's length are hidden and never count as paid.
     const years = programYears(dom);

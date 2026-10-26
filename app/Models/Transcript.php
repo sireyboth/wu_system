@@ -11,16 +11,29 @@ class Transcript extends IModel
     /** Request Docs — the layouts a record can be printed as, picked at print time. */
     public const TRANSCRIPT  = 'transcript';
     public const PROVISIONAL = 'provisional';
+    public const STATUS      = 'status';
+
+    /** study_status — how the Student Status Certification words the student's standing. */
+    public const STUDYING  = 'studying';
+    public const GRADUATED = 'graduated';
 
     public const DOC_TYPES = [
         self::TRANSCRIPT  => 'Transcript',
         self::PROVISIONAL => 'Provisional Certificate',
+        self::STATUS      => 'Student Status Certification',
+    ];
+
+    /** request_type — what the student asked for; picks the print rules. Status shares the transcript's. */
+    public const REQUEST_TYPES = [
+        self::TRANSCRIPT  => 'Transcript & Student Status',
+        self::PROVISIONAL => 'Provisional Certificate',
     ];
 
     protected $fillable = [
-        'status',
-        'issue_no', 'name', 'surname', 'name_kh', 'dob', 'pob', 'pob_kh', 'address', 'student_code', 'sex',
-        'nationality', 'degree', 'major_id', 'academic_year', 'exam_date', 'date_kh', 'issue_date',
+        'status', 'request_type',
+        'issue_no', 'name', 'surname', 'name_kh', 'dob', 'pob', 'pob_kh', 'address', 'address_kh', 'student_code', 'sex',
+        'nationality', 'degree', 'major_id', 'academic_year', 'current_year', 'current_semester', 'study_status',
+        'exam_date', 'comprehensive_exam', 'date_kh', 'issue_date',
         'person_in_charge', 'person_role', 'person_in_charge_kh', 'person_role_kh',
         'entrance_exam', 'entrance_exam_description', 'remark',
     ];
@@ -31,8 +44,9 @@ class Transcript extends IModel
         'dob'           => 'date',
         'issue_date'    => 'date',
         'exam_date'     => 'date',
-        'entrance_exam' => 'boolean',
-        'total_gpa'     => 'decimal:2',
+        'entrance_exam'      => 'boolean',
+        'comprehensive_exam' => 'boolean',
+        'total_gpa'          => 'decimal:2',
     ];
 
     public function major()
@@ -92,18 +106,26 @@ class Transcript extends IModel
         return $blocks;
     }
 
+    /** ["1-1" => "Y1 S1", …] — only the semesters that have courses entered. */
+    public function enteredSemesters(): array
+    {
+        $entered = $this->subjects->map(fn ($s) => "{$s->year}-{$s->semester}")->unique()->all();
+
+        return array_intersect_key($this->programSemesters(), array_flip($entered));
+    }
+
     /**
      * Semesters whose scores aren't complete: no course entered yet, or a
-     * course still IP (no score) or failed (F). Every semester of the
-     * degree has to be filled — one passing course isn't enough.
+     * course still IP (no score) or failed (F). With $all every semester
+     * of the degree has to be filled; otherwise only the entered ones count.
      */
-    public function incompleteScoreSemesters(): array
+    public function incompleteScoreSemesters(bool $all = true): array
     {
         $rows = $this->subjects->groupBy(fn ($s) => "{$s->year}-{$s->semester}");
 
         $missing = [];
         $failed  = [];
-        foreach ($this->programSemesters() as $block => $label) {
+        foreach ($all ? $this->programSemesters() : $this->enteredSemesters() as $block => $label) {
             $courses = $rows->get($block);
             if (! $courses) {
                 $missing[] = $label;
@@ -115,43 +137,71 @@ class Transcript extends IModel
         return [$missing, $failed];
     }
 
-    /** "Y1 S2"-style labels of the semesters not yet checked as paid. */
-    public function unpaidSemesters(): array
+    /** "Y1 S2"-style labels of the semesters not yet checked as paid — every semester, or only the entered ones. */
+    public function unpaidSemesters(bool $all = true): array
     {
         $paid = $this->payments->map(fn ($p) => "{$p->year}-{$p->semester}")->all();
 
-        return array_values(array_diff_key($this->programSemesters(), array_flip($paid)));
+        return array_values(array_diff_key($all ? $this->programSemesters() : $this->enteredSemesters(), array_flip($paid)));
     }
 
-    /** Why this record can't be printed yet — empty when it can. Needs subjects + payments loaded. */
-    public function printBlockers(): array
+    /**
+     * Why this record can't be printed as $docType (default: the type the
+     * student requested) — empty when it can. Needs subjects + payments loaded.
+     *   Transcript / Status: entrance exam, and the semesters entered must be passed and paid.
+     *   Provisional: entrance exam, every semester of the degree passed and paid,
+     *   and the comprehensive exam dated and passed.
+     */
+    public function printBlockers(?string $docType = null): array
     {
         if ($this->isDraft()) {
             return ['Draft — finish it and Save before printing'];
         }
+
+        $docType ??= $this->request_type ?: self::TRANSCRIPT;
+        $all = $docType === self::PROVISIONAL;
 
         $blockers = [];
         if (! $this->entrance_exam) {
             $blockers[] = 'Entrance exam not passed';
         }
 
-        [$missing, $failed] = $this->incompleteScoreSemesters();
+        [$missing, $failed] = $this->incompleteScoreSemesters($all);
         if ($missing) {
             $blockers[] = 'No courses: ' . implode(', ', $missing);
+        }
+        if ($docType === self::TRANSCRIPT && $this->subjects->isEmpty()) {
+            $blockers[] = 'No courses entered';
         }
         if ($failed) {
             $blockers[] = 'Failed (F) or no score (IP): ' . implode(', ', $failed);
         }
-        if ($unpaid = $this->unpaidSemesters()) {
+        if ($unpaid = $this->unpaidSemesters($all)) {
             $blockers[] = 'Unpaid: ' . implode(', ', $unpaid);
+        }
+
+        if ($all) {
+            if (! $this->exam_date) {
+                $blockers[] = 'Comprehensive exam date missing';
+            }
+            if (! $this->comprehensive_exam) {
+                $blockers[] = 'Comprehensive exam not passed';
+            }
         }
 
         return $blockers;
     }
 
-    /** Printing needs a final record, the entrance exam passed, every semester scored and passed, and every semester paid. */
-    public function canPrint(): bool
+    /** [doc_type => blockers] for every printable layout. */
+    public function printBlockersByType(): array
     {
-        return $this->printBlockers() === [];
+        return collect(array_keys(self::DOC_TYPES))
+            ->mapWithKeys(fn ($type) => [$type => $this->printBlockers($type)])
+            ->all();
+    }
+
+    public function canPrint(?string $docType = null): bool
+    {
+        return $this->printBlockers($docType) === [];
     }
 }

@@ -15,6 +15,16 @@ function formatDateEn(iso) {
     return new Date(iso).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
+const toKhDigits = (value) => String(value ?? '').replace(/\d/g, (d) => '០១២៣៤៥៦៧៨៩'[d]);
+
+// Academic year rolls over in November (an October 2026 letter reads 2025-2026).
+function academicYear(iso) {
+    if (!iso) return '';
+    const [y, m] = iso.split('-').map(Number);
+    const start = m >= 11 ? y : y - 1;
+    return `${start}-${start + 1}`;
+}
+
 function set(id, value) {
     const el = document.getElementById(id);
     if (el) el.textContent = value ?? '—';
@@ -29,7 +39,10 @@ function fillPrintArea(cert, student) {
     const major = student.major || {};
     const { en, kh } = student.degree_label;
 
-    const address = Array.isArray(person.addresses) && person.addresses.length ? person.addresses[0] : null;
+    const addresses = Array.isArray(person.addresses) ? person.addresses : [];
+    const address = addresses.find((a) => a.type === 'current') ?? null;
+    const birthPlace = addresses.find((a) => a.type === 'birth') ?? null;
+    const year = academicYear(cert.issue_date);
 
     const nameKh = [person.first_name_kh, person.last_name_kh].filter(Boolean).join(' ') || '—';
     const nameEn = [person.last_name, person.first_name].filter(Boolean).join(' ').toUpperCase() || '—';
@@ -40,20 +53,29 @@ function fillPrintArea(cert, student) {
     set('printCodeKh', student.code);
     set('printNationalityKh', person.nationality?.name_kh ?? 'ខ្មែរ');
     set('printDobKh', formatDobKh(person.dob));
+    set('printBirthPlaceKh', birthPlace?.province?.name_kh);
     set('printAddressKh', address?.province?.name_kh);
     set('printDegreeKh', kh);
     set('printMajorKh', major.name_kh);
+    set('printYearKh', toKhDigits(student.year_level));
+    set('printSemesterKh', toKhDigits(student.semester));
+    set('printAcademicYearKh', toKhDigits(year));
 
     set('printNameEn', nameEn);
     set('printSexEn', person.gender === 'female' ? 'Female' : 'Male');
     set('printCodeEn', student.code);
     set('printNationalityEn', person.nationality?.name_en ?? 'Khmer');
     set('printDobEn', formatDateEn(person.dob));
+    set('printBirthPlaceEn', birthPlace?.province?.name_en);
     set('printAddressEn', address?.province?.name_en);
     set('printDegreeEn', en);
     set('printMajorEn', major.name_en);
+    set('printYearEn', student.year_level);
+    set('printSemesterEn', student.semester);
+    set('printAcademicYearEn', year);
 
     set('printFullDateKh', cert.full_date_kh);
+    set('printShortDateKh', cert.short_date_kh ? `រាជធានីភ្នំពេញ ${cert.short_date_kh}` : '');
     set('printIssueDateEn', `Phnom Penh, ${formatDateEn(cert.issue_date)}`);
 }
 

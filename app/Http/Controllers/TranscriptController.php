@@ -28,6 +28,7 @@ class TranscriptController extends Controller
         $degrees       = collect(Degree::cases())->map(fn ($d) => ['value' => $d->value, 'label' => $d->name]);
 
         $docTypes      = Transcript::DOC_TYPES;
+        $requestTypes  = Transcript::REQUEST_TYPES;
 
         // Place of birth as printed: "Kampong Chhnang Province" / "ខេត្តកំពង់ឆ្នាំង"; Phnom Penh is the capital.
         $provinces = Province::query()->orderBy('name_en')->get(['name_en', 'name_kh'])
@@ -35,15 +36,15 @@ class TranscriptController extends Controller
                 ? ['en' => 'Phnom Penh', 'kh' => 'រាជធានីភ្នំពេញ']
                 : ['en' => "{$p->name_en} Province", 'kh' => "ខេត្ត{$p->name_kh}"]);
 
-        return view('transcript.index', compact('majors', 'subjects', 'nationalities', 'degrees', 'docTypes', 'provinces'));
+        return view('transcript.index', compact('majors', 'subjects', 'nationalities', 'degrees', 'docTypes', 'requestTypes', 'provinces'));
     }
 
     /**
      * Content only — the university prints onto pre-printed letterhead,
      * so this page has no logo/frame, just the body placed inside the
-     * letterhead's blank area. Every record shares the same print gates
-     * (Transcript::printBlockers); ?type= only picks the layout: the
-     * transcript's course table, or the bilingual provisional certificate.
+     * letterhead's blank area. ?type= picks the layout, and each layout
+     * has its own print gates (Transcript::printBlockers): Transcript and
+     * Status check the semesters entered, Provisional the whole degree.
      * The print itself is logged by Api\TranscriptController::print.
      */
     public function print(Request $request, Transcript $transcript)
@@ -53,10 +54,14 @@ class TranscriptController extends Controller
 
         $transcript->load(['major', 'subjects', 'payments']);
 
-        abort_unless($transcript->canPrint(), 403, 'Cannot print — ' . implode(' · ', $transcript->printBlockers()));
+        abort_unless($transcript->canPrint($type), 403, 'Cannot print — ' . implode(' · ', $transcript->printBlockers($type)));
 
         if ($type === Transcript::PROVISIONAL) {
             return view('transcript.provisional', compact('transcript'));
+        }
+
+        if ($type === Transcript::STATUS) {
+            return view('transcript.status', compact('transcript'));
         }
 
         // [year => [1 => rows, 2 => rows]], only years that have courses.

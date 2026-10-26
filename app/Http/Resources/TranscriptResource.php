@@ -7,6 +7,7 @@ class TranscriptResource extends IResource
     {
         return to_list($this, [
             'status'                    => $this->status,
+            'request_type'              => $this->request_type,
             'is_draft'                  => $this->isDraft(),
             'issue_no'                  => $this->issue_no,
             'name'                      => $this->name,
@@ -16,6 +17,7 @@ class TranscriptResource extends IResource
             'pob'                       => $this->pob,
             'pob_kh'                    => $this->pob_kh,
             'address'                   => $this->address,
+            'address_kh'                => $this->address_kh,
             'student_code'              => $this->student_code,
             'sex'                       => $this->sex,
             'nationality'               => $this->nationality,
@@ -28,7 +30,11 @@ class TranscriptResource extends IResource
                 'name_kh' => $this->major->name_kh,
             ] : null),
             'academic_year'             => $this->academic_year,
+            'current_year'              => $this->current_year,
+            'current_semester'          => $this->current_semester,
+            'study_status'              => $this->study_status,
             'exam_date'                 => $this->exam_date?->format('Y-m-d'),
+            'comprehensive_exam'        => $this->comprehensive_exam,
             'date_kh'                   => $this->date_kh,
             'issue_date'                => $this->issue_date?->format('Y-m-d'),
             'person_in_charge'          => $this->person_in_charge,
@@ -42,6 +48,8 @@ class TranscriptResource extends IResource
             'program_years'             => $this->program_years,
             'can_print'                 => $this->canPrint(),
             'print_blockers'            => $this->printBlockers(),
+            // Every layout can be picked at print time; each is checked against its own rules.
+            'print_blockers_by_type'    => $this->printBlockersByType(),
             // Times printed per layout + the latest print, for the reprint warning.
             'print_counts'              => $this->whenLoaded('prints', fn () => $this->prints->countBy('doc_type')),
             'last_print'                => $this->whenLoaded('prints', fn () => ($last = $this->prints->first()) ? [

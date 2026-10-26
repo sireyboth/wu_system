@@ -79,7 +79,11 @@ class TranscriptController extends Controller
         ]);
 
         $transcript->load(['subjects', 'payments']);
-        abort_unless($transcript->canPrint(), 422, 'Cannot print — ' . implode(' · ', $transcript->printBlockers()));
+        abort_unless(
+            $transcript->canPrint($data['doc_type']),
+            422,
+            'Cannot print ' . Transcript::DOC_TYPES[$data['doc_type']] . ' — ' . implode(' · ', $transcript->printBlockers($data['doc_type']))
+        );
 
         $transcript->prints()->create(['doc_type' => $data['doc_type'], 'printed_by' => auth()->id()]);
 
@@ -102,8 +106,9 @@ class TranscriptController extends Controller
      * Summary for the Report modal: status counts, GPA spread of the final
      * transcripts, and breakdowns by major and degree. All filters optional;
      * doc_type keeps the records that have been printed as that layout.
-     * "printable" / "blocked" = final records that do / don't pass every
-     * print gate (Transcript::canPrint) — worked out on the loaded rows.
+     * "printable" / "blocked" = final records that do / don't pass the
+     * print gates of the document they requested (Transcript::canPrint) —
+     * worked out on the loaded rows.
      */
     public function report(Request $request)
     {
@@ -127,7 +132,7 @@ class TranscriptController extends Controller
                 'draft'  => $q->where('status', Transcript::DRAFT),
                 default  => $q->where('status', Transcript::FINAL),
             })
-            ->get(['id', 'status', 'entrance_exam', 'degree', 'major_id', 'total_gpa']);
+            ->get(['id', 'status', 'request_type', 'entrance_exam', 'exam_date', 'comprehensive_exam', 'degree', 'major_id', 'total_gpa']);
 
         $rows = match ($filters['status'] ?? null) {
             'printable' => $rows->filter(fn ($t) => $t->canPrint())->values(),
