@@ -54,14 +54,17 @@ class TranscriptController extends Controller
 
         $transcript->load(['major', 'subjects', 'payments']);
 
-        abort_unless($transcript->canPrint($type), 403, 'Cannot print — ' . implode(' · ', $transcript->printBlockers($type)));
+        // A preview isn't logged and can't be printed (partials/preview), so it skips the gates and lists them instead.
+        $preview  = $request->boolean('preview');
+        $blockers = $transcript->printBlockers($type);
+        abort_unless($preview || $blockers === [], 403, 'Cannot print — ' . implode(' · ', $blockers));
 
         if ($type === Transcript::PROVISIONAL) {
-            return view('transcript.provisional', compact('transcript'));
+            return view('transcript.provisional', compact('transcript', 'preview', 'blockers'));
         }
 
         if ($type === Transcript::STATUS) {
-            return view('transcript.status', compact('transcript'));
+            return view('transcript.status', compact('transcript', 'preview', 'blockers'));
         }
 
         // [year => [1 => rows, 2 => rows]], only years that have courses.
@@ -70,6 +73,6 @@ class TranscriptController extends Controller
 
         $detail = $request->boolean('detail');
 
-        return view('transcript.print', compact('transcript', 'years', 'detail'));
+        return view('transcript.print', compact('transcript', 'years', 'detail', 'preview', 'blockers'));
     }
 }

@@ -92,6 +92,38 @@ class TranscriptController extends Controller
         ]);
     }
 
+    /**
+     * Earlier requests under the same student ID, newest first — the form
+     * warns with these before saving another one (still allowed). "Who"
+     * comes from the activity log's created entry.
+     */
+    public function studentRequests(Request $request)
+    {
+        $data = $request->validate([
+            'student_code' => 'required|string|max:50',
+            'except'       => 'nullable|integer',
+        ]);
+
+        $rows = Transcript::query()
+            ->where('student_code', trim($data['student_code']))
+            ->when($data['except'] ?? null, fn ($q, $id) => $q->whereKeyNot($id))
+            ->with(['activities' => fn ($q) => $q->where('event', 'created')->with('causer')])
+            ->withCount('prints')
+            ->latest('id')
+            ->get();
+
+        return response()->json($rows->map(fn ($t) => [
+            'id'           => $t->id,
+            'issue_no'     => $t->issue_no,
+            'name_kh'      => $t->name_kh,
+            'request_type' => Transcript::REQUEST_TYPES[$t->request_type] ?? $t->request_type,
+            'is_draft'     => $t->isDraft(),
+            'prints'       => $t->prints_count,
+            'requested_at' => $t->created_at?->format('Y-m-d H:i'),
+            'requested_by' => $t->activities->first()?->causer?->name,
+        ]));
+    }
+
     public function restore(Transcript $transcript)
     {
         return $this->enable($transcript);

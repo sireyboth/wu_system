@@ -53,12 +53,10 @@ function renderRow(row, number) {
 
     const btn = 'inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-colors';
     const blockedReason = escapeHtml((row.print_blockers ?? []).join(' · ') || 'Cannot print');
-    // Any layout can still be picked when the requested one is blocked — each is checked on its own rules.
-    const printBtn = row.is_draft
-        ? `<span title="${blockedReason}" class="${btn} cursor-not-allowed text-neutral-400 bg-neutral-100 dark:bg-white/5">បោះពុម្ព (Print)</span>`
-        : row.can_print
-            ? `<button data-action="print" data-id="${row.id}" class="${btn} text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20">បោះពុម្ព (Print)</button>`
-            : `<button data-action="print" data-id="${row.id}" title="${blockedReason}" class="${btn} text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20">បោះពុម្ព (Print)</button>`;
+    // Always opens the picker: any layout can be previewed, and each is print-checked on its own rules.
+    const printBtn = row.can_print
+        ? `<button data-action="print" data-id="${row.id}" class="${btn} text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20">បោះពុម្ព (Print)</button>`
+        : `<button data-action="print" data-id="${row.id}" title="${blockedReason}" class="${btn} text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20">បោះពុម្ព (Print)</button>`;
     const actions = [
         printBtn,
         state.permissions.edit

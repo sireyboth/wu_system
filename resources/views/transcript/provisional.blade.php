@@ -377,8 +377,11 @@
 </head>
 
 <body>
+    @include('transcript.partials.preview')
     <div class="toolbar">
-        <button type="button" onclick="window.print()">🖨 Print</button>
+        @unless ($preview)
+            <button type="button" onclick="window.print()">🖨 Print</button>
+        @endunless
         <label><input type="checkbox" id="showPhoto"> Photo box</label>
         <label><input type="checkbox" id="showNote"> Note line</label>
         <span>Printer offset — X <input type="number" step="0.5" id="offsetX"> mm &nbsp; Y <input type="number" step="0.5" id="offsetY"> mm</span>

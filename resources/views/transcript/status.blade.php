@@ -367,8 +367,11 @@
 </head>
 
 <body>
+    @include('transcript.partials.preview')
     <div class="toolbar">
-        <button type="button" onclick="window.print()">🖨 Print</button>
+        @unless ($preview)
+            <button type="button" onclick="window.print()">🖨 Print</button>
+        @endunless
         <span>Printer offset — X <input type="number" step="0.5" id="offsetX"> mm &nbsp; Y <input type="number" step="0.5" id="offsetY"> mm</span>
         <span style="opacity:.7">Load the letterhead paper · A4 · scale 100% · margins none</span>
     </div>

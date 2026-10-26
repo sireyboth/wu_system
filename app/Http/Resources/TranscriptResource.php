@@ -50,6 +50,8 @@ class TranscriptResource extends IResource
             'print_blockers'            => $this->printBlockers(),
             // Every layout can be picked at print time; each is checked against its own rules.
             'print_blockers_by_type'    => $this->printBlockersByType(),
+            // Print page without ?type; the picker's Preview adds type + preview=1 (not logged).
+            'preview_url'               => route('transcript.print', $this->id),
             // Times printed per layout + the latest print, for the reprint warning.
             'print_counts'              => $this->whenLoaded('prints', fn () => $this->prints->countBy('doc_type')),
             'last_print'                => $this->whenLoaded('prints', fn () => ($last = $this->prints->first()) ? [

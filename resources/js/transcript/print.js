@@ -58,20 +58,24 @@ async function chooseDocType(row, counts) {
     const entries = Object.entries(state.docTypes);
     const selected = entries.some(([value]) => value === row?.request_type) ? row.request_type : entries[0]?.[0];
 
-    const { value } = await Swal.fire({
+    const checkedType = () => Swal.getPopup().querySelector('input[name="docType"]:checked')?.value;
+
+    const { value, isDenied } = await Swal.fire({
         title: 'ជ្រើសរើសឯកសារ',
         html: `
             <p class="mb-4 text-sm text-neutral-500 dark:text-neutral-400">
-                Choose the document to print${student ? `<br><span class="font-medium text-neutral-700 dark:text-neutral-200">${student}</span>` : ''}
+                Choose the document to preview or print${student ? `<br><span class="font-medium text-neutral-700 dark:text-neutral-200">${student}</span>` : ''}
             </p>
             <div class="space-y-2.5">
                 ${entries.map((entry) => docTypeCard(entry, entry[0] === selected, counts, row?.print_blockers_by_type ?? {})).join('')}
             </div>`,
         width: 460,
         showCancelButton: true,
+        showDenyButton: true,
         reverseButtons: true,
         buttonsStyling: false,
         confirmButtonText: 'បោះពុម្ព (Print)',
+        denyButtonText: 'មើលជាមុន (Preview)',
         cancelButtonText: 'បោះបង់',
         customClass: {
             popup: '!rounded-2xl !p-0 overflow-hidden dark:!bg-neutral-900 border border-neutral-200 dark:border-white/10',
@@ -80,28 +84,41 @@ async function chooseDocType(row, counts) {
             actions: '!w-full !mt-6 !mb-0 !px-6 !py-4 !justify-end gap-2 border-t border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-white/5',
             confirmButton: 'px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-neutral-900',
             cancelButton: 'px-4 py-2 text-sm font-medium rounded-lg text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-white/10 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500',
+            denyButton: 'px-4 py-2 text-sm font-medium rounded-lg text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500',
         },
         didOpen: (popup) => {
-            // Double-click a card to print straight away.
-            popup.querySelectorAll('[data-doc-card]').forEach((card) => card.addEventListener('dblclick', () => Swal.clickConfirm()));
+            // Double-click a card to preview — never prints (or counts) by accident.
+            popup.querySelectorAll('[data-doc-card]').forEach((card) => card.addEventListener('dblclick', () => Swal.clickDeny()));
         },
-        preConfirm: () => Swal.getPopup().querySelector('input[name="docType"]:checked')?.value,
+        preConfirm: checkedType,
+        preDeny: checkedType,
     });
 
-    return value;
+    return value ? { type: value, preview: isDenied } : undefined;
+}
+
+/** Opens the layout in preview mode — not logged, and the page itself refuses to print. */
+function previewDocument(row, type) {
+    const url = new URL(row.preview_url, window.location.origin);
+    url.searchParams.set('type', type);
+    url.searchParams.set('preview', '1');
+    window.open(url.toString(), '_blank');
 }
 
 /**
- * Print flow: pick the layout (Transcript / Provisional / …), confirm when
- * that layout was printed before, log the print, then open the page. The
- * server logs it (Api\TranscriptController::print) and re-checks the gates.
+ * Print flow: pick the layout (Transcript / Provisional / …), then either
+ * Preview it (nothing logged) or Print: confirm when that layout was printed
+ * before, log the print, then open the page. The server logs it
+ * (Api\TranscriptController::print) and re-checks the gates.
  */
 export async function printDocument(ApiService, id, onDone) {
     const row = getRenderedRow(id);
     const counts = row?.print_counts ?? {};
 
-    const type = await chooseDocType(row, counts);
-    if (!type) return;
+    const choice = await chooseDocType(row, counts);
+    if (!choice) return;
+    if (choice.preview) return previewDocument(row, choice.type);
+    const { type } = choice;
 
     const label = state.docTypes[type] ?? type;
     if (counts[type]) {

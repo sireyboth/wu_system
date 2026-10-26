@@ -6,7 +6,7 @@ import { renderPagination, bindPagination } from '../invigilator/pagination.js';
 import { renderTable } from './table-render.js';
 import { openReport, bindReport } from './report.js';
 import { printDocument } from './print.js';
-import { openForm, applyDegree, bindPlaceOfBirth, bindRequestType, bindCourses, bindSubjectEdit, bindKhmerDate, submitForm, handleDelete } from './form.js';
+import { openForm, applyDegree, bindPlaceOfBirth, bindRequestType, bindStudentCode, bindCourses, bindSubjectEdit, bindKhmerDate, submitForm, handleDelete } from './form.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const dom = {
@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     bindKhmerDate(dom);
     bindPlaceOfBirth(dom);
     bindRequestType(dom);
+    bindStudentCode(dom, ApiService);
     dom.form?.addEventListener('change', (e) => e.target.name === 'degree' && applyDegree(dom));
 
     dom.form?.addEventListener('submit', (e) => {

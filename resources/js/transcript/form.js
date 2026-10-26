@@ -456,6 +456,108 @@ function findIncompleteRow(dom) {
     return null;
 }
 
+/**
+ * Same student ID already requested? Show when and by whom — creating is
+ * still allowed. Skipped when an existing record keeps its own ID.
+ * Resolves false when the user cancels.
+ */
+async function confirmRepeatStudent(dom, ApiService) {
+    const code = dom.form.elements.student_code.value.trim();
+    const editing = state.editingId;
+    if (!code || (editing && getRenderedRow(editing)?.student_code === code)) return true;
+
+    const params = new URLSearchParams({ student_code: code });
+    if (editing) params.set('except', editing);
+    const { error, data } = await ApiService.request(`${CONFIG.TRANSCRIPTS_API}/student-requests?${params}`);
+    // A failed lookup shouldn't block saving.
+    const earlier = error ? [] : (data?.data ?? data ?? []);
+    if (!earlier.length) return true;
+
+    const { isConfirmed } = await Swal.fire({
+        html: repeatStudentHtml(code, earlier, Boolean(editing)),
+        width: 500,
+        showCancelButton: true,
+        reverseButtons: true,
+        buttonsStyling: false,
+        focusCancel: true,
+        confirmButtonText: 'បន្ត (Continue anyway)',
+        cancelButtonText: 'បោះបង់ (Cancel)',
+        customClass: {
+            popup: '!rounded-2xl !p-0 overflow-hidden dark:!bg-neutral-900 border border-neutral-200 dark:border-white/10',
+            htmlContainer: '!m-0 !p-0 !text-left',
+            actions: '!w-full !mt-0 !mb-0 !px-6 !py-4 !justify-end gap-2 border-t border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-white/5',
+            confirmButton: 'px-4 py-2 text-sm font-medium text-white bg-amber-600 rounded-lg hover:bg-amber-700 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-neutral-900',
+            cancelButton: 'px-4 py-2 text-sm font-medium rounded-lg text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-white/10 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500',
+        },
+    });
+    return isConfirmed;
+}
+
+const pill = (tone, text) => `<span class="shrink-0 px-2 py-0.5 rounded-full text-[11px] font-semibold ${tone}">${text}</span>`;
+
+/** Header + one card per earlier request, styled like the print picker. */
+function repeatStudentHtml(code, earlier, editing) {
+    const nameKh = earlier.find((r) => r.name_kh)?.name_kh;
+
+    const cards = earlier.map((r) => `
+        <li class="p-3.5 rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.02]">
+            <div class="flex items-center gap-2">
+                <span class="font-mono text-sm font-bold text-neutral-900 dark:text-white truncate">${escapeHtml(r.issue_no || '—')}</span>
+                ${r.is_draft ? pill('bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400', 'Draft') : ''}
+                <span class="ms-auto"></span>
+                ${r.prints
+                    ? pill('bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400', `បោះពុម្ព ${r.prints}×`)
+                    : pill('bg-neutral-100 text-neutral-500 dark:bg-white/5 dark:text-neutral-400', 'មិនទាន់បោះពុម្ព')}
+            </div>
+            <div class="mt-1 text-xs font-medium text-indigo-600 dark:text-indigo-400">${escapeHtml(r.request_type ?? '')}</div>
+            <div class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-neutral-500 dark:text-neutral-400">
+                <span>🕒 ${escapeHtml(r.requested_at ?? '—')}</span>
+                <span>👤 ${escapeHtml(r.requested_by ?? '—')}</span>
+            </div>
+        </li>`).join('');
+
+    return `
+        <div class="px-6 pt-6 pb-5">
+            <div class="flex items-start gap-3">
+                <span class="flex items-center justify-center w-10 h-10 shrink-0 rounded-full bg-amber-100 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0 3.75h.008M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                </span>
+                <div class="min-w-0">
+                    <h3 class="text-base font-bold text-neutral-900 dark:text-white">និស្សិតនេះបានស្នើរួចហើយ</h3>
+                    <p class="text-sm text-neutral-500 dark:text-neutral-400">This student ID already has ${earlier.length} request${earlier.length > 1 ? 's' : ''}</p>
+                </div>
+            </div>
+
+            <div class="mt-4 flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-neutral-100 dark:bg-white/5">
+                <span class="font-mono text-sm font-bold text-neutral-900 dark:text-white">${escapeHtml(code)}</span>
+                ${nameKh ? `<span class="text-sm text-neutral-600 dark:text-neutral-300 truncate">${escapeHtml(nameKh)}</span>` : ''}
+            </div>
+
+            <ul class="mt-3 space-y-2 max-h-64 overflow-y-auto">${cards}</ul>
+
+            <p class="mt-4 text-xs text-neutral-500 dark:text-neutral-400">
+                You can still continue. ${editing ? 'Cancel puts the saved ID back.' : 'Cancel closes this form without saving.'}
+            </p>
+        </div>`;
+}
+
+/**
+ * Checked as soon as the ID is entered (change = on leaving the field), not
+ * at Save, so nobody fills the whole form first. Cancel drops the request:
+ * a new one closes the form, an edit gets its saved ID back.
+ */
+export function bindStudentCode(dom, ApiService) {
+    dom.form.elements.student_code?.addEventListener('change', async (e) => {
+        if (await confirmRepeatStudent(dom, ApiService)) return;
+
+        if (state.editingId) {
+            e.target.value = getRenderedRow(state.editingId)?.student_code ?? '';
+        } else {
+            window.TranscriptModal.toggle(false);
+        }
+    });
+}
+
 export async function submitForm(dom, ApiService, onDone, { draft = false } = {}) {
     const problem = draft ? null : findIncompleteRow(dom);
     if (problem) {

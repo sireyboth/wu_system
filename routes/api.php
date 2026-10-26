@@ -111,6 +111,9 @@ Route::prefix('v1')->middleware('auth')->group(function () {
         ->get('/transcripts/report', [TranscriptController::class, 'report'])
         ->name('transcripts.report');
     Route::middleware('permission:certificate.view')
+        ->get('/transcripts/student-requests', [TranscriptController::class, 'studentRequests'])
+        ->name('transcripts.student-requests');
+    Route::middleware('permission:certificate.view')
         ->post('/transcripts/{transcript}/prints', [TranscriptController::class, 'print'])
         ->name('transcripts.print');
 

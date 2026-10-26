@@ -280,8 +280,11 @@
 </head>
 
 <body>
+    @include('transcript.partials.preview')
     <div class="toolbar">
-        <button type="button" class="primary" onclick="window.print()">🖨 Print</button>
+        @unless ($preview)
+            <button type="button" class="primary" onclick="window.print()">🖨 Print</button>
+        @endunless
         <a class="ghost" href="{{ request()->fullUrlWithQuery(['detail' => $detail ? 0 : 1]) }}">
             {{ $detail ? 'Hide' : 'Show' }} score &amp; grade point columns
         </a>
